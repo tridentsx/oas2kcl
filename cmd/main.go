@@ -28,7 +28,7 @@ func main() {
 
 	// Load and validate the OpenAPI schema
 	log.Printf("loading OpenAPI schema from %s", *oasFile)
-	doc, err := openapikcl.LoadOpenAPISchema(*oasFile, openapikcl.LoadOptions{
+	doc, version, err := openapikcl.LoadOpenAPISchema(*oasFile, openapikcl.LoadOptions{
 		FlattenSpec: !*skipFlatten,
 		SkipRemote:  *skipRemote,
 		MaxDepth:    *maxDepth,
@@ -37,11 +37,12 @@ func main() {
 		log.Fatalf("failed to load OpenAPI schema: %v", err)
 	}
 
+	log.Printf("detected OpenAPI version: %s", version)
 	log.Print("OpenAPI schema validation successful")
 
 	// Generate the KCL schema
 	log.Print("generating KCL schemas")
-	err = openapikcl.GenerateKCLSchemas(doc, *outFile, *packageName)
+	err = openapikcl.GenerateKCLSchemas(doc, *outFile, *packageName, version)
 	if err != nil {
 		log.Fatalf("failed to generate KCL schema: %v", err)
 	}

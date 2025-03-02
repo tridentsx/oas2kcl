@@ -63,56 +63,62 @@ func ConvertTypeToKCL(oapiType, format string) string {
 }
 
 // GenerateConstraints creates KCL constraint expressions for a schema
-func GenerateConstraints(schema *openapi3.Schema, fieldName string) []string {
+func GenerateConstraints(schema *openapi3.Schema, fieldName string, useSelfPrefix bool) []string {
 	var constraints []string
+
+	// Prefix field name with self. for KCL constraint context if requested
+	kclFieldRef := fieldName
+	if useSelfPrefix {
+		kclFieldRef = "self." + fieldName
+	}
 
 	// Required validation is handled at the schema level
 
 	// String constraints - MinLength is uint64 (non-pointer)
 	if schema.MinLength > 0 {
-		constraints = append(constraints, fmt.Sprintf("len(%s) >= %d", fieldName, schema.MinLength))
+		constraints = append(constraints, fmt.Sprintf("len(%s) >= %d", kclFieldRef, schema.MinLength))
 	}
 	// MaxLength is *uint64 (pointer)
 	if schema.MaxLength != nil && *schema.MaxLength > 0 {
-		constraints = append(constraints, fmt.Sprintf("len(%s) <= %d", fieldName, *schema.MaxLength))
+		constraints = append(constraints, fmt.Sprintf("len(%s) <= %d", kclFieldRef, *schema.MaxLength))
 	}
 	if schema.Pattern != "" {
 		// KCL uses regex matching
-		constraints = append(constraints, fmt.Sprintf("regex.match(%s, r\"%s\")", fieldName, schema.Pattern))
+		constraints = append(constraints, fmt.Sprintf("regex.match(%s, r\"%s\")", kclFieldRef, schema.Pattern))
 	}
 
 	// Numeric constraints
 	if schema.Min != nil {
 		if schema.ExclusiveMin {
-			constraints = append(constraints, fmt.Sprintf("%s > %v", fieldName, *schema.Min))
+			constraints = append(constraints, fmt.Sprintf("%s > %v", kclFieldRef, *schema.Min))
 		} else {
-			constraints = append(constraints, fmt.Sprintf("%s >= %v", fieldName, *schema.Min))
+			constraints = append(constraints, fmt.Sprintf("%s >= %v", kclFieldRef, *schema.Min))
 		}
 	}
 	if schema.Max != nil {
 		if schema.ExclusiveMax {
-			constraints = append(constraints, fmt.Sprintf("%s < %v", fieldName, *schema.Max))
+			constraints = append(constraints, fmt.Sprintf("%s < %v", kclFieldRef, *schema.Max))
 		} else {
-			constraints = append(constraints, fmt.Sprintf("%s <= %v", fieldName, *schema.Max))
+			constraints = append(constraints, fmt.Sprintf("%s <= %v", kclFieldRef, *schema.Max))
 		}
 	}
 	if schema.MultipleOf != nil {
 		// KCL doesn't have a direct way to check if a number is a multiple of another
 		// But we can use a modulo check
-		constraints = append(constraints, fmt.Sprintf("%s %% %v == 0", fieldName, *schema.MultipleOf))
+		constraints = append(constraints, fmt.Sprintf("%s %% %v == 0", kclFieldRef, *schema.MultipleOf))
 	}
 
 	// Array constraints - MinItems is uint64 (non-pointer)
 	if schema.MinItems > 0 {
-		constraints = append(constraints, fmt.Sprintf("len(%s) >= %d", fieldName, schema.MinItems))
+		constraints = append(constraints, fmt.Sprintf("len(%s) >= %d", kclFieldRef, schema.MinItems))
 	}
 	// MaxItems is *uint64 (pointer)
 	if schema.MaxItems != nil && *schema.MaxItems > 0 {
-		constraints = append(constraints, fmt.Sprintf("len(%s) <= %d", fieldName, *schema.MaxItems))
+		constraints = append(constraints, fmt.Sprintf("len(%s) <= %d", kclFieldRef, *schema.MaxItems))
 	}
 	if schema.UniqueItems {
-		// KCL doesn't have a direct uniqueness check, but we can compare length with set length
-		constraints = append(constraints, fmt.Sprintf("len(%s) == len(set(%s))", fieldName, fieldName))
+		// Use isunique function in KCL to check uniqueness
+		constraints = append(constraints, fmt.Sprintf("isunique(%s)", kclFieldRef))
 	}
 
 	// Enum validation
@@ -127,7 +133,7 @@ func GenerateConstraints(schema *openapi3.Schema, fieldName string) []string {
 				values[i] = fmt.Sprintf("%v", value)
 			}
 		}
-		constraints = append(constraints, fmt.Sprintf("%s in [%s]", fieldName, strings.Join(values, ", ")))
+		constraints = append(constraints, fmt.Sprintf("%s in [%s]", kclFieldRef, strings.Join(values, ", ")))
 	}
 
 	return constraints

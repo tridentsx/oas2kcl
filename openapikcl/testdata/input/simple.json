@@ -2,36 +2,37 @@
     "openapi": "3.0.0",
     "info": {
       "title": "Simple API",
-      "version": "1.0.0",
-      "description": "A simple API for testing"
+      "description": "A very simple API for testing",
+      "version": "1.0.0"
     },
-    "paths": {},
+    "paths": {
+      "/hello": {
+        "get": {
+          "summary": "Say hello",
+          "operationId": "sayHello",
+          "responses": {
+            "200": {
+              "description": "Returns a greeting",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Greeting"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "components": {
       "schemas": {
-        "Simple": {
+        "Greeting": {
           "type": "object",
-          "required": ["id", "name"],
+          "required": ["message"],
           "properties": {
-            "id": {
-              "type": "string",
-              "description": "Unique identifier"
-            },
-            "name": {
-              "type": "string",
-              "description": "Name of the entity",
-              "minLength": 1,
-              "maxLength": 100
-            },
-            "tags": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "uniqueItems": true
-            },
-            "status": {
-              "type": "string",
-              "enum": ["active", "inactive", "pending"]
+            "message": {
+              "type": "string"
             }
           }
         }

@@ -30,6 +30,11 @@ func collectSchemas(schemas openapi3.Schemas) []string {
 	return keys
 }
 
+// isSorted checks if a slice of strings is already sorted
+func isSorted(strs []string) bool {
+	return sort.StringsAreSorted(strs)
+}
+
 // mergeSchemas merges multiple schemas into a single schema
 func mergeSchemas(schemas []*openapi3.SchemaRef) (*openapi3.SchemaRef, error) {
 	if len(schemas) == 0 {

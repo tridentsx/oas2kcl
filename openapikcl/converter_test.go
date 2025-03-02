@@ -99,7 +99,7 @@ func TestGenerateConstraints(t *testing.T) {
 			expectedCons: []string{
 				"len(tags) >= 5",
 				"len(tags) <= 20",
-				"len(tags) == len(set(tags))",
+				"isunique(tags)",
 			},
 		},
 		{
@@ -116,7 +116,7 @@ func TestGenerateConstraints(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			constraints := GenerateConstraints(tc.schema, tc.fieldName)
+			constraints := GenerateConstraints(tc.schema, tc.fieldName, false)
 
 			// Check if all expected constraints are present
 			for _, expected := range tc.expectedCons {

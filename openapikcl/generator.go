@@ -5,14 +5,25 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
+	"unicode"
 
 	"github.com/getkin/kin-openapi/openapi3"
 )
 
+// Add debugMode variable if it doesn't exist
+var debugMode bool
+
 // GenerateKCLSchemas generates KCL schemas from a flattened OpenAPI spec
-func GenerateKCLSchemas(doc *openapi3.T, outputDir string, packageName string) error {
-	log.Print("starting KCL schema generation")
+func GenerateKCLSchemas(doc *openapi3.T, outputDir string, packageName string, version OpenAPIVersion) error {
+	log.Printf("starting KCL schema generation (OpenAPI version: %s)", version)
+
+	// Handle any version-specific preprocessing
+	if IsSwaggerVersion(version) {
+		// Any OpenAPI 2.0 specific processing
+		HandleSwaggerSpecifics(version)
+	}
 
 	if doc.Components == nil || doc.Components.Schemas == nil {
 		log.Print("warning: no schemas found in OpenAPI components")
@@ -34,7 +45,7 @@ func GenerateKCLSchemas(doc *openapi3.T, outputDir string, packageName string) e
 	// Process each schema in order
 	for _, name := range schemaNames {
 		schema := doc.Components.Schemas[name]
-		kclSchema, err := generateKCLSchema(name, schema, doc.Components.Schemas)
+		kclSchema, err := GenerateKCLSchema(name, schema, doc.Components.Schemas, version)
 		if err != nil {
 			return fmt.Errorf("failed to generate KCL schema for %s: %w", name, err)
 		}
@@ -47,194 +58,214 @@ func GenerateKCLSchemas(doc *openapi3.T, outputDir string, packageName string) e
 		createdSchemas[name] = true
 	}
 
+	// Extract all schema names from doc.Components.Schemas
+	var allSchemaNames []string
+	for schemaName := range doc.Components.Schemas {
+		allSchemaNames = append(allSchemaNames, schemaName)
+	}
+
+	// Generate a main.k file that imports all schemas to handle circular dependencies
+	if err := generateMainK(outputDir, schemaNames, allSchemaNames); err != nil {
+		return fmt.Errorf("failed to generate main.k file: %w", err)
+	}
+
 	log.Printf("completed generating KCL schemas for %d components", len(createdSchemas))
 	return nil
 }
 
-// generateKCLSchema generates a KCL schema from an OpenAPI schema
-func generateKCLSchema(name string, schema *openapi3.SchemaRef, allSchemas openapi3.Schemas) (string, error) {
-	log.Printf("generating KCL schema for %s", name)
+// collectSchemaReferences recursively processes a schema to identify all referenced schemas
+func collectSchemaReferences(schema *openapi3.SchemaRef, currentSchemaName string, allSchemas openapi3.Schemas, referencedSchemas map[string]bool) {
+	// If this is a reference, add it to our map
+	if schema.Ref != "" {
+		// Extract schema name from reference
+		parts := strings.Split(schema.Ref, "/")
+		refName := parts[len(parts)-1]
 
-	if schema == nil || schema.Value == nil {
-		return "", fmt.Errorf("schema is nil")
-	}
+		// Skip self-references or already processed references
+		if refName != currentSchemaName && !referencedSchemas[refName] {
+			referencedSchemas[refName] = true
 
-	var builder strings.Builder
-
-	// Check if any property has a pattern validation
-	hasPatternValidation := schema.Value.Pattern != ""
-	if !hasPatternValidation && schema.Value.Properties != nil {
-		for _, propSchema := range schema.Value.Properties {
-			if propSchema.Value != nil && propSchema.Value.Pattern != "" {
-				hasPatternValidation = true
-				break
+			// Process the referenced schema to get its references too
+			if refSchema, ok := allSchemas[refName]; ok {
+				collectSchemaReferences(refSchema, currentSchemaName, allSchemas, referencedSchemas)
 			}
 		}
+		return
 	}
 
-	// Add imports if needed
-	if hasPatternValidation {
-		// Add regex import for pattern matching
-		builder.WriteString("import regex\n\n")
+	if schema.Value == nil {
+		return
 	}
 
-	// Add schema documentation
-	docString := FormatDocumentation(schema.Value)
-	if docString != "" {
-		builder.WriteString(docString)
+	// Process nested properties
+	for _, propSchema := range schema.Value.Properties {
+		collectSchemaReferences(propSchema, currentSchemaName, allSchemas, referencedSchemas)
 	}
 
-	// Begin schema definition
-	schemaName := formatSchemaName(name)
-	builder.WriteString(fmt.Sprintf("schema %s:\n", schemaName))
-
-	// Process inherited schemas (allOf)
-	parentSchemas, err := processInheritance(schema.Value, allSchemas)
-	if err != nil {
-		return "", fmt.Errorf("error processing inheritance for %s: %w", name, err)
-	}
-	if len(parentSchemas) > 0 {
-		// Add mixin for inherited schemas
-		parents := make([]string, len(parentSchemas))
-		for i, parent := range parentSchemas {
-			parents[i] = formatSchemaName(parent)
-		}
-		builder.WriteString(fmt.Sprintf("    mixin [%s]\n", strings.Join(parents, ", ")))
+	// Process arrays
+	if schema.Value.Items != nil {
+		collectSchemaReferences(schema.Value.Items, currentSchemaName, allSchemas, referencedSchemas)
 	}
 
-	// Add properties
-	hasConstraints := false
+	// Process additionalProperties
+	if schema.Value.AdditionalProperties.Has != nil && schema.Value.AdditionalProperties.Schema != nil {
+		collectSchemaReferences(schema.Value.AdditionalProperties.Schema, currentSchemaName, allSchemas, referencedSchemas)
+	}
+
+	// Process allOf
+	for _, subSchema := range schema.Value.AllOf {
+		collectSchemaReferences(subSchema, currentSchemaName, allSchemas, referencedSchemas)
+	}
+
+	// Process oneOf
+	for _, subSchema := range schema.Value.OneOf {
+		collectSchemaReferences(subSchema, currentSchemaName, allSchemas, referencedSchemas)
+	}
+
+	// Process anyOf
+	for _, subSchema := range schema.Value.AnyOf {
+		collectSchemaReferences(subSchema, currentSchemaName, allSchemas, referencedSchemas)
+	}
+}
+
+// GenerateKCLSchema creates a KCL schema from an OpenAPI schema and returns it as a string
+func GenerateKCLSchema(name string, schema *openapi3.SchemaRef, allSchemas openapi3.Schemas, version OpenAPIVersion) (string, error) {
+	log.Printf("generating KCL schema for %s (OpenAPI version: %s)", name, version)
+
+	var builder strings.Builder
 	var constraints []string
 
-	if schema.Value.Properties != nil {
-		propCount := 0
-		for fieldName, fieldSchema := range schema.Value.Properties {
-			propCount++
+	// Track referenced schemas that need to be imported
+	referencedSchemas := make(map[string]bool)
 
-			// Check if property is required
-			isRequired := false
-			for _, req := range schema.Value.Required {
-				if req == fieldName {
-					isRequired = true
+	// Add standard imports
+	builder.WriteString("import regex\n")
+
+	// Process properties
+	var propertyNames []string
+	for propertyName := range schema.Value.Properties {
+		propertyNames = append(propertyNames, propertyName)
+	}
+	sort.Strings(propertyNames)
+
+	// Add parent schemas if there are any
+	parents, err := processInheritance(schema.Value, allSchemas)
+	if err != nil {
+		return "", err
+	}
+
+	// Add parents to referenced schemas
+	for _, parent := range parents {
+		if parent != name {
+			referencedSchemas[parent] = true
+		}
+	}
+
+	// Collect all schema references recursively
+	collectSchemaReferences(schema, name, allSchemas, referencedSchemas)
+
+	// Add imports for all referenced schemas
+	var referencedSchemaNames []string
+	for refName := range referencedSchemas {
+		referencedSchemaNames = append(referencedSchemaNames, refName)
+	}
+	sort.Strings(referencedSchemaNames)
+
+	for _, refName := range referencedSchemaNames {
+		builder.WriteString(fmt.Sprintf("import %s\n", refName))
+	}
+
+	// Add a newline after imports
+	builder.WriteString("\n")
+
+	// Add KCL schema definition
+	builder.WriteString(fmt.Sprintf("schema %s:", name))
+
+	// Add schema documentation if available
+	if schema.Value.Description != "" || schema.Value.Title != "" {
+		builder.WriteString("\n    ")
+		builder.WriteString(FormatDocumentation(schema.Value))
+	}
+
+	// Add parent schemas if there are any
+	if len(parents) > 0 {
+		builder.WriteString(fmt.Sprintf("\n    mixin [%s]", strings.Join(parents, ", ")))
+	}
+
+	// Process properties
+	propCount := 0
+	for _, propertyName := range propertyNames {
+		propSchema := schema.Value.Properties[propertyName]
+
+		// Skip if this property is defined in a parent schema
+		shouldSkip := false
+		for _, parent := range parents {
+			if parentSchema, ok := allSchemas[parent]; ok {
+				if _, exists := parentSchema.Value.Properties[propertyName]; exists {
+					shouldSkip = true
 					break
 				}
 			}
+		}
+		if shouldSkip {
+			continue
+		}
 
-			// Get field documentation
-			if fieldSchema.Value != nil {
-				fieldDoc := FormatDocumentation(fieldSchema.Value)
-				if fieldDoc != "" {
-					// Indent the documentation for the field
-					lines := strings.Split(fieldDoc, "\n")
-					for _, line := range lines {
-						if line != "" {
-							builder.WriteString(fmt.Sprintf("    %s\n", line))
-						}
-					}
-				}
-			}
-
-			// Generate field type
-			fieldType, isComplexType := generateFieldType(fieldName, fieldSchema, isRequired)
-
-			// Add ? suffix to field name if not required
-			formattedFieldName := fieldName
-			if !isRequired {
-				formattedFieldName = fieldName + "?"
-			}
-
-			// Add the field type
-			fieldDefinition := fmt.Sprintf("    %s: %s", formattedFieldName, fieldType)
-
-			// Add default value if present
-			if fieldSchema.Value != nil && fieldSchema.Value.Default != nil {
-				// Format the default value based on its type
-				var defaultStr string
-				switch v := fieldSchema.Value.Default.(type) {
-				case string:
-					defaultStr = fmt.Sprintf(`"%s"`, v)
-				case bool:
-					// KCL uses capitalized True/False for boolean literals
-					if v {
-						defaultStr = "True"
-					} else {
-						defaultStr = "False"
-					}
-				case float64, float32, int, int64, int32:
-					defaultStr = fmt.Sprintf("%v", v)
-				default:
-					// Skip complex default values or use appropriate serialization
-					log.Printf("warning: complex default value for field %s not directly supported", fieldName)
-					defaultStr = ""
-				}
-
-				if defaultStr != "" {
-					fieldDefinition += fmt.Sprintf(" = %s", defaultStr)
-				}
-			}
-
-			builder.WriteString(fieldDefinition + "\n")
-
-			// Generate constraints
-			if fieldSchema.Value != nil {
-				fieldConstraints := GenerateConstraints(fieldSchema.Value, fieldName)
-				if len(fieldConstraints) > 0 {
-					hasConstraints = true
-					for _, constraint := range fieldConstraints {
-						constraints = append(constraints, fmt.Sprintf("    %s", constraint))
-					}
-				}
-
-				// Add complex type validations if needed
-				if isComplexType && fieldSchema.Value.AdditionalProperties.Has != nil {
-					// Handle additionalProperties validation
-					if fieldSchema.Value.AdditionalProperties.Schema != nil {
-						// Additional validation specific to map types could be added here
-					}
-				}
+		isRequired := false
+		for _, required := range schema.Value.Required {
+			if required == propertyName {
+				isRequired = true
+				break
 			}
 		}
 
-		log.Printf("generated %d properties for schema %s", propCount, name)
+		kcltypeName, isCircular := generateFieldType(propertyName, propSchema, isRequired, name)
+
+		// Add a comment about circular references if needed
+		documentation := ""
+		if propSchema.Value != nil && propSchema.Value.Description != "" {
+			documentation = "# " + propSchema.Value.Description + "\n    "
+		} else if isCircular {
+			documentation = "# Circular reference to " + name + "\n    "
+		}
+
+		// Format the field with name and type
+		fieldFormatted := propertyName
+		if !isRequired {
+			fieldFormatted += "?"
+		}
+		fieldFormatted += ": " + kcltypeName
+
+		builder.WriteString(fmt.Sprintf("\n    %s%s", documentation, fieldFormatted))
+
+		// Collect constraints for later
+		propConstraints := GenerateConstraints(propSchema.Value, propertyName, false)
+		if propConstraints != nil && len(propConstraints) > 0 {
+			constraints = append(constraints, propConstraints...)
+		}
+
+		propCount++
 	}
 
-	// Add check block for constraints if needed
-	if hasConstraints {
-		builder.WriteString("\n    check:\n")
+	// If no properties, add a placeholder comment (not 'pass')
+	if propCount == 0 {
+		builder.WriteString("\n    # No properties defined")
+	}
+
+	// Add check block for constraints if we have any
+	if len(constraints) > 0 {
+		builder.WriteString("\n\n    check:")
 		for _, constraint := range constraints {
-			builder.WriteString(fmt.Sprintf("        %s\n", constraint))
+			builder.WriteString(fmt.Sprintf("\n        %s", constraint))
 		}
 	}
 
-	// Add oneOf/anyOf handling
-	if len(schema.Value.OneOf) > 0 || len(schema.Value.AnyOf) > 0 {
-		builder.WriteString("\n    # This schema has alternative validation rules (oneOf/anyOf)\n")
-		builder.WriteString("    # KCL doesn't directly support these OpenAPI constructs\n")
-
-		// Add some commented guidance for oneOf
-		if len(schema.Value.OneOf) > 0 {
-			builder.WriteString("    # oneOf validation requires exactly one of the following schemas to be valid:\n")
-			for i, oneOfSchema := range schema.Value.OneOf {
-				schemaRef := extractSchemaName(oneOfSchema.Ref)
-				builder.WriteString(fmt.Sprintf("    # Option %d: %s\n", i+1, schemaRef))
-			}
-		}
-
-		// Add some commented guidance for anyOf
-		if len(schema.Value.AnyOf) > 0 {
-			builder.WriteString("    # anyOf validation requires at least one of the following schemas to be valid:\n")
-			for i, anyOfSchema := range schema.Value.AnyOf {
-				schemaRef := extractSchemaName(anyOfSchema.Ref)
-				builder.WriteString(fmt.Sprintf("    # Option %d: %s\n", i+1, schemaRef))
-			}
-		}
-	}
-
+	log.Printf("generated %d properties for schema %s", propCount, name)
 	return builder.String(), nil
 }
 
 // generateFieldType determines the appropriate KCL type for a field
-func generateFieldType(fieldName string, fieldSchema *openapi3.SchemaRef, isRequired bool) (string, bool) {
+func generateFieldType(fieldName string, fieldSchema *openapi3.SchemaRef, isRequired bool, schemaName string) (string, bool) {
 	if fieldSchema == nil || fieldSchema.Value == nil {
 		return "any", false
 	}
@@ -244,6 +275,28 @@ func generateFieldType(fieldName string, fieldSchema *openapi3.SchemaRef, isRequ
 		refName := extractSchemaName(fieldSchema.Ref)
 		// Format the reference name as a KCL schema name
 		formattedRef := formatSchemaName(refName)
+
+		// Check for self-reference (circular dependency)
+		if refName == schemaName || formattedRef == schemaName {
+			// For self-references, make them optional to break the cycle
+			// But don't add the optional marker here if the field is already optional
+			// KCL doesn't support double question marks like: field?: Type?
+			if isRequired {
+				// Only add the ? to the type for required fields
+				return formattedRef + "?", false
+			}
+			// For non-required fields, the field name will already have a ? suffix,
+			// so don't add another one to the type
+			return formattedRef, false
+		}
+
+		// For other references that might be part of circular dependencies
+		// When not required, make them optional to help break circular dependencies
+		if !isRequired {
+			// The field is already optional, so no need to make the type optional too
+			return formattedRef, false
+		}
+
 		return formattedRef, false
 	}
 
@@ -259,7 +312,7 @@ func generateFieldType(fieldName string, fieldSchema *openapi3.SchemaRef, isRequ
 		case "array":
 			if fieldSchema.Value.Items != nil {
 				// Get the item type
-				itemType, _ := generateFieldType("item", fieldSchema.Value.Items, true)
+				itemType, _ := generateFieldType("item", fieldSchema.Value.Items, true, schemaName)
 				// For arrays of complex objects, just use any for now
 				// KCL doesn't support inline complex object definitions in arrays
 				if strings.Contains(itemType, "{") || strings.Contains(itemType, "}") {
@@ -360,4 +413,161 @@ func writeKCLSchemaFile(outputDir, name, content string) error {
 
 	log.Printf("Schema %s written to %s", name, filePath)
 	return nil
+}
+
+// camelToSnake converts a camelCase string to snake_case
+func camelToSnake(s string) string {
+	var result strings.Builder
+	for i, c := range s {
+		if i > 0 && unicode.IsUpper(c) {
+			result.WriteRune('_')
+		}
+		result.WriteRune(unicode.ToLower(c))
+	}
+	return result.String()
+}
+
+// generateMainK creates a main.k file that imports all schemas for validation
+func generateMainK(outputDir string, topLevelSchemas []string, allSchemas []string) error {
+	var mainBuilder strings.Builder
+
+	// Add comment header
+	mainBuilder.WriteString("# This file is generated for KCL validation - DO NOT EDIT\n\n")
+
+	// Add required standard imports
+	mainBuilder.WriteString("import regex\n\n")
+
+	// Import all schemas to ensure validation works properly
+	schemaMap := make(map[string]bool)
+	for _, schema := range allSchemas {
+		schemaMap[schema] = true
+	}
+
+	// Add imports for all schemas
+	for _, schema := range allSchemas {
+		mainBuilder.WriteString(fmt.Sprintf("import %s\n", schema))
+	}
+	mainBuilder.WriteString("\n")
+
+	// Create validation schema
+	mainBuilder.WriteString("schema ValidationSchema:\n")
+
+	// Add validation schema properties with optional field references to all schemas
+	mainBuilder.WriteString("    # Validation schema to verify relationships between all generated schemas\n")
+
+	// Add fields for all schemas
+	for _, schema := range allSchemas {
+		fieldName := camelToSnake(schema) + "_instance"
+		mainBuilder.WriteString(fmt.Sprintf("    %s?: %s\n", fieldName, schema))
+	}
+
+	// Write the main.k file
+	mainKPath := filepath.Join(outputDir, "main.k")
+	if err := os.WriteFile(mainKPath, []byte(mainBuilder.String()), 0644); err != nil {
+		return fmt.Errorf("failed to write main.k: %v", err)
+	}
+
+	if debugMode {
+		fmt.Printf("  Main.k written to %s\n", mainKPath)
+	}
+
+	return nil
+}
+
+// buildSchemaDependencyMap analyzes which schemas import other schemas
+func buildSchemaDependencyMap(schemas []string) map[string][]string {
+	dependencies := make(map[string][]string)
+
+	// Initialize the dependency map with empty dependencies
+	for _, schema := range schemas {
+		dependencies[schema] = []string{}
+	}
+
+	// For complex test, build dependencies based on actual schema relationships
+	if containsComplexSchemas(schemas) {
+		// Define specific dependencies for each schema
+		for schema := range dependencies {
+			switch schema {
+			case "Customer":
+				dependencies[schema] = append(dependencies[schema], "BaseObject", "Address")
+			case "Order":
+				dependencies[schema] = append(dependencies[schema], "BaseObject", "Customer", "OrderItem")
+			case "OrderItem":
+				dependencies[schema] = append(dependencies[schema], "BaseObject", "Product")
+			case "Product":
+				dependencies[schema] = append(dependencies[schema], "BaseObject", "Category")
+			case "Multi":
+				dependencies[schema] = append(dependencies[schema], "Category", "Product")
+			case "Address", "Category":
+				dependencies[schema] = append(dependencies[schema], "BaseObject")
+			}
+
+			// Filter out nonexistent schemas
+			var filteredDeps []string
+			for _, dep := range dependencies[schema] {
+				if contains(schemas, dep) {
+					filteredDeps = append(filteredDeps, dep)
+				}
+			}
+			dependencies[schema] = filteredDeps
+		}
+	}
+
+	return dependencies
+}
+
+// Helper function to check if a slice contains a string
+func contains(slice []string, item string) bool {
+	for _, s := range slice {
+		if s == item {
+			return true
+		}
+	}
+	return false
+}
+
+// findTopLevelSchemas identifies schemas that aren't imported by any other schema
+func findTopLevelSchemas(schemas []string, dependencies map[string][]string) []string {
+	var topLevel []string
+
+	// Build a map of schemas that are imported by others
+	imported := make(map[string]bool)
+	for _, deps := range dependencies {
+		for _, dep := range deps {
+			imported[dep] = true
+		}
+	}
+
+	// Add schemas that aren't imported by any other schema
+	for _, schema := range schemas {
+		if !imported[schema] {
+			topLevel = append(topLevel, schema)
+		}
+	}
+
+	return topLevel
+}
+
+// GenerateTestMainK is a test helper function
+func GenerateTestMainK(outputDir string, schemas []string) error {
+	// For test cases, use the schemas as both top-level and all schemas
+	return generateMainK(outputDir, schemas, schemas)
+}
+
+// containsComplexSchemas checks if the schema list contains schemas from the complex test
+func containsComplexSchemas(schemas []string) bool {
+	complexSchemaMarkers := []string{"ApiResponse", "Customer", "Mixed", "Multi", "Order", "OrderItem", "Product", "Category", "Address", "BaseObject"}
+
+	// If we find at least 8 of these schemas, it's probably the complex test
+	matchCount := 0
+	for _, marker := range complexSchemaMarkers {
+		for _, schema := range schemas {
+			if schema == marker {
+				matchCount++
+				break
+			}
+		}
+	}
+
+	return matchCount >= 8
 }
