@@ -1,0 +1,44 @@
+# Binaries
+/openapi-to-kcl
+/*.exe
+/*.out
+/*.o
+/*.so
+/*.a
+
+# Go build artifacts
+/bin/
+/pkg/
+/cover.out
+/go.sum
+/go.work
+/go.work.sum
+
+# Vendor directory (if using vendoring)
+vendor/
+
+# Editor & IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*.bak
+
+# Logs & temp files
+*.log
+*.tmp
+*.test
+*.DS_Store
+
+# Makefile artifacts
+schema.k
+
+# Coverage & testing
+*.cover
+*.prof
+*.gcda
+*.gcno
+*.gcov
+*.test
+
