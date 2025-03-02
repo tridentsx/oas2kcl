@@ -49,11 +49,18 @@ func (f *Flattener) flattenSchemaRef(ref *openapi3.SchemaRef) (*openapi3.SchemaR
 	// Process required properties
 	if len(schema.Required) > 0 {
 		// Make a copy of the required array to avoid modifying the original
-		flatSchema.Value.Required = make([]string, len(schema.Required))
-		copy(flatSchema.Value.Required, schema.Required)
+		// Filter out any empty strings while copying
+		var requiredProps []string
+		for _, prop := range schema.Required {
+			if prop != "" {
+				requiredProps = append(requiredProps, prop)
+			}
+		}
+
+		flatSchema.Value.Required = requiredProps
 
 		// Validate that all required properties exist
-		for _, reqProp := range schema.Required {
+		for _, reqProp := range flatSchema.Value.Required {
 			if _, ok := flatSchema.Value.Properties[reqProp]; !ok {
 				return nil, fmt.Errorf("required property %q not found in schema", reqProp)
 			}
@@ -154,7 +161,11 @@ func (f *Flattener) flattenCompositeSchemas(schema *openapi3.Schema) error {
 		}
 
 		// Merge required fields
-		schema.Required = append(schema.Required, merged.Value.Required...)
+		for _, req := range merged.Value.Required {
+			if req != "" {
+				schema.Required = append(schema.Required, req)
+			}
+		}
 
 		// Clear the allOf array since we've merged its contents
 		schema.AllOf = nil
