@@ -1,0 +1,40 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "Simple API",
+      "version": "1.0.0",
+      "description": "A simple API for testing"
+    },
+    "paths": {},
+    "components": {
+      "schemas": {
+        "Simple": {
+          "type": "object",
+          "required": ["id", "name"],
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Unique identifier"
+            },
+            "name": {
+              "type": "string",
+              "description": "Name of the entity",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "uniqueItems": true
+            },
+            "status": {
+              "type": "string",
+              "enum": ["active", "inactive", "pending"]
+            }
+          }
+        }
+      }
+    }
+  }

@@ -1,0 +1,249 @@
+			{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Complex API",
+    "version": "1.0.0",
+    "description": "A complex API for testing advanced features"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "BaseObject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp"
+          }
+        },
+        "required": ["id"]
+      },
+      "Product": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseObject"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Product name",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "price": {
+                "type": "number",
+                "format": "float",
+                "description": "Product price",
+                "minimum": 0
+              },
+              "category": {
+                "$ref": "#/components/schemas/Category"
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Product tags"
+              },
+              "metadata": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "Additional metadata"
+              },
+              "status": {
+                "type": "string",
+                "enum": ["available", "out_of_stock", "discontinued"],
+                "default": "available"
+              }
+            },
+            "required": ["name", "price"]
+          }
+        ]
+      },
+      "Category": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Category ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Category name"
+          },
+          "parentCategory": {
+            "$ref": "#/components/schemas/Category"
+          }
+        },
+        "required": ["id", "name"]
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Order ID"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/Customer"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderItem"
+            },
+            "minItems": 1
+          },
+          "totalAmount": {
+            "type": "number",
+            "format": "float",
+            "description": "Total order amount"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "processing", "shipped", "delivered", "cancelled"],
+            "default": "pending"
+          }
+        },
+        "required": ["id", "customer", "items"]
+      },
+      "OrderItem": {
+        "type": "object",
+        "properties": {
+          "product": {
+            "$ref": "#/components/schemas/Product"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Item quantity"
+          },
+          "unitPrice": {
+            "type": "number",
+            "format": "float",
+            "description": "Price per unit"
+          }
+        },
+        "required": ["product", "quantity", "unitPrice"]
+      },
+      "Customer": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseObject"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "firstName": {
+                "type": "string",
+                "description": "Customer first name"
+              },
+              "lastName": {
+                "type": "string",
+                "description": "Customer last name"
+              },
+              "email": {
+                "type": "string",
+                "format": "email",
+                "description": "Customer email"
+              },
+              "address": {
+                "$ref": "#/components/schemas/Address"
+              },
+              "phoneNumber": {
+                "type": "string",
+                "pattern": "^\\+[1-9]\\d{1,14}$",
+                "description": "Phone number in E.164 format"
+              }
+            },
+            "required": ["firstName", "lastName", "email"]
+          }
+        ]
+      },
+      "Address": {
+        "type": "object",
+        "properties": {
+          "street": {
+            "type": "string",
+            "description": "Street address"
+          },
+          "city": {
+            "type": "string",
+            "description": "City"
+          },
+          "state": {
+            "type": "string",
+            "description": "State or province"
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "Postal code"
+          },
+          "country": {
+            "type": "string",
+            "description": "Country"
+          }
+        },
+        "required": ["street", "city", "country"]
+      },
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "type": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "Mixed": {
+        "type": "object",
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "simple": "#/components/schemas/Simple",
+            "complex": "#/components/schemas/Complex"
+          }
+        },
+        "properties": {
+          "type": {
+            "type": "string"
+          }
+        },
+        "required": ["type"]
+      },
+      "Multi": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/Category"
+          },
+          {
+            "$ref": "#/components/schemas/Product"
+          }
+        ]
+      }
+    }
+  }
+}
