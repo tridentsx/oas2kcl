@@ -2,47 +2,56 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"os"
+	"log"
 
-    	"github.com/tridentsx/oas2kcl/openapikcl"
+	"github.com/tridentsx/oas2kcl/openapikcl"
 )
 
-unc main() {
+func main() {
+	// Configure logging
+	log.SetFlags(log.Ldate | log.Ltime | log.LUTC)
+	log.SetPrefix("openapi-to-kcl: ")
+
 	// Define command-line flags
 	oasFile := flag.String("oas", "", "Path to the OpenAPI specification file (required)")
 	outFile := flag.String("out", "", "Optional output file for the generated KCL schema (.k)")
+	skipFlatten := flag.Bool("skip-flatten", false, "Skip flattening the OpenAPI spec")
+	skipRemote := flag.Bool("skip-remote", false, "Skip remote references during flattening")
+	maxDepth := flag.Int("max-depth", 100, "Maximum depth for reference resolution")
+	packageName := flag.String("package", "schema", "Package name for the generated KCL schema")
 	flag.Parse()
 
 	// Ensure the required flag is provided
 	if *oasFile == "" {
-		fmt.Println("Error: The -oas flag is required. Usage:")
-		fmt.Println("  openapi-to-kcl -oas openapi.json [-out schema.k]")
-		os.Exit(1)
+		log.Fatal("the -oas flag is required. Usage:\n  openapi-to-kcl -oas openapi.json [-out schema.k]")
 	}
 
 	// Load and validate the OpenAPI schema
-	doc, err := openapikcl.LoadOpenAPISchema(*oasFile)
+	log.Printf("loading OpenAPI schema from %s", *oasFile)
+	doc, err := openapikcl.LoadOpenAPISchema(*oasFile, openapikcl.LoadOptions{
+		FlattenSpec: !*skipFlatten,
+		SkipRemote:  *skipRemote,
+		MaxDepth:    *maxDepth,
+	})
 	if err != nil {
-		fmt.Println("Error loading OpenAPI schema:", err)
-		os.Exit(1)
+		log.Fatalf("failed to load OpenAPI schema: %v", err)
 	}
 
-	fmt.Println("OpenAPI schema is valid!")
+	log.Print("OpenAPI schema validation successful")
 
 	// Generate the KCL schema
-	kclOutput := openapikcl.GenerateKCLSchemas(doc)
+	log.Print("generating KCL schemas")
+	err = openapikcl.GenerateKCLSchemas(doc, *packageName)
+	if err != nil {
+		log.Fatalf("failed to generate KCL schema: %v", err)
+	}
 
-	// Handle output: either write to a file or print to stdout
+	// Since the function doesn't return the KCL content directly,
+	// we can no longer control where it's written from main.go.
+	// If the function writes to a file internally, we should log success:
 	if *outFile != "" {
-		err := os.WriteFile(*outFile, []byte(kclOutput), 0644)
-		if err != nil {
-			fmt.Println("Error writing KCL schema to file:", err)
-			os.Exit(1)
-		}
-		fmt.Println("KCL schema successfully written to", *outFile)
+		log.Printf("KCL schema should have been written to %s", *outFile)
 	} else {
-		fmt.Println(kclOutput)
+		log.Print("KCL schema generation complete")
 	}
 }
-t
