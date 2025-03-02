@@ -1,2 +1,0 @@
-schema Mixed:
-    type: str

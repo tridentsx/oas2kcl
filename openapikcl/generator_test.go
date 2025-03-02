@@ -87,7 +87,7 @@ func TestGenerateKCLSchema(t *testing.T) {
 	require.NoError(t, err)
 	assert.Contains(t, result, "schema TestSchema:")
 	assert.Contains(t, result, "name: str")
-	assert.Contains(t, result, "tags: [str] | None")
+	assert.Contains(t, result, "tags?: [str]")
 }
 
 func TestGenerateKCLSchemas(t *testing.T) {
@@ -105,7 +105,7 @@ func TestGenerateKCLSchemas(t *testing.T) {
 	doc := createTestOpenAPIDoc()
 
 	// Generate KCL schemas
-	err = GenerateKCLSchemas(doc, tempDir)
+	err = GenerateKCLSchemas(doc, tempDir, "test")
 	require.NoError(t, err)
 
 	// Check if the User.k file was created
@@ -121,7 +121,7 @@ func TestGenerateKCLSchemas(t *testing.T) {
 	contentStr := string(content)
 	assert.Contains(t, contentStr, "schema User:")
 	assert.Contains(t, contentStr, "name: str")
-	assert.Contains(t, contentStr, "age: int | None")
+	assert.Contains(t, contentStr, "age?: int")
 }
 
 func TestSchemaInheritance(t *testing.T) {

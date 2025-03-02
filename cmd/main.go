@@ -41,7 +41,7 @@ func main() {
 
 	// Generate the KCL schema
 	log.Print("generating KCL schemas")
-	err = openapikcl.GenerateKCLSchemas(doc, *packageName)
+	err = openapikcl.GenerateKCLSchemas(doc, *outFile, *packageName)
 	if err != nil {
 		log.Fatalf("failed to generate KCL schema: %v", err)
 	}

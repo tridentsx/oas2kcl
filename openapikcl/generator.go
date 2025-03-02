@@ -11,12 +11,17 @@ import (
 )
 
 // GenerateKCLSchemas generates KCL schemas from a flattened OpenAPI spec
-func GenerateKCLSchemas(doc *openapi3.T, outputDir string) error {
+func GenerateKCLSchemas(doc *openapi3.T, outputDir string, packageName string) error {
 	log.Print("starting KCL schema generation")
 
 	if doc.Components == nil || doc.Components.Schemas == nil {
 		log.Print("warning: no schemas found in OpenAPI components")
 		return nil
+	}
+
+	// Create output directory based on packageName if outputDir is empty
+	if outputDir == "" {
+		outputDir = packageName
 	}
 
 	// Get schemas in deterministic order for consistent output
@@ -55,6 +60,23 @@ func generateKCLSchema(name string, schema *openapi3.SchemaRef, allSchemas opena
 	}
 
 	var builder strings.Builder
+
+	// Check if any property has a pattern validation
+	hasPatternValidation := schema.Value.Pattern != ""
+	if !hasPatternValidation && schema.Value.Properties != nil {
+		for _, propSchema := range schema.Value.Properties {
+			if propSchema.Value != nil && propSchema.Value.Pattern != "" {
+				hasPatternValidation = true
+				break
+			}
+		}
+	}
+
+	// Add imports if needed
+	if hasPatternValidation {
+		// Add regex import for pattern matching
+		builder.WriteString("import regex\n\n")
+	}
 
 	// Add schema documentation
 	docString := FormatDocumentation(schema.Value)
@@ -114,7 +136,44 @@ func generateKCLSchema(name string, schema *openapi3.SchemaRef, allSchemas opena
 
 			// Generate field type
 			fieldType, isComplexType := generateFieldType(fieldName, fieldSchema, isRequired)
-			builder.WriteString(fmt.Sprintf("    %s: %s\n", fieldName, fieldType))
+
+			// Add ? suffix to field name if not required
+			formattedFieldName := fieldName
+			if !isRequired {
+				formattedFieldName = fieldName + "?"
+			}
+
+			// Add the field type
+			fieldDefinition := fmt.Sprintf("    %s: %s", formattedFieldName, fieldType)
+
+			// Add default value if present
+			if fieldSchema.Value != nil && fieldSchema.Value.Default != nil {
+				// Format the default value based on its type
+				var defaultStr string
+				switch v := fieldSchema.Value.Default.(type) {
+				case string:
+					defaultStr = fmt.Sprintf(`"%s"`, v)
+				case bool:
+					// KCL uses capitalized True/False for boolean literals
+					if v {
+						defaultStr = "True"
+					} else {
+						defaultStr = "False"
+					}
+				case float64, float32, int, int64, int32:
+					defaultStr = fmt.Sprintf("%v", v)
+				default:
+					// Skip complex default values or use appropriate serialization
+					log.Printf("warning: complex default value for field %s not directly supported", fieldName)
+					defaultStr = ""
+				}
+
+				if defaultStr != "" {
+					fieldDefinition += fmt.Sprintf(" = %s", defaultStr)
+				}
+			}
+
+			builder.WriteString(fieldDefinition + "\n")
 
 			// Generate constraints
 			if fieldSchema.Value != nil {
@@ -185,10 +244,7 @@ func generateFieldType(fieldName string, fieldSchema *openapi3.SchemaRef, isRequ
 		refName := extractSchemaName(fieldSchema.Ref)
 		// Format the reference name as a KCL schema name
 		formattedRef := formatSchemaName(refName)
-		if isRequired {
-			return formattedRef, false
-		}
-		return fmt.Sprintf("%s | None", formattedRef), false
+		return formattedRef, false
 	}
 
 	isComplexType := false
@@ -204,32 +260,30 @@ func generateFieldType(fieldName string, fieldSchema *openapi3.SchemaRef, isRequ
 			if fieldSchema.Value.Items != nil {
 				// Get the item type
 				itemType, _ := generateFieldType("item", fieldSchema.Value.Items, true)
-				fieldType = fmt.Sprintf("[%s]", itemType)
+				// For arrays of complex objects, just use any for now
+				// KCL doesn't support inline complex object definitions in arrays
+				if strings.Contains(itemType, "{") || strings.Contains(itemType, "}") {
+					fieldType = "[any]"
+				} else {
+					fieldType = fmt.Sprintf("[%s]", itemType)
+				}
 			} else {
 				fieldType = "[any]"
 			}
 		case "object":
 			// Handle plain objects with properties
 			if fieldSchema.Value.Properties != nil && len(fieldSchema.Value.Properties) > 0 {
-				fieldType = "{" // Start of inline object definition
-				props := make([]string, 0, len(fieldSchema.Value.Properties))
-
-				for propName, propSchema := range fieldSchema.Value.Properties {
-					propType, _ := generateFieldType(propName, propSchema, false)
-					props = append(props, fmt.Sprintf("\"%s\": %s", propName, propType))
-				}
-
-				fieldType += strings.Join(props, ", ")
-				fieldType += "}"
-
+				// KCL doesn't support inline object definitions with complex types
+				// Just use dict for complex nested objects
+				fieldType = "dict"
 				isComplexType = true
 			} else if fieldSchema.Value.AdditionalProperties.Has != nil {
 				// Handle map types (objects with additionalProperties)
 				if fieldSchema.Value.AdditionalProperties.Schema != nil {
-					valueType, _ := generateFieldType("value", fieldSchema.Value.AdditionalProperties.Schema, true)
-					fieldType = fmt.Sprintf("{str: %s}", valueType)
+					// Just use dict for maps
+					fieldType = "dict"
 				} else {
-					fieldType = "{str: any}"
+					fieldType = "dict"
 				}
 				isComplexType = true
 			} else {
@@ -242,11 +296,6 @@ func generateFieldType(fieldName string, fieldSchema *openapi3.SchemaRef, isRequ
 	} else {
 		// If no type is specified
 		fieldType = "any"
-	}
-
-	// Make the field optional if it's not required
-	if !isRequired {
-		fieldType = fmt.Sprintf("%s | None", fieldType)
 	}
 
 	return fieldType, isComplexType

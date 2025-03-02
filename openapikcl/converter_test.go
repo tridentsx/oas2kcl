@@ -16,8 +16,8 @@ func TestConvertTypeToKCL(t *testing.T) {
 		expected string
 	}{
 		{"String", "string", "", "str"},
-		{"DateTime", "string", "date-time", "datetime"},
-		{"Date", "string", "date", "date"},
+		{"DateTime", "string", "date-time", "str"},
+		{"Date", "string", "date", "str"},
 		{"Email", "string", "email", "str"},
 		{"UUID", "string", "uuid", "str"},
 		{"URI", "string", "uri", "str"},
@@ -69,7 +69,7 @@ func TestGenerateConstraints(t *testing.T) {
 			expectedCons: []string{
 				"len(username) >= 3",
 				"len(username) <= 50",
-				"username.match(r\"^[a-z]+$\")",
+				"regex.match(username, r\"^[a-z]+$\")",
 			},
 		},
 		{
@@ -145,7 +145,7 @@ func TestFormatDocumentation(t *testing.T) {
 				Deprecated:  true,
 				ReadOnly:    true,
 			},
-			expected: "# User\n# A user of the system\n# Default: guest\n# DEPRECATED\n# ReadOnly: This field is read-only\n",
+			expected: "# User\n# A user of the system\n# DEPRECATED\n# ReadOnly: This field is read-only\n",
 		},
 		{
 			name: "Multiline Description",

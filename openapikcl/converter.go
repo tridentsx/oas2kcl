@@ -17,9 +17,9 @@ func ConvertTypeToKCL(oapiType, format string) string {
 	case "string":
 		switch format {
 		case "date-time":
-			kclType = "datetime"
+			kclType = "str" // KCL doesn't have a built-in datetime type
 		case "date":
-			kclType = "date"
+			kclType = "str" // KCL doesn't have a built-in date type
 		case "email":
 			kclType = "str" // KCL doesn't have a dedicated email type, but we'll add validation
 		case "uuid":
@@ -78,7 +78,7 @@ func GenerateConstraints(schema *openapi3.Schema, fieldName string) []string {
 	}
 	if schema.Pattern != "" {
 		// KCL uses regex matching
-		constraints = append(constraints, fmt.Sprintf("%s.match(r\"%s\")", fieldName, schema.Pattern))
+		constraints = append(constraints, fmt.Sprintf("regex.match(%s, r\"%s\")", fieldName, schema.Pattern))
 	}
 
 	// Numeric constraints
@@ -149,9 +149,8 @@ func FormatDocumentation(schema *openapi3.Schema) string {
 		}
 	}
 
-	if schema.Default != nil {
-		doc.WriteString(fmt.Sprintf("# Default: %v\n", schema.Default))
-	}
+	// Default values are now handled directly in the field definition
+	// instead of as comments
 
 	if schema.Deprecated {
 		doc.WriteString("# DEPRECATED\n")
