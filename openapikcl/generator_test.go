@@ -2,6 +2,7 @@
 package openapikcl
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -313,4 +314,67 @@ func TestSchemaInheritance(t *testing.T) {
 func fileExists(path string) bool {
 	_, err := os.Stat(path)
 	return !os.IsNotExist(err)
+}
+
+func TestGenerateKCLFromFile(t *testing.T) {
+	// Skip if running in CI without tempdir access
+	if os.Getenv("CI") != "" && os.Getenv("SKIP_TEMPDIR_TESTS") != "" {
+		t.Skip("Skipping test requiring tempdir in CI")
+	}
+
+	// Create a temporary directory
+	tempDir, err := os.MkdirTemp("", "kcl-test-schema-")
+	require.NoError(t, err)
+	defer os.RemoveAll(tempDir)
+
+	// Load and parse the OpenAPI document
+	loader := openapi3.NewLoader()
+	doc, err := loader.LoadFromFile("testdata/input/schemas.yaml")
+	require.NoError(t, err)
+
+	// Generate KCL schemas
+	err = GenerateKCLSchemas(doc, tempDir, "test", OpenAPIV3)
+	require.NoError(t, err)
+
+	printFilesInDir(tempDir)
+
+	// Check if expected schema files were created
+	expectedSchemas := []string{"Address", "ArrayType", "BooleanType", "Customer", "EmptyObject", "Metadata", "NumberType", "Order", "OrderResponse", "OrderStatus", "Price", "StringType"}
+	for _, schema := range expectedSchemas {
+		schemaPath := filepath.Join(tempDir, schema+".k")
+		assert.True(t, fileExists(schemaPath), "Schema file %s should exist", schema+".k")
+
+		// Read and verify basic content
+		content, err := os.ReadFile(schemaPath)
+		require.NoError(t, err)
+		contentStr := string(content)
+
+		assert.Contains(t, contentStr, "schema "+schema+":")
+		assert.Contains(t, contentStr, "import regex")
+	}
+
+	// Verify main.k was created
+	mainKPath := filepath.Join(tempDir, "main.k")
+	assert.True(t, fileExists(mainKPath))
+
+	// Test KCL validation if available
+	if isKCLAvailable() {
+		cmd := exec.Command("kcl", "run", tempDir)
+		cmd.Dir = tempDir
+		output, err := cmd.CombinedOutput()
+		assert.NoError(t, err, "KCL validation should succeed: %s", string(output))
+	}
+}
+
+// Helper function to print files in directory
+func printFilesInDir(dir string) error {
+	files, err := ioutil.ReadDir(dir)
+	if err != nil {
+		return err
+	}
+
+	for _, file := range files {
+		fmt.Println(file.Name())
+	}
+	return nil
 }

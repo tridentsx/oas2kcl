@@ -206,15 +206,16 @@ func GenerateKCLSchema(name string, schema *openapi3.SchemaRef, allSchemas opena
 	collectSchemaReferences(schema, name, allSchemas, referencedSchemas)
 
 	// Add imports for all referenced schemas
-	var referencedSchemaNames []string
-	for refName := range referencedSchemas {
-		referencedSchemaNames = append(referencedSchemaNames, refName)
-	}
-	sort.Strings(referencedSchemaNames)
+	// var referencedSchemaNames []string
+	// for refName := range referencedSchemas {
+	// 	referencedSchemaNames = append(referencedSchemaNames, refName)
+	// }
+	// sort.Strings(referencedSchemaNames)
 
-	for _, refName := range referencedSchemaNames {
-		builder.WriteString(fmt.Sprintf("import %s\n", refName))
-	}
+	// for _, refName := range referencedSchemaNames {
+	// 	formattedRefName := formatSchemaName(refName)
+	// 	builder.WriteString(fmt.Sprintf("import %s\n", formattedRefName))
+	// }
 
 	// Add a newline after imports
 	builder.WriteString("\n")
@@ -352,9 +353,30 @@ func GenerateKCLSchema(name string, schema *openapi3.SchemaRef, allSchemas opena
 		propCount++
 	}
 
-	// If no properties, add a placeholder comment (not 'pass')
+	// If no properties, but we still need to handle various cases:
+	// 1. Schema might have allOf/oneOf/anyOf
+	// 2. Schema might be an enum
+	// 3. Schema might be a primitive type with constraints
+	// 4. Schema might be empty but referenced by other schemas
 	if propCount == 0 {
-		builder.WriteString("\n    # No properties defined")
+		// Check if it's truly an empty schema or just lacks properties
+		hasRefs := len(parents) > 0
+		hasType := schema.Value.Type != nil && len(*schema.Value.Type) > 0
+		hasEnum := len(schema.Value.Enum) > 0
+
+		if hasRefs || hasType || hasEnum || schema.Value.Description != "" {
+			// This is a valid schema without properties - keep it
+			builder.WriteString("\n    # Schema without properties but with valid type or references")
+
+			// If it's a schema with a specific type but no props, add type info
+			if hasType {
+				openAPIType := (*schema.Value.Type)[0]
+				kclType := ConvertTypeToKCL(openAPIType, schema.Value.Format)
+				builder.WriteString(fmt.Sprintf("\n    type: %q", kclType))
+			}
+		} else {
+			builder.WriteString("\n    # No properties defined")
+		}
 	}
 
 	// Add check block for constraints if we have any
@@ -400,10 +422,12 @@ func generateFieldType(fieldName string, fieldSchema *openapi3.SchemaRef, isRequ
 			return formattedRef, false, refName
 		}
 
-		// For other references, use the fully qualified name: importname.schemaname
-		// This ensures proper typing with imports
+		// For other references, we need to handle how KCL imports work
+		// When KCL imports a schema X and uses type X from it, it auto-prefixes it to X.X
+		// So instead of returning formattedRef (which would result in duplicated names),
+		// we return the rawRefName which will get properly qualified by KCL at import time
 		log.Printf("using reference %s for field %s", formattedRef, fieldName)
-		return formattedRef + "." + formattedRef, false, refName
+		return refName, false, refName
 	}
 
 	isComplexType := false
@@ -544,16 +568,16 @@ func generateMainK(outputDir string, topLevelSchemas []string, allSchemas []stri
 	mainBuilder.WriteString("import regex\n\n")
 
 	// Import all schemas to ensure validation works properly
-	schemaMap := make(map[string]bool)
-	for _, schema := range allSchemas {
-		schemaMap[schema] = true
-	}
+	// schemaMap := make(map[string]bool)
+	// for _, schema := range allSchemas {
+	// 	schemaMap[schema] = true
+	// }
 
 	// Add imports for all schemas
-	for _, schema := range allSchemas {
-		mainBuilder.WriteString(fmt.Sprintf("import %s\n", schema))
-	}
-	mainBuilder.WriteString("\n")
+	// for _, schema := range allSchemas {
+	// 	mainBuilder.WriteString(fmt.Sprintf("import %s\n", schema))
+	// }
+	// mainBuilder.WriteString("\n")
 
 	// Create validation schema
 	mainBuilder.WriteString("schema ValidationSchema:\n")
