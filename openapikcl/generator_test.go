@@ -84,7 +84,14 @@ func TestGenerateKCLSchema(t *testing.T) {
 		"TestSchema": schema,
 	}
 
-	result, err := GenerateKCLSchema("TestSchema", schema, schemas, OpenAPIV3)
+	// Create a minimal document for testing
+	doc := &openapi3.T{
+		Components: &openapi3.Components{
+			Schemas: schemas,
+		},
+	}
+
+	result, err := GenerateKCLSchema("TestSchema", schema, schemas, OpenAPIV3, doc)
 	require.NoError(t, err)
 	assert.Contains(t, result, "schema TestSchema:")
 	assert.Contains(t, result, "name: str")

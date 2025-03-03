@@ -45,7 +45,7 @@ func GenerateKCLSchemas(doc *openapi3.T, outputDir string, packageName string, v
 	// Process each schema in order
 	for _, name := range schemaNames {
 		schema := doc.Components.Schemas[name]
-		kclSchema, err := GenerateKCLSchema(name, schema, doc.Components.Schemas, version)
+		kclSchema, err := GenerateKCLSchema(name, schema, doc.Components.Schemas, version, doc)
 		if err != nil {
 			return fmt.Errorf("failed to generate KCL schema for %s: %w", name, err)
 		}
@@ -102,7 +102,7 @@ func collectSchemaReferences(schema *openapi3.SchemaRef, currentSchemaName strin
 		collectSchemaReferences(propSchema, currentSchemaName, allSchemas, referencedSchemas)
 	}
 
-	// Process arrays
+	// Process arrays - This is critical for array items that reference other schemas
 	if schema.Value.Items != nil {
 		collectSchemaReferences(schema.Value.Items, currentSchemaName, allSchemas, referencedSchemas)
 	}
@@ -129,7 +129,7 @@ func collectSchemaReferences(schema *openapi3.SchemaRef, currentSchemaName strin
 }
 
 // GenerateKCLSchema creates a KCL schema from an OpenAPI schema and returns it as a string
-func GenerateKCLSchema(name string, schema *openapi3.SchemaRef, allSchemas openapi3.Schemas, version OpenAPIVersion) (string, error) {
+func GenerateKCLSchema(name string, schema *openapi3.SchemaRef, allSchemas openapi3.Schemas, version OpenAPIVersion, doc *openapi3.T) (string, error) {
 	log.Printf("generating KCL schema for %s (OpenAPI version: %s)", name, version)
 
 	var builder strings.Builder
@@ -161,7 +161,48 @@ func GenerateKCLSchema(name string, schema *openapi3.SchemaRef, allSchemas opena
 		}
 	}
 
-	// Collect all schema references recursively
+	// Process properties to collect direct references
+	for _, propertyName := range propertyNames {
+		propSchema := schema.Value.Properties[propertyName]
+
+		// Skip if this property is defined in a parent schema
+		shouldSkip := false
+		for _, parent := range parents {
+			if parentSchema, ok := allSchemas[parent]; ok {
+				if _, exists := parentSchema.Value.Properties[propertyName]; exists {
+					shouldSkip = true
+					break
+				}
+			}
+		}
+		if shouldSkip {
+			continue
+		}
+
+		isRequired := false
+		for _, required := range schema.Value.Required {
+			if required == propertyName {
+				isRequired = true
+				break
+			}
+		}
+
+		// Get the type and potential reference
+		_, _, refType := generateFieldType(propertyName, propSchema, isRequired, name, doc)
+		if refType != "" && refType != name {
+			referencedSchemas[refType] = true
+		}
+
+		// Check for array items that reference schemas
+		if propSchema.Value != nil && propSchema.Value.Items != nil {
+			_, _, itemRefType := generateFieldType(propertyName+".items", propSchema.Value.Items, true, name, doc)
+			if itemRefType != "" && itemRefType != name {
+				referencedSchemas[itemRefType] = true
+			}
+		}
+	}
+
+	// Collect all schema references recursively - this is still useful for deeply nested references
 	collectSchemaReferences(schema, name, allSchemas, referencedSchemas)
 
 	// Add imports for all referenced schemas
@@ -219,7 +260,7 @@ func GenerateKCLSchema(name string, schema *openapi3.SchemaRef, allSchemas opena
 			}
 		}
 
-		kcltypeName, isCircular := generateFieldType(propertyName, propSchema, isRequired, name)
+		kcltypeName, isCircular, _ := generateFieldType(propertyName, propSchema, isRequired, name, doc)
 
 		// Add a comment about circular references if needed
 		documentation := ""
@@ -265,61 +306,64 @@ func GenerateKCLSchema(name string, schema *openapi3.SchemaRef, allSchemas opena
 }
 
 // generateFieldType determines the appropriate KCL type for a field
-func generateFieldType(fieldName string, fieldSchema *openapi3.SchemaRef, isRequired bool, schemaName string) (string, bool) {
+func generateFieldType(fieldName string, fieldSchema *openapi3.SchemaRef, isRequired bool, schemaName string, doc *openapi3.T) (string, bool, string) {
 	if fieldSchema == nil || fieldSchema.Value == nil {
-		return "any", false
+		return "any", false, ""
 	}
 
 	// Handle references
 	if fieldSchema.Ref != "" {
+		log.Printf("field %s has reference: %s", fieldName, fieldSchema.Ref)
 		refName := extractSchemaName(fieldSchema.Ref)
+		log.Printf("extracted reference name: %s", refName)
+
 		// Format the reference name as a KCL schema name
 		formattedRef := formatSchemaName(refName)
+		log.Printf("formatted reference name: %s", formattedRef)
 
 		// Check for self-reference (circular dependency)
 		if refName == schemaName || formattedRef == schemaName {
+			log.Printf("detected self-reference for field %s to schema %s", fieldName, schemaName)
 			// For self-references, make them optional to break the cycle
 			// But don't add the optional marker here if the field is already optional
 			// KCL doesn't support double question marks like: field?: Type?
 			if isRequired {
 				// Only add the ? to the type for required fields
-				return formattedRef + "?", false
+				return formattedRef + "?", false, refName
 			}
 			// For non-required fields, the field name will already have a ? suffix,
 			// so don't add another one to the type
-			return formattedRef, false
+			return formattedRef, false, refName
 		}
 
-		// For other references that might be part of circular dependencies
-		// When not required, make them optional to help break circular dependencies
-		if !isRequired {
-			// The field is already optional, so no need to make the type optional too
-			return formattedRef, false
-		}
-
-		return formattedRef, false
+		// For other references, use the fully qualified name: importname.schemaname
+		// This ensures proper typing with imports
+		log.Printf("using reference %s for field %s", formattedRef, fieldName)
+		return formattedRef + "." + formattedRef, false, refName
 	}
 
 	isComplexType := false
 	var fieldType string
+	var refType string
 
 	// Extract type information
 	if fieldSchema.Value.Type != nil && len(*fieldSchema.Value.Type) > 0 {
 		openAPIType := (*fieldSchema.Value.Type)[0]
+		log.Printf("field %s has type: %s", fieldName, openAPIType)
 
 		// Handle different types
 		switch openAPIType {
 		case "array":
 			if fieldSchema.Value.Items != nil {
-				// Get the item type
-				itemType, _ := generateFieldType("item", fieldSchema.Value.Items, true, schemaName)
-				// For arrays of complex objects, just use any for now
-				// KCL doesn't support inline complex object definitions in arrays
-				if strings.Contains(itemType, "{") || strings.Contains(itemType, "}") {
-					fieldType = "[any]"
-				} else {
-					fieldType = fmt.Sprintf("[%s]", itemType)
-				}
+				log.Printf("processing array items for field %s", fieldName)
+				// Get the item type - preserve references to other schemas
+				itemType, _, refName := generateFieldType("item", fieldSchema.Value.Items, true, schemaName, doc)
+				log.Printf("array item type for field %s: %s (ref: %s)", fieldName, itemType, refName)
+
+				// For referenced schema types in arrays, we want to keep the reference
+				// rather than using a generic type
+				fieldType = fmt.Sprintf("[%s]", itemType)
+				refType = refName // Pass along the reference type
 			} else {
 				fieldType = "[any]"
 			}
@@ -349,7 +393,7 @@ func generateFieldType(fieldName string, fieldSchema *openapi3.SchemaRef, isRequ
 		fieldType = "any"
 	}
 
-	return fieldType, isComplexType
+	return fieldType, isComplexType, refType
 }
 
 // processInheritance handles allOf inheritance in OpenAPI schemas
@@ -476,4 +520,37 @@ func generateMainK(outputDir string, topLevelSchemas []string, allSchemas []stri
 func GenerateTestMainK(outputDir string, schemas []string) error {
 	// For test cases, use the schemas as both top-level and all schemas
 	return generateMainK(outputDir, schemas, schemas)
+}
+
+// extractSchemaReference extracts the reference type from a property in the original OpenAPI spec
+func extractSchemaReference(doc *openapi3.T, schemaName string, propertyName string) string {
+	// Check if the schema exists in the original document
+	if doc.Components == nil || doc.Components.Schemas == nil {
+		return ""
+	}
+
+	schema, ok := doc.Components.Schemas[schemaName]
+	if !ok || schema.Value == nil {
+		return ""
+	}
+
+	// Check if the property exists and has a reference
+	prop, ok := schema.Value.Properties[propertyName]
+	if !ok || prop.Value == nil {
+		return ""
+	}
+
+	// If the property has a direct reference
+	if prop.Ref != "" {
+		return extractSchemaName(prop.Ref)
+	}
+
+	// If the property is an array, check if the items have a reference
+	if prop.Value.Type != nil && len(*prop.Value.Type) > 0 && (*prop.Value.Type)[0] == "array" {
+		if prop.Value.Items != nil && prop.Value.Items.Ref != "" {
+			return extractSchemaName(prop.Value.Items.Ref)
+		}
+	}
+
+	return ""
 }

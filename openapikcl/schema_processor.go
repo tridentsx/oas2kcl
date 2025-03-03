@@ -14,7 +14,18 @@ func (f *Flattener) flattenSchemaRef(ref *openapi3.SchemaRef) (*openapi3.SchemaR
 
 	// Handle direct reference
 	if ref.Ref != "" {
-		return f.resolveReference(ref.Ref)
+		// Instead of just resolving the reference, preserve the reference information
+		resolved, err := f.resolveReference(ref.Ref)
+		if err != nil {
+			return nil, err
+		}
+
+		// Create a new schema reference that has both the resolved value and the original reference
+		flatSchema := &openapi3.SchemaRef{
+			Ref:   ref.Ref, // Preserve the original reference
+			Value: resolved.Value,
+		}
+		return flatSchema, nil
 	}
 
 	// Create new schema to avoid modifying the original
