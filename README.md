@@ -58,7 +58,7 @@ Options:
 
 ## Features
 
-- **Multiple OpenAPI versions support**: Compatible with OpenAPI 2.0 (Swagger), 3.0, and 3.1
+- **Multiple OpenAPI versions support**: Compatible with OpenAPI 2.0 (Swagger), 3.0, and 3.1 soon
 - **Schema flattening**: Resolves local and remote references
 - **Type conversion**: Maps OpenAPI types to KCL types
 - **Validation**: Generates KCL validation constraints from OpenAPI schemas
