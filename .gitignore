@@ -42,3 +42,4 @@ schema.k
 *.gcov
 *.test
 
+schema/
