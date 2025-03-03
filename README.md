@@ -39,16 +39,18 @@ Convert an OpenAPI specification file to KCL schemas:
 
 ```bash
 oas2kcl -oas path/to/openapi.json -out schema.k
+# or use YAML format
+oas2kcl -oas path/to/openapi.yaml -out schema.k
 ```
 
 ### Command Line Options
 
 ```
 Usage:
-  oas2kcl -oas openapi.json [options]
+  oas2kcl -oas openapi.json|openapi.yaml [options]
 
 Options:
-  -oas string        Path to the OpenAPI specification file (required)
+  -oas string        Path to the OpenAPI specification file (JSON or YAML format, required)
   -out string        Optional output file for the generated KCL schema (.k)
   -package string    Package name for the generated KCL schema (default "schema")
   -skip-flatten      Skip flattening the OpenAPI spec
@@ -58,7 +60,8 @@ Options:
 
 ## Features
 
-- **Multiple OpenAPI versions support**: Compatible with OpenAPI 2.0 (Swagger), 3.0, and 3.1 soon
+- **Multiple OpenAPI versions support**: Compatible with OpenAPI 2.0 (Swagger), 3.0, and 3.1
+- **Multiple formats support**: Handles both JSON and YAML formatted OpenAPI specifications
 - **Schema flattening**: Resolves local and remote references
 - **Type conversion**: Maps OpenAPI types to KCL types
 - **Validation**: Generates KCL validation constraints from OpenAPI schemas

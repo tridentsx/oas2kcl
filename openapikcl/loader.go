@@ -28,6 +28,16 @@ func LoadOpenAPISchema(filePath string, opts LoadOptions) (*openapi3.T, OpenAPIV
 		return nil, "", fmt.Errorf("error reading file: %w", err)
 	}
 
+	// Check file extension to determine format
+	ext := strings.ToLower(filepath.Ext(filePath))
+	if ext == ".yaml" || ext == ".yml" {
+		log.Printf("detected YAML format from file extension: %s", ext)
+	} else if ext == ".json" {
+		log.Printf("detected JSON format from file extension: %s", ext)
+	} else {
+		log.Printf("no specific format identified from extension: %s, will attempt auto-detection", ext)
+	}
+
 	// Detect version
 	version, err := DetectOpenAPIVersion(data)
 	if err != nil {

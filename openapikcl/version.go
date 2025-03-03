@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+
+	"gopkg.in/yaml.v3"
 )
 
 // OpenAPIVersion represents supported OpenAPI specification versions
@@ -20,14 +22,30 @@ const (
 func DetectOpenAPIVersion(data []byte) (OpenAPIVersion, error) {
 	// Parse just enough to get the version
 	var doc struct {
-		Swagger string `json:"swagger"` // OpenAPI 2.0
-		OpenAPI string `json:"openapi"` // OpenAPI 3.x
+		Swagger string `json:"swagger" yaml:"swagger"` // OpenAPI 2.0
+		OpenAPI string `json:"openapi" yaml:"openapi"` // OpenAPI 3.x
 	}
 
-	if err := json.Unmarshal(data, &doc); err != nil {
-		return "", fmt.Errorf("failed to parse document: %w", err)
+	// Try JSON first
+	jsonErr := json.Unmarshal(data, &doc)
+	if jsonErr == nil {
+		return detectVersion(doc)
 	}
 
+	// If JSON parsing fails, try YAML
+	yamlErr := yaml.Unmarshal(data, &doc)
+	if yamlErr != nil {
+		return "", fmt.Errorf("failed to parse document as JSON (%w) or YAML (%w)", jsonErr, yamlErr)
+	}
+
+	return detectVersion(doc)
+}
+
+// detectVersion determines the OpenAPI version from the parsed document
+func detectVersion(doc struct {
+	Swagger string `json:"swagger" yaml:"swagger"`
+	OpenAPI string `json:"openapi" yaml:"openapi"`
+}) (OpenAPIVersion, error) {
 	if doc.Swagger == "2.0" {
 		return OpenAPIV2, nil
 	} else if doc.OpenAPI == "3.0.0" || doc.OpenAPI == "3.0.1" || doc.OpenAPI == "3.0.2" || doc.OpenAPI == "3.0.3" {

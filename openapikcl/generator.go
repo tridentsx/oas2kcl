@@ -335,8 +335,6 @@ func generateFieldType(fieldName string, fieldSchema *openapi3.SchemaRef, isRequ
 				if fieldSchema.Value.AdditionalProperties.Schema != nil {
 					// Just use dict for maps
 					fieldType = "dict"
-				} else {
-					fieldType = "dict"
 				}
 				isComplexType = true
 			} else {
@@ -399,7 +397,7 @@ func extractSchemaName(ref string) string {
 // writeKCLSchemaFile writes the KCL schema to a file
 func writeKCLSchemaFile(outputDir, name, content string) error {
 	// Create the output directory if it doesn't exist
-	if err := os.MkdirAll(outputDir, 0755); err != nil {
+	if err := os.MkdirAll(outputDir, 0700); err != nil {
 		return fmt.Errorf("failed to create output directory: %w", err)
 	}
 
@@ -407,7 +405,7 @@ func writeKCLSchemaFile(outputDir, name, content string) error {
 	filePath := filepath.Join(outputDir, name+".k")
 
 	// Write the content to the file
-	if err := os.WriteFile(filePath, []byte(content), 0644); err != nil {
+	if err := os.WriteFile(filePath, []byte(content), 0600); err != nil {
 		return fmt.Errorf("failed to write schema file: %w", err)
 	}
 
@@ -463,7 +461,7 @@ func generateMainK(outputDir string, topLevelSchemas []string, allSchemas []stri
 
 	// Write the main.k file
 	mainKPath := filepath.Join(outputDir, "main.k")
-	if err := os.WriteFile(mainKPath, []byte(mainBuilder.String()), 0644); err != nil {
+	if err := os.WriteFile(mainKPath, []byte(mainBuilder.String()), 0600); err != nil {
 		return fmt.Errorf("failed to write main.k: %v", err)
 	}
 
