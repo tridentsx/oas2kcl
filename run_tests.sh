@@ -1,55 +1,58 @@
 #!/bin/bash
 set -e
 
-# Create logs directory
-LOGS_DIR="test_logs"
-mkdir -p "$LOGS_DIR"
-LOG_FILE="$LOGS_DIR/test_run_$(date +%Y%m%d_%H%M%S).log"
-
-# Helper function to log to both file and terminal
-log() {
-  echo "$@" | tee -a "$LOG_FILE"
-}
-
-# Helper for logging verbose output only to file
-log_verbose() {
-  echo "$@" >> "$LOG_FILE"
-}
-
-log "Running unit tests..."
-go test -v ./openapikcl -run "^Test.*$" > "$LOGS_DIR/unit_tests.log" 2>&1 || {
-  log "❌ Unit tests FAILED - see $LOGS_DIR/unit_tests.log for details"
-  exit 1
-}
-log "✅ Unit tests PASSED"
-
-# Check if the converter exists
-if [ ! -f "./openapi-to-kcl" ]; then
-  log "Error: openapi-to-kcl binary not found. Build it first with 'go build -o openapi-to-kcl ./cmd/main.go'"
-  exit 1
-fi
-
-# Check if KCL is installed
-if ! command -v kcl &> /dev/null; then
-  log "Warning: KCL is not installed or not in PATH. KCL validation will be skipped."
-  KCL_AVAILABLE=0
-else
-  log "KCL available - will perform schema validation"
-  KCL_AVAILABLE=1
-fi
+# Colors for better output
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+RESET='\033[0m'
 
 # Create temporary directory for output
 temp_dir=$(mktemp -d)
 trap "rm -rf $temp_dir" EXIT
 
-overall_result=0
+echo -e "${BLUE}===== OpenAPI to KCL Test Runner =====${RESET}"
+echo -e "Using temporary directory: ${temp_dir}"
 
-log "Running integration tests..."
+# Test results tracking
+unit_tests_passed=0
+integration_tests_passed=0
+integration_tests_failed=0
+total_schemas_validated=0
+schemas_validated_success=0
+schemas_validated_failed=0
+
+echo -e "\n${BLUE}Running unit tests...${RESET}"
+if go test -v ./openapikcl -run "^Test.*$"; then
+  echo -e "${GREEN}✅ Unit tests PASSED${RESET}"
+  unit_tests_passed=1
+else
+  echo -e "${RED}❌ Unit tests FAILED${RESET}"
+  exit 1
+fi
+
+# Check if the converter exists
+if [ ! -f "./openapi-to-kcl" ]; then
+  echo -e "${RED}Error: openapi-to-kcl binary not found. Build it first with 'go build -o openapi-to-kcl ./cmd/main.go'${RESET}"
+  exit 1
+fi
+
+# Check if KCL is installed
+if ! command -v kcl &> /dev/null; then
+  echo -e "${YELLOW}Warning: KCL is not installed or not in PATH. KCL validation will be skipped.${RESET}"
+  KCL_AVAILABLE=0
+else
+  echo -e "${GREEN}KCL available - will perform schema validation${RESET}"
+  KCL_AVAILABLE=1
+fi
+
+echo -e "\n${BLUE}Running integration tests...${RESET}"
 
 # Debug: List all test files
-log "Available test files:"
+echo -e "${BLUE}Available test files:${RESET}"
 for test_file in openapikcl/testdata/input/*.json; do
-  log "  - $(basename "$test_file")"
+  echo "  - $(basename "$test_file")"
 done
 
 # Use specific test files or all if "all" is specified
@@ -64,12 +67,15 @@ if [ "$1" = "all" ] || [ -z "$1" ]; then
 else
   test_files=("openapikcl/testdata/input/$1.json")
   if [ ! -f "${test_files[0]}" ]; then
-    log "Error: Test file '${test_files[0]}' not found."
+    echo -e "${RED}Error: Test file '${test_files[0]}' not found.${RESET}"
     exit 1
   fi
 fi
 
-log "Running tests for: ${test_files[@]}"
+echo -e "${BLUE}Running tests for:${RESET}"
+for file in "${test_files[@]}"; do
+  echo "  - $(basename "$file")"
+done
 
 # For each OpenAPI file in the testdata/input directory
 for input_file in "${test_files[@]}"; do
@@ -78,55 +84,95 @@ for input_file in "${test_files[@]}"; do
   
   # Extract test name from filename
   test_name=$(basename "${input_file}" .json)
-  test_log="$LOGS_DIR/${test_name}_test.log"
-  
-  log "Testing $test_name..."
+  echo -e "\n${BLUE}Testing ${test_name}...${RESET}"
   
   # Generate KCL schemas
-  ./openapi-to-kcl -oas "${input_file}" -out "${temp_dir}" -package "${test_name}" >> "$test_log" 2>&1
+  output_dir="${temp_dir}/${test_name}"
+  mkdir -p "${output_dir}"
   
-  failed=0
+  echo "  Generating KCL schemas from ${input_file}..."
+  if ./openapi-to-kcl -oas "${input_file}" -out "${output_dir}" -package "${test_name}"; then
+    echo -e "  ${GREEN}✅ Schema generation successful${RESET}"
+  else
+    echo -e "  ${RED}❌ Schema generation failed${RESET}"
+    integration_tests_failed=$((integration_tests_failed + 1))
+    continue
+  fi
+  
+  test_failed=0
   
   # Run KCL validation if available
   if [ $KCL_AVAILABLE -eq 1 ]; then
-    log_verbose "Running KCL validation for $test_name..."
+    echo -e "  ${BLUE}Running KCL validations:${RESET}"
     
-    # Directly run main.k validation
-    if [ -f "$temp_dir/main.k" ]; then
-      log "  Running KCL validation: kcl run ./main.k"
-      if (cd "$temp_dir" && kcl run "main.k" > /dev/null 2>&1); then
-        log "  ✅ KCL validation: PASSED (main.k validates successfully)"
+    # First validate each individual schema file
+    for schema_file in "${output_dir}"/*.k; do
+      # Skip main.k and schema files that aren't actual KCL schemas (like helpers)
+      if [[ "${schema_file}" != *"main.k"* ]] && grep -q "schema " "${schema_file}"; then
+        schema_name=$(basename "${schema_file}" .k)
+        total_schemas_validated=$((total_schemas_validated + 1))
+        
+        echo -n "    Validating ${schema_name}... "
+        if (cd "${output_dir}" && kcl run "${schema_name}.k" > /dev/null 2>&1); then
+          echo -e "${GREEN}PASSED${RESET}"
+          schemas_validated_success=$((schemas_validated_success + 1))
+        else
+          echo -e "${RED}FAILED${RESET}"
+          echo -e "    ${RED}Error details:${RESET}"
+          (cd "${output_dir}" && kcl run "${schema_name}.k" 2>&1 | sed 's/^/      /')
+          schemas_validated_failed=$((schemas_validated_failed + 1))
+          test_failed=1
+        fi
+      fi
+    done
+    
+    # Then validate main.k which should import and use all schemas
+    if [ -f "${output_dir}/main.k" ]; then
+      echo -n "    Validating main.k (all schemas)... "
+      if (cd "${output_dir}" && kcl run "main.k" > /dev/null 2>&1); then
+        echo -e "${GREEN}PASSED${RESET}"
       else
-        log "  ❌ KCL validation: FAILED (main.k validation errors)"
-        # Show the error in the console and log
-        (cd "$temp_dir" && kcl run "main.k" 2>&1) | tee -a "$test_log"
-        failed=1
+        echo -e "${RED}FAILED${RESET}"
+        echo -e "    ${RED}Error details:${RESET}"
+        (cd "${output_dir}" && kcl run "main.k" 2>&1 | sed 's/^/      /')
+        test_failed=1
       fi
     else
-      log "  ❌ KCL validation: FAILED (main.k file not generated)"
-      failed=1
+      echo -e "    ${RED}❌ main.k file not generated${RESET}"
+      test_failed=1
     fi
   else
     # If KCL is not available, consider the test passed if files were generated
-    if [ -f "$temp_dir/main.k" ]; then
-      log "  ⚠️ KCL not available - but files were generated successfully"
+    if [ -f "${output_dir}/main.k" ]; then
+      echo -e "  ${YELLOW}⚠️ KCL not available - but files were generated successfully${RESET}"
     else
-      log "  ❌ Test FAILED (main.k file not generated)"
-      failed=1
+      echo -e "  ${RED}❌ main.k file not generated${RESET}"
+      test_failed=1
     fi
   fi
   
-  if [ $failed -eq 1 ]; then
-    overall_result=1
-    log "❌ Test $test_name FAILED - see $test_log for details"
+  if [ $test_failed -eq 1 ]; then
+    echo -e "  ${RED}❌ Test ${test_name} FAILED${RESET}"
+    integration_tests_failed=$((integration_tests_failed + 1))
   else
-    log "✅ Test $test_name PASSED"
+    echo -e "  ${GREEN}✅ Test ${test_name} PASSED${RESET}"
+    integration_tests_passed=$((integration_tests_passed + 1))
   fi
 done
 
-if [ $overall_result -eq 0 ]; then
-  log "All integration tests passed! 🎉"
+# Print summary
+echo -e "\n${BLUE}===== Test Summary =====${RESET}"
+echo -e "Unit tests: ${unit_tests_passed}/1 passed"
+echo -e "Integration tests: ${integration_tests_passed}/$((integration_tests_passed + integration_tests_failed)) passed"
+
+if [ $KCL_AVAILABLE -eq 1 ]; then
+  echo -e "KCL schema validations: ${schemas_validated_success}/${total_schemas_validated} passed"
+fi
+
+if [ $integration_tests_failed -eq 0 ]; then
+  echo -e "\n${GREEN}All tests passed! 🎉${RESET}"
+  exit 0
 else
-  log "Some integration tests failed. See logs in $LOGS_DIR directory."
+  echo -e "\n${RED}Some tests failed.${RESET}"
   exit 1
 fi
