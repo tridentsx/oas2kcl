@@ -1,6 +1,6 @@
 # oas2kcl
 
-A command-line tool to generate [KCL](https://kcl-lang.io/) schemas from OpenAPI specifications (supports OpenAPI 2.0/Swagger, 3.0, and 3.1).
+A command-line tool to generate [KCL](https://kcl-lang.io/) schemas from OpenAPI specifications (supports OpenAPI 2.0/Swagger, 3.0, and soon 3.1).
 
 ## Overview
 
@@ -60,7 +60,7 @@ Options:
 
 ## Features
 
-- **Multiple OpenAPI versions support**: Compatible with OpenAPI 2.0 (Swagger), 3.0, and 3.1
+- **Multiple OpenAPI versions support**: Compatible with OpenAPI 2.0 (Swagger), 3.0, and soon 3.1
 - **Multiple formats support**: Handles both JSON and YAML formatted OpenAPI specifications
 - **Schema flattening**: Resolves local and remote references
 - **Type conversion**: Maps OpenAPI types to KCL types
