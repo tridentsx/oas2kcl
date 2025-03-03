@@ -277,6 +277,70 @@ func GenerateKCLSchema(name string, schema *openapi3.SchemaRef, allSchemas opena
 		}
 		fieldFormatted += ": " + kcltypeName
 
+		// Add default value if present
+		if propSchema.Value != nil && propSchema.Value.Default != nil {
+			// Format the default value based on its type
+			var defaultStr string
+			switch v := propSchema.Value.Default.(type) {
+			case string:
+				// For strings, check if it's an enum value
+				if len(propSchema.Value.Enum) > 0 {
+					// Verify the default is a valid enum value
+					isValidEnum := false
+					for _, enumVal := range propSchema.Value.Enum {
+						if enumStr, ok := enumVal.(string); ok && enumStr == v {
+							isValidEnum = true
+							break
+						}
+					}
+					if !isValidEnum {
+						log.Printf("warning: default value '%s' is not a valid enum value for field %s", v, propertyName)
+					}
+				}
+				defaultStr = fmt.Sprintf("\"%s\"", v)
+			case float64:
+				// Handle both integer and float defaults
+				if v == float64(int64(v)) {
+					// For integers, check if it's an enum value
+					if len(propSchema.Value.Enum) > 0 {
+						// Verify the default is a valid enum value
+						isValidEnum := false
+						for _, enumVal := range propSchema.Value.Enum {
+							if enumFloat, ok := enumVal.(float64); ok && enumFloat == v {
+								isValidEnum = true
+								break
+							}
+						}
+						if !isValidEnum {
+							log.Printf("warning: default value '%d' is not a valid enum value for field %s", int64(v), propertyName)
+						}
+					}
+					defaultStr = fmt.Sprintf("%d", int64(v))
+				} else {
+					defaultStr = fmt.Sprintf("%f", v)
+				}
+			case bool:
+				// For booleans, check if it's an enum value
+				if len(propSchema.Value.Enum) > 0 {
+					// Verify the default is a valid enum value
+					isValidEnum := false
+					for _, enumVal := range propSchema.Value.Enum {
+						if enumBool, ok := enumVal.(bool); ok && enumBool == v {
+							isValidEnum = true
+							break
+						}
+					}
+					if !isValidEnum {
+						log.Printf("warning: default value '%v' is not a valid enum value for field %s", v, propertyName)
+					}
+				}
+				defaultStr = fmt.Sprintf("%v", v)
+			default:
+				defaultStr = fmt.Sprintf("%v", v)
+			}
+			fieldFormatted += " = " + defaultStr
+		}
+
 		builder.WriteString(fmt.Sprintf("\n    %s%s", documentation, fieldFormatted))
 
 		// Collect constraints for later

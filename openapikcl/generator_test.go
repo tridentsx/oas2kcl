@@ -63,6 +63,41 @@ func TestGenerateKCLSchema(t *testing.T) {
 					Value: &openapi3.Schema{
 						Type:      typesPtr("string"), // Use typesPtr
 						MinLength: 1,
+						Default:   "default_name",
+					},
+				},
+				"age": &openapi3.SchemaRef{
+					Value: &openapi3.Schema{
+						Type:    typesPtr("integer"), // Use typesPtr
+						Default: float64(25),
+					},
+				},
+				"isActive": &openapi3.SchemaRef{
+					Value: &openapi3.Schema{
+						Type:    typesPtr("boolean"), // Use typesPtr
+						Default: true,
+					},
+				},
+				"status": &openapi3.SchemaRef{
+					Value: &openapi3.Schema{
+						Type: typesPtr("string"), // Use typesPtr
+						Enum: []interface{}{
+							"active",
+							"inactive",
+							"pending",
+						},
+						Default: "active",
+					},
+				},
+				"priority": &openapi3.SchemaRef{
+					Value: &openapi3.Schema{
+						Type: typesPtr("integer"), // Use typesPtr
+						Enum: []interface{}{
+							float64(1),
+							float64(2),
+							float64(3),
+						},
+						Default: float64(2),
 					},
 				},
 				"tags": &openapi3.SchemaRef{
@@ -94,7 +129,11 @@ func TestGenerateKCLSchema(t *testing.T) {
 	result, err := GenerateKCLSchema("TestSchema", schema, schemas, OpenAPIV3, doc)
 	require.NoError(t, err)
 	assert.Contains(t, result, "schema TestSchema:")
-	assert.Contains(t, result, "name: str")
+	assert.Contains(t, result, "name: str = \"default_name\"")
+	assert.Contains(t, result, "age?: int = 25")
+	assert.Contains(t, result, "isActive?: bool = true")
+	assert.Contains(t, result, "status?: str = \"active\"")
+	assert.Contains(t, result, "priority?: int = 2")
 	assert.Contains(t, result, "tags?: [str]")
 }
 
