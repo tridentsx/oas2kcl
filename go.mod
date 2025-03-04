@@ -1,6 +1,6 @@
 module github.com/tridentsx/oas2kcl
 
-go 1.23.6
+go 1.23
 
 require (
 	github.com/getkin/kin-openapi v0.129.0
