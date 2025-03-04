@@ -233,7 +233,7 @@ func TestGenerateMainK(t *testing.T) {
 	schemaNames := []string{"User", "Pet", "Order", "Category"}
 
 	// Generate the main.k file
-	err = generateMainK(tmpDir, schemaNames, schemaNames)
+	err = generateMainK(tmpDir, schemaNames, schemaNames, nil)
 	if err != nil {
 		t.Fatalf("Failed to generate main.k: %v", err)
 	}
