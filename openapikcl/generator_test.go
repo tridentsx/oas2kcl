@@ -232,7 +232,7 @@ func TestGenerateMainK(t *testing.T) {
 	schemaNames := []string{"User", "Pet", "Order", "Category"}
 
 	// Generate the main.k file
-	err = generateMainK(tmpDir, schemaNames, schemaNames, nil)
+	err = generateMainK(tmpDir, schemaNames, nil)
 	if err != nil {
 		t.Fatalf("Failed to generate main.k: %v", err)
 	}
@@ -265,17 +265,6 @@ func TestGenerateMainK(t *testing.T) {
 }
 
 func TestSchemaInheritance(t *testing.T) {
-	// Create parent schema
-	parentSchema := &openapi3.Schema{
-		Type: typesPtr("object"), // Already using typesPtr correctly
-		Properties: openapi3.Schemas{
-			"id": &openapi3.SchemaRef{
-				Value: &openapi3.Schema{
-					Type: typesPtr("string"), // Already using typesPtr correctly
-				},
-			},
-		},
-	}
 
 	// Create child schema with allOf reference
 	childSchema := &openapi3.Schema{
@@ -293,9 +282,7 @@ func TestSchemaInheritance(t *testing.T) {
 		},
 	}
 
-	result, err := processInheritance(childSchema, openapi3.Schemas{
-		"Parent": &openapi3.SchemaRef{Value: parentSchema},
-	})
+	result, err := processInheritance(childSchema)
 
 	require.NoError(t, err)
 	assert.Equal(t, 1, len(result))
