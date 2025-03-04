@@ -2,7 +2,6 @@ package openapikcl
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -43,7 +42,7 @@ func TestOpenAPI2Conversion(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			// Create temporary output directory
-			tempDir, err := ioutil.TempDir("", "kcl-test-")
+			tempDir, err := os.MkdirTemp("", "kcl-test-")
 			require.NoError(t, err)
 			defer os.RemoveAll(tempDir)
 

@@ -3,7 +3,6 @@ package openapikcl
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -145,7 +144,7 @@ func TestGenerateKCLSchemas(t *testing.T) {
 	}
 
 	// Create a temporary directory
-	tempDir, err := ioutil.TempDir("", "kcl-test-")
+	tempDir, err := os.MkdirTemp("", "kcl-test-")
 	require.NoError(t, err)
 	defer os.RemoveAll(tempDir)
 
@@ -162,7 +161,7 @@ func TestGenerateKCLSchemas(t *testing.T) {
 	assert.NoError(t, err, "User.k file should have been created")
 
 	// Read the contents of the file
-	content, err := ioutil.ReadFile(userSchemaPath)
+	content, err := os.ReadFile(userSchemaPath)
 	require.NoError(t, err)
 
 	// Check content
@@ -180,7 +179,7 @@ func TestGenerateKCLSchemas(t *testing.T) {
 	assert.NoError(t, err, "main.k file should have been created")
 
 	// Read main.k contents
-	mainContent, err := ioutil.ReadFile(mainKPath)
+	mainContent, err := os.ReadFile(mainKPath)
 	require.NoError(t, err)
 
 	mainContentStr := string(mainContent)
@@ -198,7 +197,7 @@ import User
 schema ValidationTest:
     user_instance?: User
 `
-		err = ioutil.WriteFile(validationPath, []byte(validationContent), 0644)
+		err = os.WriteFile(validationPath, []byte(validationContent), 0644)
 		require.NoError(t, err)
 
 		// Run KCL validation on the test file
@@ -361,13 +360,13 @@ func TestGenerateKCLFromFile(t *testing.T) {
 
 // Helper function to print files in directory
 func printFilesInDir(dir string) error {
-	files, err := ioutil.ReadDir(dir)
+	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return err
 	}
 
-	for _, file := range files {
-		fmt.Println(file.Name())
+	for _, entry := range entries {
+		fmt.Println(entry.Name())
 	}
 	return nil
 }
