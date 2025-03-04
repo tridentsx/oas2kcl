@@ -1,11 +1,11 @@
 package openapikcl
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -69,53 +69,25 @@ func TestOpenAPI2Conversion(t *testing.T) {
 			for _, schemaName := range tc.expectedSchemas {
 				schemaPath := filepath.Join(tempDir, schemaName+".k")
 				_, err := os.Stat(schemaPath)
+				fmt.Println(schemaPath)
 				assert.NoError(t, err, "Schema file %s should have been created", schemaName)
 			}
 
 			// Run KCL validation
 			if tc.expectedValidKCL {
-				// Instead of validating all schemas at once with main.k,
-				// validate each schema individually to avoid circular references
-				var validationSuccess = true
+				// Validate main.k file which imports all schemas
+				cmd := exec.Command("kcl", "run", tempDir)
+				cmd.Dir = tempDir
+				output, err := cmd.CombinedOutput()
 
-				files, err := ioutil.ReadDir(tempDir)
-				require.NoError(t, err)
-
-				for _, file := range files {
-					if !file.IsDir() && strings.HasSuffix(file.Name(), ".k") {
-						// Skip main.k file
-						if file.Name() == "main.k" {
-							continue
-						}
-
-						// Create validation file for this schema
-						schemaName := strings.TrimSuffix(file.Name(), ".k")
-						validationFile := filepath.Join(tempDir, "validate_"+schemaName+".k")
-
-						var validationContent strings.Builder
-						validationContent.WriteString("# Validation file for " + schemaName + "\n")
-						validationContent.WriteString("import regex\n")                // Standard import
-						validationContent.WriteString("import " + schemaName + "\n\n") // Import the schema
-						validationContent.WriteString("schema Validation:\n")
-						validationContent.WriteString("    dummy: str = \"test\"\n")
-
-						err = ioutil.WriteFile(validationFile, []byte(validationContent.String()), 0644)
-						require.NoError(t, err)
-
-						// Run KCL validation for this schema
-						cmd := exec.Command("kcl", validationFile)
-						cmd.Dir = tempDir
-						output, err := cmd.CombinedOutput()
-
-						if err != nil {
-							t.Logf("KCL validation failed for schema %s: %s", schemaName, string(output))
-							validationSuccess = false
-						}
-					}
+				if err != nil {
+					t.Logf("KCL validation failed: %s", string(output))
+					fmt.Println(err)
+					t.Error("KCL validation should succeed")
 				}
 
 				// Assert that all validations passed
-				assert.True(t, validationSuccess, "KCL validation should succeed")
+				assert.NoError(t, err, "KCL validation should succeed")
 			}
 		})
 	}

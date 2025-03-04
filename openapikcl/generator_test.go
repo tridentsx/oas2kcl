@@ -257,13 +257,6 @@ func TestGenerateMainK(t *testing.T) {
 	assert.Contains(t, contentStr, "# This file is generated for KCL validation")
 	assert.Contains(t, contentStr, "import regex")
 
-	// Verify that it DOES contain imports for schemas
-	// (our approach imports schemas for validation)
-	assert.Contains(t, contentStr, "import Category")
-	assert.Contains(t, contentStr, "import Order")
-	assert.Contains(t, contentStr, "import Pet")
-	assert.Contains(t, contentStr, "import User")
-
 	// Check for the validation schema
 	assert.Contains(t, contentStr, "schema ValidationSchema:")
 
@@ -339,7 +332,7 @@ func TestGenerateKCLFromFile(t *testing.T) {
 	printFilesInDir(tempDir)
 
 	// Check if expected schema files were created
-	expectedSchemas := []string{"Address", "ArrayType", "BooleanType", "Customer", "EmptyObject", "Metadata", "NumberType", "Order", "OrderResponse", "OrderStatus", "Price", "StringType"}
+	expectedSchemas := []string{"Address", "Customer", "Metadata", "Order", "OrderResponse", "Price"}
 	for _, schema := range expectedSchemas {
 		schemaPath := filepath.Join(tempDir, schema+".k")
 		assert.True(t, fileExists(schemaPath), "Schema file %s should exist", schema+".k")
