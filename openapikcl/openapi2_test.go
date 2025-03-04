@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"kcl-lang.io/kcl-go"
 )
 
 // TestOpenAPI2Conversion tests conversion of OpenAPI 2.0 schemas
@@ -17,12 +17,6 @@ func TestOpenAPI2Conversion(t *testing.T) {
 	// Skip if running in CI without proper access
 	if os.Getenv("CI") != "" && os.Getenv("SKIP_INTEGRATION_TESTS") != "" {
 		t.Skip("Skipping integration test in CI")
-	}
-
-	// Validate KCL is installed
-	_, err := exec.LookPath("kcl")
-	if err != nil {
-		t.Skip("KCL not found in PATH, skipping KCL validation test")
 	}
 
 	// Test files
@@ -73,21 +67,19 @@ func TestOpenAPI2Conversion(t *testing.T) {
 				assert.NoError(t, err, "Schema file %s should have been created", schemaName)
 			}
 
-			// Run KCL validation
+			// Run KCL validation using go-sdk
 			if tc.expectedValidKCL {
-				// Validate main.k file which imports all schemas
-				cmd := exec.Command("kcl", "run", tempDir)
-				cmd.Dir = tempDir
-				output, err := cmd.CombinedOutput()
+				// Run validation using KCL go-sdk
+				result, err := kcl.Run(tempDir)
 
 				if err != nil {
-					t.Logf("KCL validation failed: %s", string(output))
-					fmt.Println(err)
+					t.Logf("KCL validation failed: %v", err)
 					t.Error("KCL validation should succeed")
 				}
 
-				// Assert that all validations passed
+				// Assert that validation passed
 				assert.NoError(t, err, "KCL validation should succeed")
+				assert.NotNil(t, result, "KCL validation result should not be nil")
 			}
 		})
 	}
