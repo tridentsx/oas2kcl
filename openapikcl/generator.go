@@ -75,7 +75,7 @@ func GenerateKCLSchemas(doc *openapi3.T, outputDir string, packageName string, v
 	}
 
 	// Generate a main.k file that imports all schemas to handle circular dependencies
-	if err := generateMainK(outputDir, schemaNames, allSchemaNames, doc); err != nil {
+	if err := generateMainK(outputDir, allSchemaNames, doc); err != nil {
 		return fmt.Errorf("failed to generate main.k file: %w", err)
 	}
 
@@ -159,7 +159,7 @@ func GenerateKCLSchema(name string, schema *openapi3.SchemaRef, allSchemas opena
 	sort.Strings(propertyNames)
 
 	// Add parent schemas if there are any
-	parents, err := processInheritance(schema.Value, allSchemas)
+	parents, err := processInheritance(schema.Value)
 	if err != nil {
 		return "", err
 	}
@@ -510,7 +510,7 @@ func generateFieldType(fieldName string, fieldSchema *openapi3.SchemaRef, isRequ
 }
 
 // processInheritance handles allOf inheritance in OpenAPI schemas
-func processInheritance(schema *openapi3.Schema, allSchemas openapi3.Schemas) ([]string, error) {
+func processInheritance(schema *openapi3.Schema) ([]string, error) {
 	var parents []string
 
 	// Process allOf to extract parent schemas
@@ -583,7 +583,7 @@ func camelToSnake(s string) string {
 }
 
 // generateMainK creates a main.k file that imports all schemas for validation
-func generateMainK(outputDir string, topLevelSchemas []string, allSchemas []string, doc *openapi3.T) error {
+func generateMainK(outputDir string, allSchemas []string, doc *openapi3.T) error {
 	var mainBuilder strings.Builder
 
 	// Add comment header
@@ -591,18 +591,6 @@ func generateMainK(outputDir string, topLevelSchemas []string, allSchemas []stri
 
 	// Add required standard imports
 	mainBuilder.WriteString("import regex\n\n")
-
-	// Import all schemas to ensure validation works properly
-	// schemaMap := make(map[string]bool)
-	// for _, schema := range allSchemas {
-	// 	schemaMap[schema] = true
-	// }
-
-	// Add imports for all schemas
-	// for _, schema := range allSchemas {
-	// 	mainBuilder.WriteString(fmt.Sprintf("import %s\n", schema))
-	// }
-	// mainBuilder.WriteString("\n")
 
 	// Create validation schema
 	mainBuilder.WriteString("schema ValidationSchema:\n")
@@ -649,38 +637,38 @@ func generateMainK(outputDir string, topLevelSchemas []string, allSchemas []stri
 // GenerateTestMainK is a test helper function
 func GenerateTestMainK(outputDir string, schemas []string) error {
 	// For test cases, use the schemas as both top-level and all schemas
-	return generateMainK(outputDir, schemas, schemas, nil)
+	return generateMainK(outputDir, schemas, nil)
 }
 
 // extractSchemaReference extracts the reference type from a property in the original OpenAPI spec
-func extractSchemaReference(doc *openapi3.T, schemaName string, propertyName string) string {
-	// Check if the schema exists in the original document
-	if doc.Components == nil || doc.Components.Schemas == nil {
-		return ""
-	}
+// func extractSchemaReference(doc *openapi3.T, schemaName string, propertyName string) string {
+// 	// Check if the schema exists in the original document
+// 	if doc.Components == nil || doc.Components.Schemas == nil {
+// 		return ""
+// 	}
 
-	schema, ok := doc.Components.Schemas[schemaName]
-	if !ok || schema.Value == nil {
-		return ""
-	}
+// 	schema, ok := doc.Components.Schemas[schemaName]
+// 	if !ok || schema.Value == nil {
+// 		return ""
+// 	}
 
-	// Check if the property exists and has a reference
-	prop, ok := schema.Value.Properties[propertyName]
-	if !ok || prop.Value == nil {
-		return ""
-	}
+// 	// Check if the property exists and has a reference
+// 	prop, ok := schema.Value.Properties[propertyName]
+// 	if !ok || prop.Value == nil {
+// 		return ""
+// 	}
 
-	// If the property has a direct reference
-	if prop.Ref != "" {
-		return extractSchemaName(prop.Ref)
-	}
+// 	// If the property has a direct reference
+// 	if prop.Ref != "" {
+// 		return extractSchemaName(prop.Ref)
+// 	}
 
-	// If the property is an array, check if the items have a reference
-	if prop.Value.Type != nil && len(*prop.Value.Type) > 0 && (*prop.Value.Type)[0] == "array" {
-		if prop.Value.Items != nil && prop.Value.Items.Ref != "" {
-			return extractSchemaName(prop.Value.Items.Ref)
-		}
-	}
+// 	// If the property is an array, check if the items have a reference
+// 	if prop.Value.Type != nil && len(*prop.Value.Type) > 0 && (*prop.Value.Type)[0] == "array" {
+// 		if prop.Value.Items != nil && prop.Value.Items.Ref != "" {
+// 			return extractSchemaName(prop.Value.Items.Ref)
+// 		}
+// 	}
 
-	return ""
-}
+// 	return ""
+// }
