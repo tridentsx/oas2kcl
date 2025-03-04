@@ -45,6 +45,16 @@ func GenerateKCLSchemas(doc *openapi3.T, outputDir string, packageName string, v
 	// Process each schema in order
 	for _, name := range schemaNames {
 		schema := doc.Components.Schemas[name]
+
+		// Skip schemas without properties but with a simple type
+		// These will be directly handled in the referencing schemas
+		if schema.Value != nil &&
+			(schema.Value.Properties == nil || len(schema.Value.Properties) == 0) &&
+			schema.Value.Type != nil && len(*schema.Value.Type) > 0 {
+			log.Printf("skipping schema without properties: %s", name)
+			continue
+		}
+
 		kclSchema, err := GenerateKCLSchema(name, schema, doc.Components.Schemas, version, doc)
 		if err != nil {
 			return fmt.Errorf("failed to generate KCL schema for %s: %w", name, err)
@@ -65,7 +75,7 @@ func GenerateKCLSchemas(doc *openapi3.T, outputDir string, packageName string, v
 	}
 
 	// Generate a main.k file that imports all schemas to handle circular dependencies
-	if err := generateMainK(outputDir, schemaNames, allSchemaNames); err != nil {
+	if err := generateMainK(outputDir, schemaNames, allSchemaNames, doc); err != nil {
 		return fmt.Errorf("failed to generate main.k file: %w", err)
 	}
 
@@ -422,6 +432,21 @@ func generateFieldType(fieldName string, fieldSchema *openapi3.SchemaRef, isRequ
 			return formattedRef, false, refName
 		}
 
+		// Check if referenced schema has no properties and has a simple type
+		if doc != nil && doc.Components != nil && doc.Components.Schemas != nil {
+			if refSchema, ok := doc.Components.Schemas[refName]; ok {
+				if refSchema.Value != nil &&
+					(refSchema.Value.Properties == nil || len(refSchema.Value.Properties) == 0) &&
+					refSchema.Value.Type != nil && len(*refSchema.Value.Type) > 0 {
+					// Instead of referencing a separate schema, directly use the type
+					openAPIType := (*refSchema.Value.Type)[0]
+					kclType := ConvertTypeToKCL(openAPIType, refSchema.Value.Format)
+					log.Printf("schema without properties detected for %s, using direct type: %s", refName, kclType)
+					return kclType, false, ""
+				}
+			}
+		}
+
 		// For other references, we need to handle how KCL imports work
 		// When KCL imports a schema X and uses type X from it, it auto-prefixes it to X.X
 		// So instead of returning formattedRef (which would result in duplicated names),
@@ -558,7 +583,7 @@ func camelToSnake(s string) string {
 }
 
 // generateMainK creates a main.k file that imports all schemas for validation
-func generateMainK(outputDir string, topLevelSchemas []string, allSchemas []string) error {
+func generateMainK(outputDir string, topLevelSchemas []string, allSchemas []string, doc *openapi3.T) error {
 	var mainBuilder strings.Builder
 
 	// Add comment header
@@ -586,9 +611,26 @@ func generateMainK(outputDir string, topLevelSchemas []string, allSchemas []stri
 	mainBuilder.WriteString("    # Validation schema to verify relationships between all generated schemas\n")
 
 	// Add fields for all schemas
-	for _, schema := range allSchemas {
-		fieldName := camelToSnake(schema) + "_instance"
-		mainBuilder.WriteString(fmt.Sprintf("    %s?: %s\n", fieldName, schema))
+	for _, schemaName := range allSchemas {
+		fieldName := camelToSnake(schemaName) + "_instance"
+
+		// Check if the schema has no properties and has a simple type
+		if doc != nil && doc.Components != nil && doc.Components.Schemas != nil {
+			if schemaRef, ok := doc.Components.Schemas[schemaName]; ok {
+				if schemaRef.Value != nil &&
+					(schemaRef.Value.Properties == nil || len(schemaRef.Value.Properties) == 0) &&
+					schemaRef.Value.Type != nil && len(*schemaRef.Value.Type) > 0 {
+					// Instead of referencing a separate schema, directly use the type
+					openAPIType := (*schemaRef.Value.Type)[0]
+					kclType := ConvertTypeToKCL(openAPIType, schemaRef.Value.Format)
+					mainBuilder.WriteString(fmt.Sprintf("    %s?: %s\n", fieldName, kclType))
+					continue
+				}
+			}
+		}
+
+		// If schema has properties or we couldn't determine its type, use the schema reference
+		mainBuilder.WriteString(fmt.Sprintf("    %s?: %s\n", fieldName, schemaName))
 	}
 
 	// Write the main.k file
@@ -607,7 +649,7 @@ func generateMainK(outputDir string, topLevelSchemas []string, allSchemas []stri
 // GenerateTestMainK is a test helper function
 func GenerateTestMainK(outputDir string, schemas []string) error {
 	// For test cases, use the schemas as both top-level and all schemas
-	return generateMainK(outputDir, schemas, schemas)
+	return generateMainK(outputDir, schemas, schemas, nil)
 }
 
 // extractSchemaReference extracts the reference type from a property in the original OpenAPI spec

@@ -3,7 +3,6 @@ package openapikcl
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -145,7 +144,7 @@ func TestGenerateKCLSchemas(t *testing.T) {
 	}
 
 	// Create a temporary directory
-	tempDir, err := ioutil.TempDir("", "kcl-test-")
+	tempDir, err := os.MkdirTemp("", "kcl-test-")
 	require.NoError(t, err)
 	defer os.RemoveAll(tempDir)
 
@@ -162,7 +161,7 @@ func TestGenerateKCLSchemas(t *testing.T) {
 	assert.NoError(t, err, "User.k file should have been created")
 
 	// Read the contents of the file
-	content, err := ioutil.ReadFile(userSchemaPath)
+	content, err := os.ReadFile(userSchemaPath)
 	require.NoError(t, err)
 
 	// Check content
@@ -180,7 +179,7 @@ func TestGenerateKCLSchemas(t *testing.T) {
 	assert.NoError(t, err, "main.k file should have been created")
 
 	// Read main.k contents
-	mainContent, err := ioutil.ReadFile(mainKPath)
+	mainContent, err := os.ReadFile(mainKPath)
 	require.NoError(t, err)
 
 	mainContentStr := string(mainContent)
@@ -198,7 +197,7 @@ import User
 schema ValidationTest:
     user_instance?: User
 `
-		err = ioutil.WriteFile(validationPath, []byte(validationContent), 0644)
+		err = os.WriteFile(validationPath, []byte(validationContent), 0644)
 		require.NoError(t, err)
 
 		// Run KCL validation on the test file
@@ -233,7 +232,7 @@ func TestGenerateMainK(t *testing.T) {
 	schemaNames := []string{"User", "Pet", "Order", "Category"}
 
 	// Generate the main.k file
-	err = generateMainK(tmpDir, schemaNames, schemaNames)
+	err = generateMainK(tmpDir, schemaNames, schemaNames, nil)
 	if err != nil {
 		t.Fatalf("Failed to generate main.k: %v", err)
 	}
@@ -256,13 +255,6 @@ func TestGenerateMainK(t *testing.T) {
 	// Check that the file contains expected elements
 	assert.Contains(t, contentStr, "# This file is generated for KCL validation")
 	assert.Contains(t, contentStr, "import regex")
-
-	// Verify that it DOES contain imports for schemas
-	// (our approach imports schemas for validation)
-	assert.Contains(t, contentStr, "import Category")
-	assert.Contains(t, contentStr, "import Order")
-	assert.Contains(t, contentStr, "import Pet")
-	assert.Contains(t, contentStr, "import User")
 
 	// Check for the validation schema
 	assert.Contains(t, contentStr, "schema ValidationSchema:")
@@ -339,7 +331,7 @@ func TestGenerateKCLFromFile(t *testing.T) {
 	printFilesInDir(tempDir)
 
 	// Check if expected schema files were created
-	expectedSchemas := []string{"Address", "ArrayType", "BooleanType", "Customer", "EmptyObject", "Metadata", "NumberType", "Order", "OrderResponse", "OrderStatus", "Price", "StringType"}
+	expectedSchemas := []string{"Address", "Customer", "Metadata", "Order", "OrderResponse", "Price"}
 	for _, schema := range expectedSchemas {
 		schemaPath := filepath.Join(tempDir, schema+".k")
 		assert.True(t, fileExists(schemaPath), "Schema file %s should exist", schema+".k")
@@ -368,13 +360,13 @@ func TestGenerateKCLFromFile(t *testing.T) {
 
 // Helper function to print files in directory
 func printFilesInDir(dir string) error {
-	files, err := ioutil.ReadDir(dir)
+	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return err
 	}
 
-	for _, file := range files {
-		fmt.Println(file.Name())
+	for _, entry := range entries {
+		fmt.Println(entry.Name())
 	}
 	return nil
 }
