@@ -2,7 +2,8 @@ package openapikcl
 
 import (
 	"path/filepath"
-	"sort"
+	"strings"
+	"unicode"
 
 	"github.com/getkin/kin-openapi/openapi3"
 )
@@ -20,14 +21,20 @@ func isURLRef(ref string) bool {
 	return len(ref) > 7 && (ref[:7] == "http://" || ref[:8] == "https://")
 }
 
-// collectSchemas collects and returns a sorted list of schema names
-func collectSchemas(schemas openapi3.Schemas) []string {
-	keys := make([]string, 0, len(schemas))
-	for k := range schemas {
-		keys = append(keys, k)
+// camelToSnake converts a camelCase string to snake_case
+func camelToSnake(s string) string {
+	var result strings.Builder
+	for i, r := range s {
+		if unicode.IsUpper(r) {
+			if i > 0 {
+				result.WriteRune('_')
+			}
+			result.WriteRune(unicode.ToLower(r))
+		} else {
+			result.WriteRune(r)
+		}
 	}
-	sort.Strings(keys)
-	return keys
+	return result.String()
 }
 
 // mergeSchemas merges multiple schemas into a single schema

@@ -1,7 +1,6 @@
 package openapikcl
 
 import (
-	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,21 +9,21 @@ import (
 func TestLoadOpenAPISchema(t *testing.T) {
 	tests := []struct {
 		name                string
-		file                string
+		filename            string
 		expectedVersion     OpenAPIVersion
 		shouldError         bool
 		expectedSchemaCount int
 	}{
 		{
 			name:                "Load OpenAPI 3.0",
-			file:                "petstore.json",
+			filename:            "testdata/oas/input/petstore.json",
 			expectedVersion:     OpenAPIV3,
 			shouldError:         false,
 			expectedSchemaCount: 3, // Pet, Pets, Error
 		},
 		{
 			name:                "Load OpenAPI 2.0",
-			file:                "petstore_v2.json",
+			filename:            "testdata/oas/input/petstore_v2.json",
 			expectedVersion:     OpenAPIV2,
 			shouldError:         false,
 			expectedSchemaCount: 3, // Pet, PetInput, ErrorModel
@@ -33,7 +32,7 @@ func TestLoadOpenAPISchema(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			filePath := filepath.Join("testdata", "input", tc.file)
+			filePath := tc.filename
 			doc, version, err := LoadOpenAPISchema(filePath, LoadOptions{
 				FlattenSpec: false,
 			})
@@ -60,21 +59,21 @@ func TestLoadOpenAPISchema(t *testing.T) {
 func TestLoadOpenAPISchemaWithFlattening(t *testing.T) {
 	tests := []struct {
 		name                string
-		file                string
+		filename            string
 		expectedVersion     OpenAPIVersion
 		shouldError         bool
 		expectedSchemaCount int
 	}{
 		{
 			name:                "Flatten OpenAPI 3.0",
-			file:                "petstore.json",
+			filename:            "testdata/oas/input/petstore.json",
 			expectedVersion:     OpenAPIV3,
 			shouldError:         false,
 			expectedSchemaCount: 3, // Pet, Pets, Error
 		},
 		{
 			name:                "Flatten OpenAPI 2.0",
-			file:                "petstore_v2.json",
+			filename:            "testdata/oas/input/petstore_v2.json",
 			expectedVersion:     OpenAPIV2,
 			shouldError:         false,
 			expectedSchemaCount: 3, // Pet, PetInput, ErrorModel
@@ -83,7 +82,7 @@ func TestLoadOpenAPISchemaWithFlattening(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			filePath := filepath.Join("testdata", "input", tc.file)
+			filePath := tc.filename
 			doc, version, err := LoadOpenAPISchema(filePath, LoadOptions{
 				FlattenSpec: true,
 				SkipRemote:  true,

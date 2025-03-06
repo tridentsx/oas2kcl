@@ -5,9 +5,9 @@ import (
 	"flag"
 	"io/ioutil"
 	"log"
-	"strings"
+	"os"
 
-	"github.com/santhosh-tekuri/jsonschema/v5"
+	"github.com/getkin/kin-openapi/openapi3"
 	"gopkg.in/yaml.v3"
 
 	"github.com/tridentsx/oas2kcl/openapikcl"
@@ -19,109 +19,65 @@ func main() {
 	log.SetPrefix("openapi-to-kcl: ")
 
 	// Define command-line flags
-	oasFile := flag.String("oas", "", "Path to the OpenAPI specification file")
-	jsonFile := flag.String("json", "", "Path to the JSON Schema file")
-	outFile := flag.String("out", "", "Optional output file for the generated KCL schema (.k)")
+	schemaFile := flag.String("schema", "", "Path to the schema file (OpenAPI or JSON Schema)")
+	outDir := flag.String("out", "", "Output directory for the generated KCL schemas")
 	skipFlatten := flag.Bool("skip-flatten", false, "Skip flattening the OpenAPI spec")
 	skipRemote := flag.Bool("skip-remote", false, "Skip remote references during flattening")
 	maxDepth := flag.Int("max-depth", 100, "Maximum depth for reference resolution")
-	packageName := flag.String("package", "schema", "Package name for the generated KCL schema")
+	packageName := flag.String("package", "schema", "Package name for the generated KCL schemas")
 	flag.Parse()
 
-	// Ensure only one of -oas or -json is provided
-	if (*oasFile != "" && *jsonFile != "") || (*oasFile == "" && *jsonFile == "") {
-		log.Fatal("Either -oas or -json must be provided, but not both. Usage:\n  openapi-to-kcl -oas openapi.json [-out schema.k]\n  OR\n  openapi-to-kcl -json schema.json [-out schema.k]")
+	// Ensure a schema file is provided
+	if *schemaFile == "" {
+		log.Fatal("Missing required -schema flag. Usage:\n  openapi-to-kcl -schema schema.json -out output_dir")
 	}
 
-	// Processing based on the selected mode
-	if *oasFile != "" {
-		processOpenAPI(*oasFile, *outFile, *skipFlatten, *skipRemote, *maxDepth, *packageName)
-	} else {
-		processJSONSchema(*jsonFile, *outFile, *packageName)
-	}
+	// Process the schema file
+	processSchema(*schemaFile, *outDir, *skipFlatten, *skipRemote, *maxDepth, *packageName)
 }
 
-// processOpenAPI handles OpenAPI file conversion
-func processOpenAPI(oasFile, outFile string, skipFlatten, skipRemote bool, maxDepth int, packageName string) {
-	log.Printf("Loading OpenAPI schema from %s", oasFile)
-	doc, version, err := openapikcl.LoadOpenAPISchema(oasFile, openapikcl.LoadOptions{
+// processSchema handles schema file conversion (either OpenAPI or JSON Schema)
+func processSchema(schemaFile, outDir string, skipFlatten, skipRemote bool, maxDepth int, packageName string) {
+	log.Printf("Processing schema from %s", schemaFile)
+
+	// Read the schema file
+	data, err := ioutil.ReadFile(schemaFile)
+	if err != nil {
+		log.Fatalf("Failed to read schema file: %v", err)
+	}
+
+	// Try to parse as JSON first, then fallback to YAML
+	var rawSchema map[string]interface{}
+	if err := json.Unmarshal(data, &rawSchema); err != nil {
+		// Try YAML if JSON parsing failed
+		if err := yaml.Unmarshal(data, &rawSchema); err != nil {
+			log.Fatalf("Failed to parse schema file: not a valid JSON or YAML: %v", err)
+		}
+	}
+
+	// First, try to load as an OpenAPI schema
+	var doc *openapi3.T
+	var version openapikcl.OpenAPIVersion
+
+	// Attempt to load as OpenAPI
+	doc, version, err = openapikcl.LoadOpenAPISchema(schemaFile, openapikcl.LoadOptions{
 		FlattenSpec: !skipFlatten,
 		SkipRemote:  skipRemote,
 		MaxDepth:    maxDepth,
 	})
-	if err != nil {
-		log.Fatalf("Failed to load OpenAPI schema: %v", err)
-	}
 
-	log.Printf("Detected OpenAPI version: %s", version)
-	log.Print("OpenAPI schema validation successful")
-
-	// Generate the KCL schema
-	log.Print("Generating KCL schemas")
-	err = openapikcl.GenerateKCLSchemas(doc, outFile, packageName, version)
-	if err != nil {
-		log.Fatalf("Failed to generate KCL schema: %v", err)
-	}
-
-	if outFile != "" {
-		log.Printf("KCL schema written to %s", outFile)
-	} else {
-		log.Print("KCL schema generation complete")
-	}
-}
-
-// processJSONSchema handles JSON Schema conversion
-func processJSONSchema(jsonFile, outFile, packageName string) {
-	log.Printf("Processing JSON Schema from %s", jsonFile)
-
-	// Read the schema file
-	data, err := ioutil.ReadFile(jsonFile)
-	if err != nil {
-		log.Fatalf("Failed to read JSON Schema file: %v", err)
-	}
-
-	// Try JSON first, then fallback to YAML
-	var schemaData map[string]interface{}
-	if json.Unmarshal(data, &schemaData) != nil {
-		if yaml.Unmarshal(data, &schemaData) != nil {
-			log.Fatal("Invalid JSON Schema: not a valid JSON or YAML file")
+	// Create output directory if it doesn't exist
+	if outDir != "" {
+		if err := os.MkdirAll(outDir, 0755); err != nil {
+			log.Fatalf("Failed to create output directory: %v", err)
 		}
 	}
 
-	// Validate schema using jsonschema package
-	log.Print("Validating JSON Schema")
-	compiler := jsonschema.NewCompiler()
-
-	// Detect JSON Schema version from $schema field
-	if val, ok := schemaData["$schema"]; ok {
-		if schemaURL, valid := val.(string); valid {
-			log.Printf("Detected JSON Schema version: %s", schemaURL)
-		} else {
-			log.Print("Warning: Could not determine JSON Schema version")
-		}
-	} else {
-		log.Print("Warning: No $schema field detected; assuming latest draft")
-	}
-
-	// Compile schema
-	err = compiler.AddResource(jsonFile, strings.NewReader(string(data)))
+	// Generate KCL schemas based on detected schema type
+	err = openapikcl.GenerateKCLSchemas(doc, outDir, packageName, version, rawSchema)
 	if err != nil {
-		log.Fatalf("Failed to load JSON Schema: %v", err)
-	}
-	schema, err := compiler.Compile(jsonFile)
-	if err != nil {
-		log.Fatalf("JSON Schema validation failed: %v", err)
+		log.Fatalf("Failed to generate KCL schemas: %v", err)
 	}
 
-	// Log validation success
-	log.Print("JSON Schema validation successful")
-
-	// TODO: Convert validated JSON Schema to KCL
-	log.Print("Converting JSON Schema to KCL (not yet implemented)")
-
-	if outFile != "" {
-		log.Printf("Expected to write output to %s", outFile)
-	} else {
-		log.Print("JSON Schema processing completed")
-	}
+	log.Printf("Successfully generated KCL schemas in %s", outDir)
 }

@@ -1,0 +1,28 @@
+{
+  "pet": {
+    "id": 1,
+    "name": "Fluffy",
+    "tag": "cat"
+  },
+  "pets": [
+    {
+      "id": 1,
+      "name": "Fluffy",
+      "tag": "cat"
+    },
+    {
+      "id": 2,
+      "name": "Rex",
+      "tag": "dog"
+    },
+    {
+      "id": 3,
+      "name": "Bubbles",
+      "tag": "fish"
+    }
+  ],
+  "error": {
+    "code": 404,
+    "message": "Pet not found"
+  }
+}

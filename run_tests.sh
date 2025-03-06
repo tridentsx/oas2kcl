@@ -34,7 +34,7 @@ fi
 
 # Check if the converter exists
 if [ ! -f "./openapi-to-kcl" ]; then
-  echo -e "${RED}Error: openapi-to-kcl binary not found. Build it first with 'go build -o openapi-to-kcl ./cmd/main.go'${RESET}"
+  echo -e "${RED}Error: openapi-to-kcl binary not found. Build it first with 'go build -o openapi-to-kcl ./main.go'${RESET}"
   exit 1
 fi
 

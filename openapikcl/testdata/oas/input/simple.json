@@ -1,0 +1,41 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "Simple API",
+      "description": "A very simple API for testing",
+      "version": "1.0.0"
+    },
+    "paths": {
+      "/hello": {
+        "get": {
+          "summary": "Say hello",
+          "operationId": "sayHello",
+          "responses": {
+            "200": {
+              "description": "Returns a greeting",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Greeting"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "Greeting": {
+          "type": "object",
+          "required": ["message"],
+          "properties": {
+            "message": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
