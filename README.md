@@ -1,6 +1,6 @@
 # oas2kcl
 
-A command-line tool to generate [KCL](https://kcl-lang.io/) schemas from OpenAPI specifications (supports OpenAPI 2.0/Swagger, 3.0, and soon 3.1).
+A command-line tool to generate [KCL](https://kcl-lang.io/) schemas from OpenAPI specifications (supports OpenAPI 2.0/Swagger, 3.0, and soon 3.1, it also supports json schema of different versions its all experimental for now).
 
 ## Overview
 
@@ -22,7 +22,7 @@ A command-line tool to generate [KCL](https://kcl-lang.io/) schemas from OpenAPI
 ```bash
 git clone https://github.com/tridentsx/oas2kcl.git
 cd oas2kcl
-go build -o oas2kcl cmd/main.go
+go build -o oas2kcl main.go
 ```
 
 ### Using as a Module
@@ -38,19 +38,19 @@ go get github.com/tridentsx/oas2kcl
 Convert an OpenAPI specification file to KCL schemas:
 
 ```bash
-oas2kcl -oas path/to/openapi.json -out schema.k
+oas2kcl -schema path/to/openapi_or_json_schema.json -out schema.k
 # or use YAML format
-oas2kcl -oas path/to/openapi.yaml -out schema.k
+oas2kcl -xchema path/to/openapi_or_jsonschema.yaml -out schema.k
 ```
 
 ### Command Line Options
 
 ```
 Usage:
-  oas2kcl -oas openapi.json|openapi.yaml [options]
+  oas2kcl -oas openapi.json|openapi.yaml|jsonschema.json|jsonmschema.yaml [options]
 
 Options:
-  -oas string        Path to the OpenAPI specification file (JSON or YAML format, required)
+  -schema string     Path to the OpenAPI or JSON schema specification file (JSON or YAML format, required)
   -out string        Optional output file for the generated KCL schema (.k)
   -package string    Package name for the generated KCL schema (default "schema")
   -skip-flatten      Skip flattening the OpenAPI spec
@@ -61,6 +61,7 @@ Options:
 ## Features
 
 - **Multiple OpenAPI versions support**: Compatible with OpenAPI 2.0 (Swagger), 3.0, and soon 3.1
+- **Multiple JSON schema versions support**:  draft-04, draft-06, draft-07, draft/2019-09 and draft/2020-12
 - **Multiple formats support**: Handles both JSON and YAML formatted OpenAPI specifications
 - **Schema flattening**: Resolves local and remote references
 - **Type conversion**: Maps OpenAPI types to KCL types

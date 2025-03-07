@@ -1,5 +1,6 @@
 # Binaries and compiled files
 openapi-to-kcl
+oas2kcl
 
 # Go build and cache files
 /bin/

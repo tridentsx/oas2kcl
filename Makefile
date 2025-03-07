@@ -1,5 +1,5 @@
 # Project variables
-BINARY_NAME = openapi-to-kcl
+BINARY_NAME = oas2kcl
 MAIN_FILE = main.go
 OUTPUT_DIR = third_party_licenses
 
