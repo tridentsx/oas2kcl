@@ -33,11 +33,11 @@ func main() {
 	}
 
 	// Process the schema file
-	processSchema(*schemaFile, *outDir, *skipFlatten, *skipRemote, *maxDepth, *packageName)
+	ProcessSchema(*schemaFile, *outDir, *skipFlatten, *skipRemote, *maxDepth, *packageName)
 }
 
 // processSchema handles schema file conversion (either OpenAPI or JSON Schema)
-func processSchema(schemaFile, outDir string, skipFlatten, skipRemote bool, maxDepth int, packageName string) {
+func ProcessSchema(schemaFile, outDir string, skipFlatten, skipRemote bool, maxDepth int, packageName string) {
 	log.Printf("Processing schema from %s", schemaFile)
 
 	// Read the schema file
