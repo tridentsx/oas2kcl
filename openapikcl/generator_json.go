@@ -4,11 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
+	"unicode"
 
 	"github.com/santhosh-tekuri/jsonschema/v5"
 )
@@ -31,8 +34,99 @@ func generateJSONSchemas(rawSchema map[string]interface{}, outputDir string, pac
 		rootName = formatSchemaName(title)
 	}
 
+	// Handle top-level $ref
+	if ref, ok := rawSchema["$ref"].(string); ok && ref != "" {
+		log.Printf("schema uses top-level $ref: %s", ref)
+		// If the ref is to a local definition, extract it
+		if strings.HasPrefix(ref, "#/$defs/") || strings.HasPrefix(ref, "#/definitions/") {
+			defName := strings.TrimPrefix(strings.TrimPrefix(ref, "#/$defs/"), "#/definitions/")
+			log.Printf("resolving top-level $ref to local definition: %s", defName)
+
+			// Try to get the definition from $defs or definitions
+			var defs map[string]interface{}
+			if defsObj, ok := rawSchema["$defs"].(map[string]interface{}); ok {
+				defs = defsObj
+			} else if defsObj, ok := rawSchema["definitions"].(map[string]interface{}); ok {
+				defs = defsObj
+			}
+
+			if defs != nil {
+				if defSchema, ok := defs[defName].(map[string]interface{}); ok {
+					// Use the definition as our schema
+					log.Printf("found definition %s, using it as root schema", defName)
+
+					// If the definition has a title, use it for the root name
+					if defTitle, ok := defSchema["title"].(string); ok && defTitle != "" {
+						rootName = formatSchemaName(defTitle)
+					} else {
+						// Otherwise use the definition name
+						rootName = formatSchemaName(defName)
+					}
+
+					// Create a new schema with the definition's contents
+					newSchema := make(map[string]interface{})
+					for k, v := range defSchema {
+						newSchema[k] = v
+					}
+
+					// Add all definitions to the new schema so references work
+					if defs != nil {
+						newSchema["$defs"] = defs
+					}
+
+					// Replace the raw schema with our extracted definition
+					rawSchema = newSchema
+				}
+			}
+		}
+	}
+
+	// Preprocess properties to resolve references
+	if props, ok := rawSchema["properties"].(map[string]interface{}); ok {
+		for _, propData := range props {
+			if propObj, ok := propData.(map[string]interface{}); ok {
+				if ref, ok := propObj["$ref"].(string); ok && ref != "" {
+					// Try to resolve the reference
+					if strings.HasPrefix(ref, "#/$defs/") || strings.HasPrefix(ref, "#/definitions/") {
+						defName := strings.TrimPrefix(strings.TrimPrefix(ref, "#/$defs/"), "#/definitions/")
+
+						// Try to get the definition from $defs or definitions
+						var defs map[string]interface{}
+						if defsObj, ok := rawSchema["$defs"].(map[string]interface{}); ok {
+							defs = defsObj
+						} else if defsObj, ok := rawSchema["definitions"].(map[string]interface{}); ok {
+							defs = defsObj
+						}
+
+						if defs != nil {
+							if defSchema, ok := defs[defName].(map[string]interface{}); ok {
+								// Replace the reference with the actual definition
+								log.Printf("resolving reference to %s", defName)
+								for k, v := range defSchema {
+									propObj[k] = v
+								}
+								// Keep the $ref for reference
+								propObj["_originalRef"] = ref
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// Compile the JSON Schema
 	compiler := jsonschema.NewCompiler()
+
+	// Add support for loading local references
+	compiler.LoadURL = func(url string) (io.ReadCloser, error) {
+		if strings.HasPrefix(url, "#") {
+			// Local reference, handled by the compiler
+			return nil, fmt.Errorf("local ref should be handled by compiler: %s", url)
+		}
+		return nil, fmt.Errorf("loading external references not supported: %s", url)
+	}
+
 	schemaBytes, err := json.Marshal(rawSchema)
 	if err != nil {
 		return fmt.Errorf("failed to marshal JSON schema: %w", err)
@@ -133,9 +227,17 @@ func generateJSONSchemaToKCL(name string, schema *jsonschema.Schema) (string, er
 
 	var builder strings.Builder
 	var constraints []string
+	needsRegexImport := false
 
-	// No schema imports needed - schemas in same directory
-	builder.WriteString("# No schema imports needed - schemas in same directory\n\n")
+	// Check if we need regex import for format validation
+	needsRegexImport = checkIfNeedsRegexImport(schema)
+
+	// Add required imports
+	if needsRegexImport {
+		builder.WriteString("import regex\n\n")
+	} else {
+		builder.WriteString("# No schema imports needed - schemas in same directory\n\n")
+	}
 
 	// Start schema definition
 	builder.WriteString(fmt.Sprintf("schema %s:", name))
@@ -179,9 +281,12 @@ func generateJSONSchemaToKCL(name string, schema *jsonschema.Schema) (string, er
 	sort.Strings(propertyNames)
 
 	propCount := 0
-	for _, propName := range propertyNames {
-		propSchema := properties[propName]
-		isRequired := required[propName]
+	for _, originalPropName := range propertyNames {
+		propSchema := properties[originalPropName]
+		isRequired := required[originalPropName]
+
+		// Sanitize property name to ensure it's a valid KCL identifier
+		propName := sanitizePropertyName(originalPropName)
 
 		// Generate the KCL type
 		kclType := jsonSchemaTypeToKCL(propSchema)
@@ -195,23 +300,8 @@ func generateJSONSchemaToKCL(name string, schema *jsonschema.Schema) (string, er
 
 		// Add default value if present
 		if propSchema.Default != nil {
-			// Format the default value based on its type
-			var defaultStr string
-			switch v := propSchema.Default.(type) {
-			case string:
-				defaultStr = fmt.Sprintf("\"%s\"", v)
-			case float64:
-				// Handle both integer and float defaults
-				if v == float64(int64(v)) {
-					defaultStr = fmt.Sprintf("%d", int64(v))
-				} else {
-					defaultStr = fmt.Sprintf("%f", v)
-				}
-			case bool:
-				defaultStr = fmt.Sprintf("%v", v)
-			default:
-				defaultStr = fmt.Sprintf("%v", v)
-			}
+			// Format the default value using our helper function
+			defaultStr := formatKCLDefaultValue(propSchema.Default)
 			fieldFormatted += " = " + defaultStr
 		}
 
@@ -255,9 +345,17 @@ func generateJSONSchemaToKCLWithDefaults(name string, schema *jsonschema.Schema,
 
 	var builder strings.Builder
 	var constraints []string
+	needsRegexImport := false
 
-	// No schema imports needed - schemas in same directory
-	builder.WriteString("# No schema imports needed - schemas in same directory\n\n")
+	// Check if we need regex import for format validation
+	needsRegexImport = checkIfNeedsRegexImport(schema)
+
+	// Add required imports
+	if needsRegexImport {
+		builder.WriteString("import regex\n\n")
+	} else {
+		builder.WriteString("# No schema imports needed - schemas in same directory\n\n")
+	}
 
 	// Start schema definition
 	builder.WriteString(fmt.Sprintf("schema %s:", name))
@@ -316,14 +414,13 @@ func generateJSONSchemaToKCLWithDefaults(name string, schema *jsonschema.Schema,
 	propCount := 0
 	for propName, propSchema := range properties {
 		// Skip if this is a reserved field in KCL
-		if contains([]string{"schema", "mixin", "protocol", "check", "assert"}, propName) {
-			propName = propName + "_field"
-		}
+		originalPropName := propName
+		propName = sanitizePropertyName(propName)
 
 		propCount++
 
 		// Determine if property is required
-		isRequired := contains(schema.Required, propName)
+		isRequired := contains(schema.Required, originalPropName)
 		optionalMarker := "?"
 		if isRequired {
 			optionalMarker = ""
@@ -376,34 +473,10 @@ func generateJSONSchemaToKCLWithDefaults(name string, schema *jsonschema.Schema,
 		// Determine the default value if one exists
 		var defaultValueStr string
 		if propSchema.Default != nil {
-			switch v := propSchema.Default.(type) {
-			case string:
-				defaultValueStr = fmt.Sprintf(" = \"%v\"", v)
-			case bool:
-				// KCL uses capitalized True/False
-				if v {
-					defaultValueStr = " = True"
-				} else {
-					defaultValueStr = " = False"
-				}
-			default:
-				defaultValueStr = fmt.Sprintf(" = %v", propSchema.Default)
-			}
+			defaultValueStr = " = " + formatKCLDefaultValue(propSchema.Default)
 		} else if defaultValues != nil {
-			if defaultVal, ok := defaultValues[propName]; ok {
-				switch v := defaultVal.(type) {
-				case string:
-					defaultValueStr = fmt.Sprintf(" = \"%v\"", v)
-				case bool:
-					// KCL uses capitalized True/False
-					if v {
-						defaultValueStr = " = True"
-					} else {
-						defaultValueStr = " = False"
-					}
-				default:
-					defaultValueStr = fmt.Sprintf(" = %v", defaultVal)
-				}
+			if defaultVal, ok := defaultValues[originalPropName]; ok {
+				defaultValueStr = " = " + formatKCLDefaultValue(defaultVal)
 			}
 		}
 
@@ -443,6 +516,27 @@ func generateJSONSchemaToKCLWithDefaults(name string, schema *jsonschema.Schema,
 
 // jsonSchemaTypeToKCL converts a JSON Schema type to a KCL type
 func jsonSchemaTypeToKCL(schema *jsonschema.Schema) string {
+	// If schema explicitly defines a type, use that
+	if len(schema.Types) > 0 {
+		schemaType := schema.Types[0]
+		switch schemaType {
+		case "string":
+			return "str"
+		case "number":
+			return "float"
+		case "integer":
+			return "int"
+		case "boolean":
+			return "bool"
+		case "array":
+			return "[any]"
+		case "object":
+			return "{str:any}" // More specific type instead of dict
+		default:
+			return "any"
+		}
+	}
+
 	// Check for nested compositions
 	if (schema.AllOf != nil && len(schema.AllOf) > 0 &&
 		(hasNestedCompositions(schema.AllOf))) ||
@@ -461,7 +555,7 @@ func jsonSchemaTypeToKCL(schema *jsonschema.Schema) string {
 	if schema.AllOf != nil && len(schema.AllOf) > 0 {
 		// For allOf, we'll implement inheritance where possible
 		// This is the first step - we'll expand on this in subsequent implementations
-		return "dict" // Placeholder for allOf composition
+		return "{str:any}" // Using more specific type for allOf composition
 	}
 
 	if schema.AnyOf != nil && len(schema.AnyOf) > 0 {
@@ -492,9 +586,9 @@ func jsonSchemaTypeToKCL(schema *jsonschema.Schema) string {
 	if containsType(schema.Types, "object") {
 		// If it has properties, it's a complex object
 		if len(schema.Properties) > 0 {
-			return "dict"
+			return "{str:any}"
 		}
-		return "dict"
+		return "{str:any}"
 	}
 
 	// Handle primitive types
@@ -559,6 +653,34 @@ func generateJSONSchemaConstraints(schema *jsonschema.Schema, fieldName string) 
 		// Simplify the pattern if needed for KCL compatibility
 		patternStr = strings.ReplaceAll(patternStr, "\\", "\\\\")
 		constraints = append(constraints, fmt.Sprintf("regex.match(%s, r\"%s\")", kclFieldRef, patternStr))
+	}
+
+	// Format validation for strings
+	if containsType(schema.Types, "string") && schema.Format != "" {
+		switch schema.Format {
+		case "email":
+			constraints = append(constraints, fmt.Sprintf("regex.match(%s, r\"^[a-zA-Z0-9._%%-]++@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$\")", kclFieldRef))
+		case "ipv4":
+			constraints = append(constraints, fmt.Sprintf("regex.match(%s, r\"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$\")", kclFieldRef))
+		case "ipv6":
+			// Simplified IPv6 regex for KCL compatibility
+			constraints = append(constraints, fmt.Sprintf("regex.match(%s, r\"^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|::1$\")", kclFieldRef))
+		case "uri":
+			constraints = append(constraints, fmt.Sprintf("regex.match(%s, r\"^(https?|ftp)://[^\\s/$.?#].[^\\s]*$\")", kclFieldRef))
+		case "uri-reference":
+			// Simplified URI reference pattern
+			constraints = append(constraints, fmt.Sprintf("regex.match(%s, r\"^(https?://)?[^\\s]+$\")", kclFieldRef))
+		case "hostname":
+			constraints = append(constraints, fmt.Sprintf("regex.match(%s, r\"^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$\")", kclFieldRef))
+		case "date":
+			constraints = append(constraints, fmt.Sprintf("regex.match(%s, r\"^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$\")", kclFieldRef))
+		case "date-time":
+			constraints = append(constraints, fmt.Sprintf("regex.match(%s, r\"^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z|[+-](2[0-3]|[01][0-9]):([0-5][0-9]))$\")", kclFieldRef))
+		case "time":
+			constraints = append(constraints, fmt.Sprintf("regex.match(%s, r\"^(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?$\")", kclFieldRef))
+		case "uuid":
+			constraints = append(constraints, fmt.Sprintf("regex.match(%s, r\"^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$\")", kclFieldRef))
+		}
 	}
 
 	// Numeric constraints - simplified to avoid complex expressions
@@ -734,7 +856,7 @@ func handleOneOf(schema *jsonschema.Schema, fieldName string) (string, []string,
 	} else if allArray {
 		kclType = "list"
 	} else if allObject {
-		kclType = "dict"
+		kclType = "{str:any}" // More specific type instead of dict
 	}
 
 	// Try to identify a discriminator property for validation
@@ -938,7 +1060,7 @@ func handleAnyOf(schema *jsonschema.Schema, fieldName string) (string, []string,
 		} else if hasArray {
 			kclType = "[any]"
 		} else if hasObject {
-			kclType = "dict"
+			kclType = "{str:any}" // More specific type instead of dict
 		}
 	} else {
 		// Mixed types, we need to use a more flexible type
@@ -1503,6 +1625,34 @@ func generateOptimizedConstraints(schema *jsonschema.Schema, fieldName string) [
 			pattern = strings.ReplaceAll(pattern, "\\", "\\\\")
 			constraints = append(constraints, fmt.Sprintf("regex.match(%s, r\"%s\")", fieldName, pattern))
 		}
+
+		// Format validation for strings
+		if schema.Format != "" {
+			switch schema.Format {
+			case "email":
+				constraints = append(constraints, fmt.Sprintf("regex.match(%s, r\"^[a-zA-Z0-9._%%-]++@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$\")", fieldName))
+			case "ipv4":
+				constraints = append(constraints, fmt.Sprintf("regex.match(%s, r\"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$\")", fieldName))
+			case "ipv6":
+				// Simplified IPv6 regex for KCL compatibility
+				constraints = append(constraints, fmt.Sprintf("regex.match(%s, r\"^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|::1$\")", fieldName))
+			case "uri":
+				constraints = append(constraints, fmt.Sprintf("regex.match(%s, r\"^(https?|ftp)://[^\\s/$.?#].[^\\s]*$\")", fieldName))
+			case "uri-reference":
+				// Simplified URI reference pattern
+				constraints = append(constraints, fmt.Sprintf("regex.match(%s, r\"^(https?://)?[^\\s]+$\")", fieldName))
+			case "hostname":
+				constraints = append(constraints, fmt.Sprintf("regex.match(%s, r\"^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$\")", fieldName))
+			case "date":
+				constraints = append(constraints, fmt.Sprintf("regex.match(%s, r\"^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$\")", fieldName))
+			case "date-time":
+				constraints = append(constraints, fmt.Sprintf("regex.match(%s, r\"^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z|[+-](2[0-3]|[01][0-9]):([0-5][0-9]))$\")", fieldName))
+			case "time":
+				constraints = append(constraints, fmt.Sprintf("regex.match(%s, r\"^(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?$\")", fieldName))
+			case "uuid":
+				constraints = append(constraints, fmt.Sprintf("regex.match(%s, r\"^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$\")", fieldName))
+			}
+		}
 	} else if containsType(schema.Types, "number") || containsType(schema.Types, "integer") {
 		// Generate numeric constraints
 		if schema.Minimum != nil {
@@ -1547,4 +1697,134 @@ func generateOptimizedConstraints(schema *jsonschema.Schema, fieldName string) [
 	}
 
 	return constraints
+}
+
+// checkIfNeedsRegexImport checks if the schema or its properties use pattern or format validation
+func checkIfNeedsRegexImport(schema *jsonschema.Schema) bool {
+	// Check if top-level schema has pattern or format
+	if schema.Pattern != nil || (containsType(schema.Types, "string") && schema.Format != "") {
+		return true
+	}
+
+	// Check properties
+	if schema.Properties != nil {
+		for _, propSchema := range schema.Properties {
+			if propSchema.Pattern != nil || (containsType(propSchema.Types, "string") && propSchema.Format != "") {
+				return true
+			}
+		}
+	}
+
+	// Check nested schemas in allOf, oneOf, anyOf
+	if schema.AllOf != nil {
+		for _, s := range schema.AllOf {
+			if checkIfNeedsRegexImport(s) {
+				return true
+			}
+		}
+	}
+	if schema.OneOf != nil {
+		for _, s := range schema.OneOf {
+			if checkIfNeedsRegexImport(s) {
+				return true
+			}
+		}
+	}
+	if schema.AnyOf != nil {
+		for _, s := range schema.AnyOf {
+			if checkIfNeedsRegexImport(s) {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+// sanitizePropertyName ensures the property name is a valid KCL identifier
+func sanitizePropertyName(name string) string {
+	// Reserved KCL keywords that cannot be used as identifiers
+	reservedKeywords := []string{
+		"import", "schema", "mixin", "protocol", "check", "assert", "for",
+		"in", "if", "elif", "else", "or", "and", "not", "True", "False", "None",
+		"as", "lambda", "all", "any", "filter", "map", "type",
+	}
+
+	// Check if the name is a reserved keyword
+	for _, keyword := range reservedKeywords {
+		if name == keyword {
+			return name + "_value"
+		}
+	}
+
+	// Handle property names with special characters or that start with numbers
+	var result strings.Builder
+	for i, ch := range name {
+		if i == 0 {
+			// First character must be a letter or underscore
+			if !unicode.IsLetter(ch) && ch != '_' {
+				result.WriteRune('_')
+			}
+		}
+
+		// Replace dashes, dots, and other special characters with underscores
+		if unicode.IsLetter(ch) || unicode.IsDigit(ch) || ch == '_' {
+			result.WriteRune(ch)
+		} else {
+			result.WriteRune('_')
+		}
+	}
+
+	return result.String()
+}
+
+// formatKCLDefaultValue takes a Go value and formats it in KCL syntax
+func formatKCLDefaultValue(value interface{}) string {
+	if value == nil {
+		return "None"
+	}
+
+	switch v := value.(type) {
+	case string:
+		// Escape quotes and format as KCL string
+		escaped := strings.ReplaceAll(v, "\"", "\\\"")
+		return "\"" + escaped + "\""
+	case int:
+		return strconv.Itoa(v)
+	case int64:
+		return strconv.FormatInt(v, 10)
+	case float64:
+		return strconv.FormatFloat(v, 'f', -1, 64)
+	case bool:
+		if v {
+			return "True"
+		}
+		return "False"
+	case []interface{}:
+		if len(v) == 0 {
+			return "[]"
+		}
+		var items []string
+		for _, item := range v {
+			items = append(items, formatKCLDefaultValue(item))
+		}
+		return "[" + strings.Join(items, ", ") + "]"
+	case map[string]interface{}:
+		if len(v) == 0 {
+			return "{}"
+		}
+		var pairs []string
+		for key, val := range v {
+			// Handle special case for keys that have dashes or other special characters
+			safeKey := key
+			if strings.ContainsAny(key, "-. ") {
+				safeKey = "\"" + strings.ReplaceAll(key, "\"", "\\\"") + "\""
+			}
+			pairs = append(pairs, safeKey+": "+formatKCLDefaultValue(val))
+		}
+		return "{" + strings.Join(pairs, ", ") + "}"
+	default:
+		// Try to convert to string as a fallback
+		return fmt.Sprintf("\"%v\"", v)
+	}
 }

@@ -52,7 +52,7 @@ func ConvertTypeToKCL(oapiType, format string) string {
 	case "array":
 		kclType = "list" // The element type will be handled separately
 	case "object":
-		kclType = "dict" // For generic objects, specific schema types will be handled differently
+		kclType = "{str:any}" // For generic objects, specific schema types will be handled differently
 	default:
 		log.Printf("warning: unknown type '%s', defaulting to 'any'", oapiType)
 		kclType = "any"

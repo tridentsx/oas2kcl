@@ -29,7 +29,7 @@ func TestConvertTypeToKCL(t *testing.T) {
 		{"Float", "number", "float", "float"},
 		{"Double", "number", "double", "float"},
 		{"Array", "array", "", "list"},
-		{"Object", "object", "", "dict"},
+		{"Object", "object", "", "{str:any}"},
 		{"Unknown", "unknown", "", "any"},
 	}
 

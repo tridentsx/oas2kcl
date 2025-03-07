@@ -29,9 +29,9 @@ func TestJSONSchemaComposition(t *testing.T) {
 			jsonSchemaFile: "testdata/jsonschema/oneof.json",
 			expectedOutputs: []string{
 				"schema Payment:",
-				"type: str",
+				"type_value: str",
 				"check:",
-				"type in [\"credit_card\", \"bank_transfer\"]",
+				"type_value in [\"credit_card\", \"bank_transfer\"]",
 			},
 		},
 		{

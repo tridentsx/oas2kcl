@@ -104,9 +104,28 @@ func formatSchemaName(name string) string {
 		return ""
 	}
 
+	// Replace spaces and special characters with underscores
+	name = strings.ReplaceAll(name, " ", "_")
+
+	// Remove any non-alphanumeric characters except underscores
+	var result strings.Builder
+	for i, r := range name {
+		if unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' {
+			if i == 0 && unicode.IsDigit(r) {
+				// KCL identifiers can't start with a digit, so prefix with underscore
+				result.WriteRune('_')
+			}
+			result.WriteRune(r)
+		}
+	}
+
+	name = result.String()
+
 	// Ensure the first character is uppercase (PascalCase)
 	runes := []rune(name)
-	runes[0] = unicode.ToUpper(runes[0])
+	if len(runes) > 0 {
+		runes[0] = unicode.ToUpper(runes[0])
+	}
 	return string(runes)
 }
 
