@@ -1,0 +1,100 @@
+{
+  "title": "ArrayTest",
+  "type": "object",
+  "description": "A schema to test array constraints",
+  "properties": {
+    "simpleArray": {
+      "type": "array",
+      "description": "A simple array without constraints",
+      "items": {
+        "type": "string"
+      }
+    },
+    "constrainedArray": {
+      "type": "array",
+      "description": "An array with min/max constraints",
+      "minItems": 1,
+      "maxItems": 5,
+      "items": {
+        "type": "string"
+      }
+    },
+    "uniqueArray": {
+      "type": "array",
+      "description": "An array with unique items",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "comboArray": {
+      "type": "array",
+      "description": "An array with multiple constraints",
+      "minItems": 2,
+      "maxItems": 10,
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "numberArray": {
+      "type": "array",
+      "description": "An array of numbers with constraints",
+      "minItems": 1,
+      "maxItems": 5,
+      "items": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 100
+      }
+    },
+    "integerArray": {
+      "type": "array",
+      "description": "An array of integers with constraints",
+      "minItems": 1,
+      "maxItems": 10,
+      "uniqueItems": true,
+      "items": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 100,
+        "multipleOf": 5
+      }
+    },
+    "nestedArray": {
+      "type": "array",
+      "description": "An array containing arrays",
+      "minItems": 1,
+      "maxItems": 3,
+      "items": {
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 4,
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "objectArray": {
+      "type": "array",
+      "description": "An array of objects",
+      "minItems": 1,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "age": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    }
+  },
+  "required": ["constrainedArray", "uniqueArray"]
+} 

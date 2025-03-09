@@ -1,0 +1,22 @@
+{
+  "simpleArray": ["item1", "item2", "item3"],
+  "constrainedArray": ["item1", "item2", "item3", "item4", "item5", "item6"],
+  "uniqueArray": ["item1", "item2", "item3"],
+  "comboArray": ["item1", "item2", "item3", "item4", "item5", "item6", "item7", "item8", "item9", "item10", "item11"],
+  "numberArray": [1, 2, 3, 4, 5, 6],
+  "integerArray": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+  "nestedArray": [
+    ["nested1", "nested2"],
+    ["nested3", "nested4"],
+    ["nested5", "nested6"],
+    ["nested7", "nested8"]
+  ],
+  "objectArray": [
+    {"name": "object1"},
+    {"name": "object2"},
+    {"name": "object3"},
+    {"name": "object4"},
+    {"name": "object5"},
+    {"name": "object6"}
+  ]
+} 

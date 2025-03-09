@@ -45,7 +45,7 @@ func TestIntegratedGenerateKCL(t *testing.T) {
 	require.NoError(t, err)
 
 	// Generate KCL
-	err = openapikcl.GenerateKCL(schemaPath, tempDir, "test")
+	err = openapikcl.GenerateKCL(schemaPath, tempDir, "test", false)
 	require.NoError(t, err)
 
 	// Check if the output file exists
@@ -103,7 +103,7 @@ func TestIntegratedGenerateKCLFromOpenAPI(t *testing.T) {
 	require.NoError(t, err)
 
 	// Generate KCL
-	err = openapikcl.GenerateKCL(schemaPath, tempDir, "test")
+	err = openapikcl.GenerateKCL(schemaPath, tempDir, "test", false)
 	require.NoError(t, err)
 
 	// Check if the output files exist

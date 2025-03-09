@@ -1,0 +1,162 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ComprehensiveTest",
+  "type": "object",
+  "properties": {
+    "stringConstraints": {
+      "type": "object",
+      "properties": {
+        "simpleString": {
+          "type": "string"
+        },
+        "minMaxString": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 10
+        },
+        "patternString": {
+          "type": "string",
+          "pattern": "^[A-Z][a-z]+$"
+        },
+        "formatString": {
+          "type": "string",
+          "format": "email"
+        },
+        "enumString": {
+          "type": "string",
+          "enum": ["option1", "option2", "option3"]
+        },
+        "constString": {
+          "type": "string",
+          "const": "fixed-value"
+        }
+      }
+    },
+    "numberConstraints": {
+      "type": "object",
+      "properties": {
+        "simpleInteger": {
+          "type": "integer"
+        },
+        "minMaxInt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "exclusiveInt": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 10
+        },
+        "multipleOfInt": {
+          "type": "integer",
+          "multipleOf": 5
+        },
+        "simpleNumber": {
+          "type": "number"
+        },
+        "minMaxNumber": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 10.5
+        },
+        "exclusiveNumber": {
+          "type": "number",
+          "exclusiveMinimum": 0.5,
+          "exclusiveMaximum": 9.5
+        },
+        "multipleOfNumber": {
+          "type": "number",
+          "multipleOf": 0.5
+        },
+        "enumNumber": {
+          "type": "number",
+          "enum": [0.5, 1.0, 1.5, 2.0, 2.5]
+        }
+      }
+    },
+    "arrayConstraints": {
+      "type": "object",
+      "properties": {
+        "simpleArray": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sizedArray": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 5,
+          "items": {
+            "type": "string"
+          }
+        },
+        "uniqueArray": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "typedArray": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          }
+        },
+        "tupleArray": {
+          "type": "array",
+          "items": [
+            { "type": "string" },
+            { "type": "integer" },
+            { "type": "boolean" }
+          ],
+          "additionalItems": false
+        }
+      }
+    },
+    "objectConstraints": {
+      "type": "object",
+      "properties": {
+        "simpleObject": {
+          "type": "object",
+          "properties": {
+            "prop1": { "type": "string" },
+            "prop2": { "type": "integer" }
+          }
+        },
+        "requiredObject": {
+          "type": "object",
+          "properties": {
+            "requiredProp1": { "type": "string" },
+            "requiredProp2": { "type": "integer" },
+            "optionalProp": { "type": "boolean" }
+          },
+          "required": ["requiredProp1", "requiredProp2"]
+        },
+        "sizedObject": {
+          "type": "object",
+          "minProperties": 2,
+          "maxProperties": 5
+        },
+        "patternObject": {
+          "type": "object",
+          "patternProperties": {
+            "^S_": { "type": "string" },
+            "^N_": { "type": "number" }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "booleanValue": {
+      "type": "boolean"
+    },
+    "nullValue": {
+      "type": "null"
+    }
+  }
+} 

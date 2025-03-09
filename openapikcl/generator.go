@@ -193,8 +193,8 @@ func GenerateTestMainK(outputDir string, schemas []string) error {
 	return nil
 }
 
-// GenerateKCL generates KCL schemas from a schema file (OpenAPI or JSON Schema)
-func GenerateKCL(schemaFile string, outputDir string, packageName string) error {
+// GenerateKCL generates KCL schemas from an OpenAPI or JSON Schema file
+func GenerateKCL(schemaFile string, outputDir string, packageName string, generateValidator bool) error {
 	// Read the schema file
 	schemaData, err := os.ReadFile(schemaFile)
 	if err != nil {
@@ -321,7 +321,7 @@ func GenerateTestCaseOutput(testCaseDir string) error {
 	packageName := filepath.Base(testCaseDir)
 
 	// Generate KCL schemas
-	if err := GenerateKCL(schemaFile, outputDir, packageName); err != nil {
+	if err := GenerateKCL(schemaFile, outputDir, packageName, true); err != nil {
 		return fmt.Errorf("failed to generate KCL schemas: %w", err)
 	}
 

@@ -1,0 +1,33 @@
+{
+  "stringField": "Valid string",
+  "patternField": "Valid",
+  "emailField": "test@example.com",
+  "uriField": "https://example.com",
+  "ipv4Field": "192.168.1.1",
+  "integerField": 50,
+  "exclusiveIntegerField": 5,
+  "multipleOfIntegerField": 15,
+  "enumIntegerField": 5,
+  "numberField": 50.5,
+  "exclusiveNumberField": 0.5,
+  "multipleOfNumberField": 2.5,
+  "enumNumberField": 1.5,
+  "simpleArray": ["item1", "item2", "item3"],
+  "constrainedArray": ["item1", "item2", "item3"],
+  "uniqueArray": ["item1", "item2", "item3"],
+  "comboArray": ["item1", "item2", "item3", "item4"],
+  "nestedObject": {
+    "name": "Test Object",
+    "age": 30
+  },
+  "objectArray": [
+    {
+      "name": "Object 1",
+      "age": 25
+    },
+    {
+      "name": "Object 2",
+      "age": 30
+    }
+  ]
+} 

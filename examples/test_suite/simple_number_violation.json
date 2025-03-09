@@ -1,0 +1,12 @@
+{
+  "stringField": "Valid string",
+  "patternField": "Validpattern",
+  "emailField": "test@example.com",
+  "integerField": 0,
+  "exclusiveIntegerField": 10,
+  "multipleOfIntegerField": 17,
+  "enumIntegerField": 4,
+  "constrainedArray": ["item1", "item2", "item3"],
+  "uniqueArray": ["item1", "item2", "item3"],
+  "comboArray": ["item1", "item2", "item3", "item4"]
+} 

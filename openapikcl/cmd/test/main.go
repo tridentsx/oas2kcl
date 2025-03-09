@@ -51,7 +51,7 @@ func main() {
 	fmt.Printf("Output directory: %s\n", outputDir)
 
 	fmt.Println("Generating KCL schemas...")
-	if err := openapikcl.GenerateKCL(schemaFile, outputDir, "test"); err != nil {
+	if err := openapikcl.GenerateKCL(schemaFile, outputDir, "test", false); err != nil {
 		log.Fatalf("Failed to generate KCL: %v", err)
 	}
 

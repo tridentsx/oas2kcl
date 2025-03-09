@@ -1,0 +1,147 @@
+{
+  "title": "ComprehensiveTest",
+  "type": "object",
+  "description": "A schema to test all implemented constraints",
+  "properties": {
+    "stringField": {
+      "type": "string",
+      "description": "A string with length constraints",
+      "minLength": 3,
+      "maxLength": 50
+    },
+    "patternField": {
+      "type": "string",
+      "description": "A string with pattern constraint",
+      "pattern": "^[A-Z][a-z]+$"
+    },
+    "emailField": {
+      "type": "string",
+      "description": "A string with email format",
+      "format": "email"
+    },
+    "uriField": {
+      "type": "string",
+      "description": "A string with URI format",
+      "format": "uri"
+    },
+    "ipv4Field": {
+      "type": "string",
+      "description": "A string with IPv4 format",
+      "format": "ipv4"
+    },
+    "integerField": {
+      "type": "integer",
+      "description": "An integer with range constraints",
+      "minimum": 1,
+      "maximum": 100
+    },
+    "exclusiveIntegerField": {
+      "type": "integer",
+      "description": "An integer with exclusive range constraints",
+      "minimum": 1,
+      "exclusiveMaximum": 10
+    },
+    "multipleOfIntegerField": {
+      "type": "integer",
+      "description": "An integer with multipleOf constraint",
+      "multipleOf": 5
+    },
+    "enumIntegerField": {
+      "type": "integer",
+      "description": "An integer with enum constraint",
+      "enum": [1, 2, 3, 5, 8, 13]
+    },
+    "numberField": {
+      "type": "number",
+      "description": "A number with range constraints",
+      "minimum": 0.5,
+      "maximum": 99.5
+    },
+    "exclusiveNumberField": {
+      "type": "number",
+      "description": "A number with exclusive range constraints",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 1
+    },
+    "multipleOfNumberField": {
+      "type": "number",
+      "description": "A number with multipleOf constraint",
+      "multipleOf": 0.5
+    },
+    "enumNumberField": {
+      "type": "number",
+      "description": "A number with enum constraint",
+      "enum": [0.5, 1.0, 1.5, 2.0, 2.5]
+    },
+    "simpleArray": {
+      "type": "array",
+      "description": "A simple array without constraints",
+      "items": {
+        "type": "string"
+      }
+    },
+    "constrainedArray": {
+      "type": "array",
+      "description": "An array with min/max constraints",
+      "minItems": 1,
+      "maxItems": 5,
+      "items": {
+        "type": "string"
+      }
+    },
+    "uniqueArray": {
+      "type": "array",
+      "description": "An array with unique items",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "comboArray": {
+      "type": "array",
+      "description": "An array with multiple constraints",
+      "minItems": 2,
+      "maxItems": 10,
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "nestedObject": {
+      "type": "object",
+      "description": "A nested object with properties",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "age": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": ["name"]
+    },
+    "objectArray": {
+      "type": "array",
+      "description": "An array of objects",
+      "minItems": 1,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "age": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": ["name"]
+      }
+    }
+  },
+  "required": ["stringField", "integerField", "numberField", "constrainedArray", "uniqueArray", "nestedObject"]
+} 

@@ -1,121 +1,91 @@
-# oas2kcl
+# OAS2KCL - OpenAPI and JSON Schema to KCL Converter
 
-A command-line tool to generate [KCL](https://kcl-lang.io/) schemas from OpenAPI specifications (supports OpenAPI 2.0/Swagger, 3.0, and soon 3.1, it also supports json schema of different versions its all experimental for now).
+This tool converts OpenAPI specifications and JSON Schema files to KCL (Kubernetes Configuration Language) schemas.
 
-## Overview
+## Features
 
-`oas2kcl` converts OpenAPI schemas into KCL (Kubernetes Configuration Language) schema files, enabling validation and configuration management using KCL for API specifications. The tool handles complex OpenAPI features including:
+- Converts OpenAPI 3.0 specifications to KCL schemas
+- Converts JSON Schema files to KCL schemas
+- Generates validator schemas with constraint validation
+- Supports various constraint types:
+  - String constraints: minLength, maxLength, pattern, format, enum
+  - Number constraints: minimum, maximum, exclusiveMinimum, exclusiveMaximum, multipleOf, enum
+  - Array constraints: minItems, maxItems, uniqueItems, items
+  - Object constraints: required, properties, minProperties, maxProperties, patternProperties
 
-- Schema conversion with appropriate type mapping
-- Constraint validation (min/max values, patterns, etc.)
-- Schema references and inheritance
-- Documentation generation
+## Documentation
+
+- [Changes and Improvements](docs/CHANGES.md) - Recent updates and enhancements
+- [Developer Guide](docs/DEVELOPERS.md) - Technical details on implementation
 
 ## Installation
-
-### Prerequisites
-
-- Go 1.23 or higher
-
-### Build from Source
 
 ```bash
 git clone https://github.com/tridentsx/oas2kcl.git
 cd oas2kcl
-go build -o oas2kcl main.go
-```
-
-### Using as a Module
-
-```bash
-go get github.com/tridentsx/oas2kcl
+go build
 ```
 
 ## Usage
 
-### Basic Usage
+```bash
+# Basic usage
+go run main.go -input=<input-file> -output=<output-directory>
 
-Convert an OpenAPI specification file to KCL schemas:
+# Generate validator schemas
+go run main.go -input=<input-file> -output=<output-directory> -validator
+
+# Specify package name
+go run main.go -input=<input-file> -output=<output-directory> -package=<package-name>
+```
+
+### Command-line Options
+
+- `-input`: Path to the input schema file (OpenAPI or JSON Schema) (required)
+- `-output`: Directory to output the generated KCL schemas (default: "output")
+- `-package`: Name of the KCL package (default: "schema")
+- `-validator`: Generate validator schemas (default: false)
+
+## Testing
+
+The repository includes comprehensive test cases for various constraint types:
 
 ```bash
-oas2kcl -schema path/to/openapi_or_json_schema.json -out schema.k
-# or use YAML format
-oas2kcl -xchema path/to/openapi_or_jsonschema.yaml -out schema.k
+# Run comprehensive tests
+./run_comprehensive_tests.sh
+
+# Clean up test files
+./cleanup.sh
 ```
 
-### Command Line Options
+## Examples
 
-```
-Usage:
-  oas2kcl -oas openapi.json|openapi.yaml|jsonschema.json|jsonmschema.yaml [options]
+### Converting a JSON Schema file
 
-Options:
-  -schema string     Path to the OpenAPI or JSON schema specification file (JSON or YAML format, required)
-  -out string        Optional output file for the generated KCL schema (.k)
-  -package string    Package name for the generated KCL schema (default "schema")
-  -skip-flatten      Skip flattening the OpenAPI spec
-  -skip-remote       Skip remote references during flattening
-  -max-depth int     Maximum depth for reference resolution (default 100)
+```bash
+go run main.go -input=examples/string_constraints.json -output=examples/output-string
 ```
 
-## Features
+### Converting an OpenAPI specification
 
-- **Multiple OpenAPI versions support**: Compatible with OpenAPI 2.0 (Swagger), 3.0, and soon 3.1
-- **Multiple JSON schema versions support**:  draft-04, draft-06, draft-07, draft/2019-09 and draft/2020-12
-- **Multiple formats support**: Handles both JSON and YAML formatted OpenAPI specifications
-- **Schema flattening**: Resolves local and remote references
-- **Type conversion**: Maps OpenAPI types to KCL types
-- **Validation**: Generates KCL validation constraints from OpenAPI schemas
-- **Documentation**: Preserves descriptions and examples from OpenAPI documents
-
-## Example
-
-Given an OpenAPI specification with a `Pet` schema:
-
-```json
-{
-  "components": {
-    "schemas": {
-      "Pet": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64",
-            "description": "Pet ID"
-          },
-          "name": {
-            "type": "string",
-            "description": "Pet name"
-          },
-          "status": {
-            "type": "string",
-            "enum": ["available", "pending", "sold"],
-            "description": "Pet status in the store"
-          }
-        },
-        "required": ["name"]
-      }
-    }
-  }
-}
+```bash
+go run main.go -input=examples/openapi.yaml -output=examples/output-openapi
 ```
 
-`oas2kcl` will generate a KCL schema like:
+### Generating validator schemas
 
-```python
-# Pet represents a pet in the pet store
-schema Pet:
-    # Pet ID
-    id?: int
-    
-    # Pet name
-    name: str
-    
-    # Pet status in the store
-    status?: "available" | "pending" | "sold"
+```bash
+go run main.go -input=examples/number_constraints.json -output=examples/output-number -validator
+```
+
+## Validation
+
+The generated KCL schemas can be used to validate JSON data using the KCL validator:
+
+```bash
+kcl vet <json-data-file> <kcl-schema-file> -s <schema-name>
 ```
 
 ## License
 
-[Apache License 2.0](LICENSE)
+MIT

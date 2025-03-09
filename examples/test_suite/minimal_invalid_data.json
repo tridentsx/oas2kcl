@@ -1,0 +1,6 @@
+{
+  "integerField": 0,
+  "numberField": 100.5,
+  "constrainedArray": [],
+  "uniqueArray": ["item1", "item2", "item1"]
+} 

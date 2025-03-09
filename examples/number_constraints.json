@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NumberTest",
+  "description": "A schema to test number constraints",
+  "type": "object",
+  "properties": {
+    "simpleInteger": {
+      "type": "integer",
+      "description": "A simple integer without constraints"
+    },
+    "constrainedInteger": {
+      "type": "integer",
+      "description": "An integer with min/max constraints",
+      "minimum": 1,
+      "maximum": 100
+    },
+    "exclusiveInteger": {
+      "type": "integer",
+      "description": "An integer with exclusive min/max constraints",
+      "minimum": 1,
+      "exclusiveMaximum": true,
+      "maximum": 10
+    },
+    "multipleOfInteger": {
+      "type": "integer",
+      "description": "An integer that must be a multiple of 5",
+      "multipleOf": 5
+    },
+    "enumInteger": {
+      "type": "integer",
+      "description": "An integer with allowed values",
+      "enum": [1, 2, 3, 5, 8, 13]
+    },
+    "comboInteger": {
+      "type": "integer",
+      "description": "An integer with multiple constraints",
+      "minimum": 10,
+      "maximum": 100,
+      "multipleOf": 5,
+      "enum": [10, 25, 50, 75, 100]
+    },
+    "simpleNumber": {
+      "type": "number",
+      "description": "A simple floating-point number without constraints"
+    },
+    "constrainedNumber": {
+      "type": "number",
+      "description": "A number with min/max constraints",
+      "minimum": 0.5,
+      "maximum": 99.5
+    },
+    "exclusiveNumber": {
+      "type": "number",
+      "description": "A number with exclusive constraints",
+      "exclusiveMinimum": 0.0,
+      "exclusiveMaximum": true,
+      "maximum": 1.0
+    },
+    "multipleOfNumber": {
+      "type": "number",
+      "description": "A number that must be a multiple of 0.5",
+      "multipleOf": 0.5
+    },
+    "enumNumber": {
+      "type": "number",
+      "description": "A number with allowed values",
+      "enum": [0.5, 1.0, 1.5, 2.0, 2.5]
+    },
+    "comboNumber": {
+      "type": "number",
+      "description": "A number with multiple constraints",
+      "minimum": 0.0,
+      "exclusiveMaximum": true,
+      "maximum": 10.0,
+      "multipleOf": 0.25
+    }
+  },
+  "required": ["constrainedInteger", "constrainedNumber"]
+} 

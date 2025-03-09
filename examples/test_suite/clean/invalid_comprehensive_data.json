@@ -1,0 +1,45 @@
+{
+  "stringConstraints": {
+    "simpleString": 123,
+    "minMaxString": "hi",
+    "patternString": "lowercase",
+    "formatString": "not-an-email",
+    "enumString": "invalid-option",
+    "constString": "wrong-value"
+  },
+  "numberConstraints": {
+    "simpleInteger": "not-a-number",
+    "minMaxInt": 0,
+    "exclusiveInt": 0,
+    "multipleOfInt": 12,
+    "simpleNumber": "not-a-number",
+    "minMaxNumber": 0.1,
+    "exclusiveNumber": 0.5,
+    "multipleOfNumber": 2.25,
+    "enumNumber": 1.75
+  },
+  "arrayConstraints": {
+    "simpleArray": [1, 2, 3],
+    "sizedArray": ["one"],
+    "uniqueArray": ["duplicate", "duplicate", "unique"],
+    "typedArray": [10, 200, -5],
+    "tupleArray": ["string", 42, "not-a-boolean", "extra-item"]
+  },
+  "objectConstraints": {
+    "simpleObject": {
+      "prop1": 123,
+      "prop2": "not-an-integer"
+    },
+    "requiredObject": {
+      "requiredProp1": "required value"
+    },
+    "sizedObject": {
+      "prop1": "value1"
+    },
+    "patternObject": {
+      "S_name": 123,
+      "invalid_key": "value"
+    }
+  },
+  "booleanValue": "not-a-boolean"
+} 

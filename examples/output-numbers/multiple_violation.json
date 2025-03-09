@@ -1,0 +1,14 @@
+{
+  "simpleInteger": 5,
+  "exclusiveInteger": 5,
+  "comboInteger": 26,
+  "constrainedNumber": 50.5,
+  "exclusiveNumber": 0.5,
+  "multipleOfNumber": 2.5,
+  "comboNumber": 7.5,
+  "constrainedInteger": 50,
+  "multipleOfInteger": 17,
+  "enumInteger": 5,
+  "enumNumber": 1.5,
+  "simpleNumber": 3.14
+} 

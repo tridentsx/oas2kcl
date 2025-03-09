@@ -1,0 +1,12 @@
+{
+  "stringField": "AB",
+  "patternField": "invalid_pattern",
+  "emailField": "not-an-email",
+  "integerField": 50,
+  "exclusiveIntegerField": 5,
+  "multipleOfIntegerField": 15,
+  "enumIntegerField": 5,
+  "constrainedArray": ["item1", "item2", "item3"],
+  "uniqueArray": ["item1", "item2", "item3"],
+  "comboArray": ["item1", "item2", "item3", "item4"]
+} 

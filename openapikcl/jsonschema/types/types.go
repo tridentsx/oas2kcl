@@ -74,25 +74,37 @@ func GetKCLType(rawSchema map[string]interface{}) string {
 		// Check if items is defined
 		if items, ok := utils.GetMapValue(rawSchema, "items"); ok {
 			itemType := GetKCLType(items)
-			return "[" + itemType + "]"
+			// For array of objects, just use list[type] or list for generic objects
+			if itemType == "dict" {
+				return "list"
+			}
+			// For simple arrays, use list[type] syntax
+			return "list[" + itemType + "]"
 		}
 
-		// Handle tuple types (items as array)
+		// Handle tuple types (items as array) - each position can have a different type
 		if items, ok := utils.GetArrayValue(rawSchema, "items"); ok && len(items) > 0 {
-			// In KCL we'll use [any] for tuples since KCL doesn't have tuple types
-			return "[any]"
+			// In KCL we can't directly represent tuples with heterogeneous types
+			// Just use list as the type
+			return "list"
 		}
 
-		// Default to any array
-		return "[any]"
+		// Default to generic list
+		return "list"
 	case "object":
 		// If we have a title, use it as the schema name
 		if title, ok := utils.GetStringValue(rawSchema, "title"); ok && title != "" {
 			return FormatSchemaName(title)
 		}
 
+		// Check for additionalProperties to see if this is a map type
+		if _, ok := utils.GetMapValue(rawSchema, "additionalProperties"); ok {
+			// This is a map/dictionary type - use dict without generics
+			return "dict"
+		}
+
 		// Default to non-specific object type
-		return "dict[str, any]"
+		return "dict"
 	default:
 		// Default fallback
 		return "any"

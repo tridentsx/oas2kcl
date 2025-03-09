@@ -1,0 +1,49 @@
+{
+  "stringConstraints": {
+    "simpleString": "hello",
+    "minMaxString": "hello123",
+    "patternString": "Hello",
+    "formatString": "test@example.com",
+    "enumString": "option2",
+    "constString": "fixed-value"
+  },
+  "numberConstraints": {
+    "simpleInteger": 42,
+    "minMaxInt": 50,
+    "exclusiveInt": 5,
+    "multipleOfInt": 15,
+    "simpleNumber": 3.14,
+    "minMaxNumber": 5.5,
+    "exclusiveNumber": 5.0,
+    "multipleOfNumber": 2.0,
+    "enumNumber": 1.5
+  },
+  "arrayConstraints": {
+    "simpleArray": ["one", "two", "three"],
+    "sizedArray": ["one", "two", "three"],
+    "uniqueArray": ["one", "two", "three"],
+    "typedArray": [10, 20, 30],
+    "tupleArray": ["string", 42, true]
+  },
+  "objectConstraints": {
+    "simpleObject": {
+      "prop1": "value1",
+      "prop2": 123
+    },
+    "requiredObject": {
+      "requiredProp1": "required value",
+      "requiredProp2": 456,
+      "optionalProp": true
+    },
+    "sizedObject": {
+      "prop1": "value1",
+      "prop2": "value2",
+      "prop3": "value3"
+    },
+    "patternObject": {
+      "S_name": "John",
+      "N_age": 30
+    }
+  },
+  "booleanValue": true
+} 
