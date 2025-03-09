@@ -1,0 +1,37 @@
+{
+  "eiusmod_1": false,
+  "veniam_1f": "quis dolor dolore",
+  "podDisruptionBudget": {
+    "minAvailable": -96805290.05795187
+  },
+  "topologySpreadConstraints": {
+    "veniam_2a": false,
+    "dced": [
+      {
+        "maxSkew": 79378642,
+        "topologyKey": "aliquip Duis consequat dolor minim",
+        "whenUnsatisfiable": "DoNotSchedule"
+      },
+      {
+        "maxSkew": 93400162,
+        "topologyKey": "aute mollit sed",
+        "whenUnsatisfiable": "DoNotSchedule"
+      },
+      {
+        "maxSkew": 53031106,
+        "topologyKey": "in pariatur",
+        "whenUnsatisfiable": "DoNotSchedule"
+      },
+      {
+        "maxSkew": 96210214,
+        "topologyKey": "id pariatur Excepteur fugiat elit",
+        "whenUnsatisfiable": "ScheduleAnyway"
+      },
+      {
+        "maxSkew": 59016546,
+        "topologyKey": "ipsum",
+        "whenUnsatisfiable": "ScheduleAnyway"
+      }
+    ]
+  }
+}

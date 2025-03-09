@@ -1,0 +1,262 @@
+# Global parameters shall be defined in the top level values.yaml
+# They are kept here for indicating which are supported and their default values
+
+# global:
+#  security:
+#    policyBinding:
+#      create:false
+#    policyReferenceMap:
+#      default-restricted-security-policy: "default-restricted-security-policy"
+#    tls:
+#      enabled: true
+#    externalTls:
+#      enabled: true
+#  internalIPFamily:
+#  registry:
+#    url: armdocker.rnd.ericsson.se
+#    imagePullPolicy: IfNotPresent
+#  log:
+#    streamingMethod: direct
+#  timezone: UTC
+#  pullSecret:
+#  nodeSelector: {}
+#  locationName: ""
+#  locationDetails:
+#    namespace: ""
+#    cluster: ""
+#    region: ""
+#    site: ""
+
+imageCredentials:
+  gas:
+    # See default in eric-product-info.yaml
+    # Container image repository path.
+    repoPath:
+    registry:
+      # Image registry URL. Overrides global registry url if not empty.
+      url:
+      # Image pull policy. One of Always, Never, IfNotPresent.
+      imagePullPolicy:
+  # Authorization token that stores docker credentials used for accessing a registry.
+  pullSecret:
+
+# Override the name of the chart in chart.yaml.
+nameOverride: ""
+# Override the full name of resources.
+fullnameOverride: ""
+
+# Number of replicas
+replicaCount: 2
+
+# To enable or disable the XDC data collection
+dataCollection:
+  enabled: false
+
+sfc:
+  # Provides flexibility to enable or disable system function control check for GUI Applications. Enabling this will control the availability of GUI applications based on function control status.
+  enabled: false
+  service:
+    # Name of the system function control service
+    name: "eric-bss-bam-function-controller-evaluation-service"
+    # The port of system function control service
+    port: 8443
+  tls:
+    # CA certificate issuer for system function control service.
+    issuer: eric-bss-bam-function-controller-eval-client-ca
+    # TTL value for the system function control client certificate.
+    clientCertificateTtl:
+
+service:
+  app:
+    # Label name used for service discovery.
+    labelName: workspace-gui
+  # Flexibility to change the context path of the UI during installation.
+  uiContextPath: /
+  # This value enables the pre-content authorization with RBAC.
+  authorization: RBAC
+
+log:
+  # Default value is empty, meaning that the global.log.streamingMethod value is used.  If the global parameter is also null or empty, indirect streaming is chosen.
+  streamingMethod:
+  # Indicates log transformer host.
+  transformerHost: "eric-log-transformer"
+  # Indicates log transformer SSL port.
+  transformerTlsPort: 5024
+  # Indicates log transformer Non-SSL port.
+  transformerNoTlsPort: 5025
+  tls:
+    # Indicates TTL of client certificate created for log transformer streaming. Default is empty, meaning that SIP-TLS validity value is used
+    clientCertificateTtl:
+    # Indicates issuer based on which client certificate is created.
+    issuer: eric-log-transformer-input-ca-cert
+  # Indicates socket timeout value (in seconds).
+  timeoutSeconds: 5
+  # Indicates internal queue size used for storing log events.
+  queueSize: 1000
+  # Indicates socket connection TTL value (in seconds).
+  connectionTtlSeconds: 15
+
+networkPolicy:
+  # Pod-level firewall. If enabled, pod can only be accessed via Ingress.
+  enabled: true
+
+# Details of the UI Settings Manager service
+usm:
+  service:
+    name: eric-ui-settings-manager
+
+# Allows to dynamically scale number of replicas without intervention based on a criteria.
+autoScaling:
+  # Flag that determines if autoScaling should be enabled/disabled.
+  enabled: false
+  # Number of minimum replicas
+  minReplicas: 2
+  # Number of maximum replicas
+  maxReplicas: 5
+  # If the mean of the pods' CPU utilization is higher than the target defined, the replicas will be adjusted
+  targetCPUUtilizationPercentage: 95
+
+# Configuration for node selection constraints, based on labels on the node.
+nodeSelector: {}
+# Configuration for topology-spread constraints.
+topologySpreadConstraints: []
+
+
+updateStrategy:
+  # Type of update strategy.
+  type: RollingUpdate
+  rollingUpdate:
+    # Describes how many pods can be unavailable at a given time during the rolling update.
+    maxUnavailable: 25% #Kubernetes default value
+    # Describes how many pods can be added at a time.
+    maxSurge: 25% #Kubernetes default value
+
+prometheus:
+  # Flag to determine if the scraping should be done.
+  scrape: true
+
+# Certificate refresh configuration
+security:
+  tls:
+    karaf:
+      # Client certificate time-to-live in seconds.
+      clientCertificateTtl:
+      # Server certificate time-to-live in seconds.
+      serverCertificateTtl:
+  cmMediator:
+    tls:
+      # Client certificate time-to-live in seconds.
+      clientCertificateTtl:
+      # cmMediator CA to be referred to create a client certificate.
+      issuer: eric-cm-mediator-ca
+
+application:
+  cmMediator:
+    # Name of the cmMediator service.
+    serviceName: eric-cm-mediator
+    # Port exposed by the cmMediator service.
+    port: 5004
+
+ingress:
+  # Flexibility to enable/disable the deployment of ingress resource.
+  enabled: false
+  # CA to verify incoming requests from ingress, mandatory if ingress has been installed with clientCertificate.enabled=true
+  ca: eric-tm-ingress-controller-cr-client-ca
+  # The Ingress FQDN for accesing the UI.
+  fqdn: ""
+  # Ingress class name indicates which ingress controller instance will consume the ingress resource
+  ingressClass: ""
+  tls:
+    # Name of the K8s secret resource to be associated with Ingress for HTTPS connection.
+    secretName: eric-gui-aggregator-root-httpproxy-secret
+    # To bypass the traffic without terminating TLS at Ingress controller
+    passthrough : false
+  proxy:
+    # The calls will be routed to this configured RBAC proxy from ingress.
+    service:
+    # The port of configured RBAC proxy service.
+    port:
+    root:
+      # Enable automatic discovery and update of UI application proxy
+      enabled: false
+      # Name of the common GUI proxy
+      name: ""
+# Configuration for scheduling based on taints on the nodes
+tolerations: []
+
+# Maximum graceful termination timeout in seconds
+terminationGracePeriodSeconds: 30
+
+# A map for setting custom labels for all Kubernetes resources
+labels: {}
+
+# A map for setting custom annotations for all Kubernetes resources
+annotations: {}
+
+## affinity.podAntiAffinity , valid value are "soft" or "hard"
+affinity:
+  # Anti-affinity config. The value hard will require one node per replica, while soft is best-effort anti-affinity.
+  podAntiAffinity: soft
+  # TopologyKey is the key of a label attached to a node. If two Nodes are labelled with this key and have identical values for that label, the scheduler treats both Nodes as being in the same topology. The scheduler tries to place a balanced number of Pods into each topology domain
+  topologyKey: "kubernetes.io/hostname"
+  # Service-level parameter of node affinity
+  nodeAffinity: {}
+
+# Specifies the number/percentage of Pods that must remain available during voluntary disruptions. Either minAvailable or maxUnavailable shall be configured and not both
+podDisruptionBudget:
+  # Number of pods from the set that must still be available after the eviction, even in the absence of the evicted pod
+  minAvailable: 50%
+
+resources:
+  gas:
+    requests:
+      # Memory resource request for the container
+      memory: "512Mi"
+      # CPU resource request for the container
+      cpu: "100m"
+      # Ephemeral storage resource request for the container
+      ephemeral-storage: "256Mi"
+    limits:
+      # Memory resource limit for the container. The container will be killed with an out of memory error if it goes above this limit
+      memory: "1Gi"
+      # CPU resource limit for the container. The container CPU usage may be throttled to this value
+      cpu: "500m"
+      # Ephemeral storage resource request for the container. The container will be killed with an out of memory error if it goes above this limit
+      ephemeral-storage: "512Mi"
+
+probes:
+  gas:
+    livenessProbe:
+      # Minimum consecutive failures for the probe to be considered failed after having succeeded.
+      failureThreshold: 20
+      # Number of seconds after the container has started before the probe is initiated.
+      initialDelaySeconds: 20
+      # How often (in seconds) to perform the probe.
+      periodSeconds: 10
+      # Number of seconds after which the probe times out.
+      timeoutSeconds: 10
+    readinessProbe:
+      # Minimum consecutive failures for the probe to be considered failed after having succeeded.
+      failureThreshold: 20
+      # Number of seconds after the container has started before the probe is initiated.
+      initialDelaySeconds: 20
+      # How often (in seconds) to perform the probe.
+      periodSeconds: 10
+      # Minimum consecutive successes for the probe to be considered successful after having failed
+      successThreshold: 1
+      # Number of seconds after which the probe times out
+      timeoutSeconds: 10
+
+appArmorProfile:
+  gas:
+    # Sets the AppArmor type. The following values are possible; 'unconfined' - Indicates that there is no profile loaded. 'runtime/default' - Applies the default profile of the container engine. 'localhost' - Applies a specific profile loaded on the host. "" - The appArmor is not set in the Helm chart.
+    type:
+    # The 'localhostProfile' requires a profile name to be provided. The name of the local AppArmor profile to be used. Applicable only if type is set to 'localhost'.
+    localhostProfile:
+
+seccompProfile:
+  gas:
+    # Configuration of seccomp profile types. The following values are possible; 'Unconfined' - Indicates that there is no profile loaded. 'RuntimeDefault' - Applies the default profile of the container engine. 'Localhost' - Applies a specific profile loaded on the host. "" - The seccomp is not set in the Helm chart.
+    type:
+    # The variable 'localhostProfile' contains the name of the local seccomp profile to be used. Applicable only if type is set to 'Localhost'.
+    localhostProfile:

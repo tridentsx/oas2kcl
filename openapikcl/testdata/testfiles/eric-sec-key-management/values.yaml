@@ -1,0 +1,590 @@
+#global:
+## annotations, merged with service and application specific ones
+#annotations:
+#fsGroup:
+## Define either 'manual' or 'namespace', or do not define fsGroup at all (fallback is 10000)
+## manual, enforce a specific value, for example 15000
+#manual: 15000
+## namespace, use the value defined for the namespace (that value is set by a cluster admin)
+#namespace: true
+#podSecurityContext:
+## When both global and local values are provided, the global values are combined with the local values.
+## If no local settings are given, the global values will be used as-is.
+#supplementalGroups:
+## internalIPFamily, IP version can be chosen in dual stack cluster
+#internalIPFamily:
+## labels, merged with service and application specific ones
+#labels:
+## networkPolicy, global switch for the feature
+#networkPolicy:
+#enabled: false
+## pullSecret, the secret resource name used for authenticating towards docker registry where images are pulled
+#pullSecret:
+#registry:
+## container registry url
+#url: armdocker.rnd.ericsson.se
+## registry repository path
+#repoPath:
+## imagePullPolicy, desired policy under which condition the images are pulled from registry
+#imagePullPolicy: IfNotPresent
+#security:
+## policyBinding, condition to create role binding to cluster role for security policy, DEPRECATED
+#policyBinding:
+#create:
+## policyReferenceMap, PSP/SCC policies (key) references to cluster roles (value), DEPRECATED
+#policyReferenceMap:
+#tls:
+#trustedInternalRootCa:
+## secret name holding trusted CA root certificate, defaults to eric-sec-sip-tls-trusted-root-cert
+#secret:
+#securityPolicy:
+## rolekind, configuration options for security policy role kind { choice='ClusterRole, Role, ""' } [ default="" ]
+#rolekind: ""
+#featureGates:
+## turn on or off schema validation of Helm parameter values
+#helmSchemaValidation: false
+## timezone, used to populate the TZ environment variable in containers
+#timezone: UTC
+## local log has precedence over global.log
+#log:
+## Supported values: direct, indirect, dual
+#streamingMethod: null
+#logShipper:
+#deployment:
+#model: "static"
+#tolerations: []
+#keyManagement:
+#operator:
+## Controls whether Key Management is deployed as a operator-enabled service or not.
+## When set to `true` operator resources will be deployed.
+## When set to `false` legacy resources will be deployed.
+#enabled: false
+
+## Container image storage configurations
+
+imageCredentials:
+  repoPath:
+  ## pullSecret, the secret resource name used for authenticating towards docker registry where images are pulled
+  ## overrides the global setting when set
+  pullSecret: null
+  registry:
+    ## url, service specific docker registry url, overrides the global setting when set
+    url: null
+    ## imagePullPolicy, service specific image pull policy, overrides the global setting when set
+    imagePullPolicy: null
+  vault:
+    repoPath:
+  metrics:
+    repoPath:
+  unsealer:
+    repoPath:
+  ca:
+    repoPath:
+  hooklauncher:
+    repoPath:
+    registry:
+      url:
+      imagePullPolicy:
+## Database backend configurations
+persistence:
+  type: etcd
+  etcd:
+    ## serviceName, database service name
+    serviceName: eric-data-distributed-coordinator-ed
+    ## servicePort, database service port to connect
+    servicePort: 2379
+    ## requestTimeout, specifies timeout for requests to DCED
+    ## 5 seconds should be long enough for most cases, but can be adjusted if frequent timeouts are seen
+    requestTimeout: "5s"
+    ## lockTimeout, the number of seconds the leader remains active without refreshing the leader lock
+    lockTimeout: "15s"
+    tls:
+      ## trustedCaSecret, secret name holding trusted CA root certificate
+      ## Deprecated in favor of global.security.tls.trustedInternalRootCa.secret
+      trustedCaSecret: eric-sec-sip-tls-trusted-root-cert
+  ## Usage of the pvc is not for production use, only for demo/test usage
+  pvc:
+    ## Deprecated in favor of persistentVolumeClaim.size
+    size: 100Mi
+    ## Deprecated in favor of persistentVolumeClaim.storageClassName
+    storageClassName: null
+    ## keep the pvc after helm deletion or not
+    keep: true
+  ## Usage of the pvc is not for production use, only for demo/test usage
+  ## Duplicate definiton to fullfill DR requirements
+  ## will be used if value given
+  persistentVolumeClaim:
+    size: null
+    storageClassName: null
+## Feature activations and configurations
+
+## shelter, when set to true, enables consistent backups
+## when DCED is used as database backend for KMS
+shelter:
+  enabled: false
+## metrics, when set to false, the pm data will not be scraped
+## metrics-exporter container will not be created
+metrics:
+  enabled: true
+  serviceName: eric-pm-server
+## networkPolicy, local override for global switch
+## do not activate network policy usage if global denies it
+networkPolicy:
+  enabled: true
+## bootstrap, configurable certificate details
+bootstrap:
+  ## kubernetes cluster domain name, part of the Subject Alternative Name
+  clusterDomain: cluster.local
+## Resource configurations
+
+## DR-D1126-005
+resources:
+  ca:
+    requests:
+      memory: "400Mi"
+      cpu: "100m"
+      ephemeral-storage:
+    limits:
+      memory: "400Mi"
+      cpu: "100m"
+      ephemeral-storage:
+  unsealer:
+    requests:
+      memory: "400Mi"
+      cpu: "100m"
+      ephemeral-storage:
+    limits:
+      memory: "400Mi"
+      cpu: "100m"
+      ephemeral-storage:
+  shelter:
+    requests:
+      memory: "400Mi"
+      cpu: "100m"
+      ephemeral-storage:
+    limits:
+      memory: "1200Mi"
+      cpu: "300m"
+      ephemeral-storage:
+  vault:
+    requests:
+      memory: "400Mi"
+      cpu: "100m"
+      ephemeral-storage:
+    limits:
+      memory: "1200Mi"
+      cpu: "300m"
+      ephemeral-storage:
+  metrics:
+    requests:
+      memory: "10Mi"
+      cpu: "10m"
+      ephemeral-storage:
+    limits:
+      memory: "50Mi"
+      cpu: "50m"
+      ephemeral-storage:
+  logshipper:
+    requests:
+      memory: "20Mi"
+      cpu: "46m"
+      ephemeral-storage:
+    limits:
+      memory: "30Mi"
+      cpu: "60m"
+      ephemeral-storage:
+  bootstrapJob:
+    requests:
+      memory: "400Mi"
+      cpu: "100m"
+      ephemeral-storage:
+    limits:
+      memory: "400Mi"
+      cpu: "100m"
+      ephemeral-storage:
+  hooklauncher:
+    requests:
+      memory: "100Mi"
+      cpu: "50m"
+      ephemeral-storage: "100Mi"
+    limits:
+      memory: "100Mi"
+      cpu: "50m"
+      ephemeral-storage: "100Mi"
+  operator:
+    requests:
+      # -- The memory request for the operator container
+      memory: "100Mi"
+      # -- The cpu request for the operator container
+      cpu: "20m"
+      # -- (string) The ephemeral storage request for the operator container
+      ephemeral-storage:
+    limits:
+      # -- The memory limit for the operator container
+      memory: "200Mi"
+      # -- The cpu limit for the operator container
+      cpu: "40m"
+      # -- (string) The ephemeral storage limit for the operator container
+      ephemeral-storage:
+  migrator:
+    requests:
+      # -- The memory request for the migrator container
+      memory: "100Mi"
+      # -- The cpu request for the migrator container
+      cpu: "20m"
+      # -- (string) The ephemeral storage request for the migrator container
+      ephemeral-storage:
+    limits:
+      # -- The memory limit for the migrator container
+      memory: "200Mi"
+      # -- The cpu limit for the migrator container
+      cpu: "40m"
+      # -- (string) The ephemeral storage limit for the migrator container
+      ephemeral-storage:
+## Probe behavior configurations
+probes:
+  shelter:
+    livenessProbe:
+      initialDelaySeconds: 0
+      failureThreshold: 3
+      periodSeconds: 10
+      timeoutSeconds: 5
+    readinessProbe:
+      initialDelaySeconds: 0
+      failureThreshold: 3
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 4
+    startupProbe:
+      initialDelaySeconds: 0
+      failureThreshold: 30
+      periodSeconds: 10
+      timeoutSeconds: 1
+  vault:
+    livenessProbe:
+      initialDelaySeconds: 0
+      failureThreshold: 3
+      periodSeconds: 10
+      timeoutSeconds: 5
+    readinessProbe:
+      initialDelaySeconds: 0
+      failureThreshold: 3
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 4
+    startupProbe:
+      initialDelaySeconds: 0
+      failureThreshold: 30
+      periodSeconds: 10
+      timeoutSeconds: 1
+  metrics:
+    livenessProbe:
+      initialDelaySeconds: 0
+      failureThreshold: 3
+      periodSeconds: 10
+      timeoutSeconds: 4
+    readinessProbe:
+      initialDelaySeconds: 0
+      failureThreshold: 3
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 4
+    startupProbe:
+      initialDelaySeconds: 0
+      failureThreshold: 60
+      periodSeconds: 10
+      timeoutSeconds: 4
+  logshipper:
+    livenessProbe:
+      initialDelaySeconds: 90
+      failureThreshold: 3
+      periodSeconds: 10
+      timeoutSeconds: 10
+## Pod behavior configurations
+updateStrategy:
+  ## If the chosen pvc backend does not support ReadWriteOnce access, use 'Recreate'
+  type: RollingUpdate
+## replicaCount, number of KMS pod instances. Only one of them is active. Max value is 2.
+## If set to 2 requires persistence.type=etcd.
+## DR-D1122-131
+replicaCount:
+  kms: 1
+  # -- The number of operator pods to deploy
+  operator: 1
+## podDisruptionBudget, enables workload to be able to properly deal with voluntary disruptions
+## applicable when replicaCount is 2, parameters are mutually exclusive, one of them is empty and other has value 1
+## DR-D1120-056
+podDisruptionBudget:
+  # -- Minimum amount of available pods during voluntary disruptions, applicable when replicaCount is more than one. If defined, then maxUnavailable is not set
+  minAvailable: 1
+  # -- Maximum amount of unavailable pods during voluntary disruptions, applicable when replicaCount is more than one. If defined, then minAvailable is not set
+  maxUnavailable:
+## podPriority.priorityClassName, allows assigning priorities to POD
+## DR-D1126-030
+podPriority:
+  eric-sec-key-management-main:
+    priorityClassName: ""
+  hooklauncher:
+    priorityClassName: ""
+  operator:
+    # -- The priority assigned to operator pod for scheduling
+    priorityClassName: ""
+  migrator:
+    # -- The priority assigned to migrator pod for scheduling
+    priorityClassName: ""
+## DR-D1120-045
+nodeSelector:
+  kms: {}
+  bootstrapJob: {}
+  hooklauncher: {}
+  # -- (map) Node labels for operator pod assignment
+  operator: {}
+  # -- (map) Node labels for migrator pod assignment
+  migrator: {}
+## tolerations, node tolerations for the pod(s)
+## DR-D1120-060
+tolerations:
+  kms: []
+  bootstrapJob: []
+  hooklauncher: []
+  # -- (list) Tolerations for scheduling of the operator pod(s)
+  operator: []
+  # -- (list) Tolerations for scheduling of the migrator pod
+  migrator: []
+## topologySpreadConstraints, specifies how to spread matching pods among the given topology
+## DR-D1120-090
+# -- (list) Specifies how to spread matching pods among the given topology
+topologySpreadConstraints: []
+## affinity, purpose is to spread pod replicas evenly among failure domains
+## DR-D1120-057
+affinity:
+  ## podAntiAffinity, strictness of anti affinity, possible values: soft, hard
+  # -- The strictness of pod anti affinity, possible values: soft, hard
+  podAntiAffinity: "hard"
+  ## topologyKey, use as the failure domain, default value "kubernetes.io/hostname"
+  # -- The topologyKey describes the failure domain
+  topologyKey: "kubernetes.io/hostname"
+## terminationGracePeriodSeconds, time duration after process termination before
+## it is forcibly killed
+## DR-D1120-080
+# -- Duration after process termination before it is forcibly killed
+terminationGracePeriodSeconds: 30
+## bandwidth, specifies amount of data that can leave the pod in megabits per seconds
+## format: integers followed by the character M, e.g. 10M
+## DR-D1125-040
+bandwidth:
+  # bandwidth.maxEgressRate is the old parameter for KMS pod
+  # It is deprecated (bandwidth.kms.maxEgressRate overrides bandwidth.maxEgressRate)
+  maxEgressRate: ""
+  kms:
+    maxEgressRate: ""
+  operator:
+    # -- The rate in megabit-per-second at which traffic can leave the operator pod
+    maxEgressRate: ""
+## Application specific labels and annotations
+
+## labels, application specific labels
+labels: {}
+## annotations, application specific annotations
+annotations: {}
+## Service specific configurations
+service:
+  ## The port where the KMS REST API is exposed
+  ## Shelter port is not configurable (8210)
+  port: 8200
+  tls:
+    ## Toggle TLS secured communication for the REST API
+    ## Requires Service Identity Provider TLS service
+    enabled: true
+    serviceName: eric-sec-sip-tls
+## deployClusterRoleBinding, condition if the cluster role binding resource
+## is created during the deployment. This binding allows usage of the
+## Kubernetes Authentication method. If it is not created during deployment,
+## it must be created before deployment separately.
+deployClusterRoleBinding: true
+## Logging configurations
+
+## DR-D1114-030
+# -- Log severity, possible values: debug, info, error
+logLevel: "info"
+## log has precedence over global.log
+log:
+  ## Supported values: direct, indirect, dual
+  streamingMethod: null
+  logtransformer:
+    serviceName: eric-log-transformer
+## Logshipper configurations
+## Only in effect when:
+##    global.log.streamingMethod is set to dual or direct
+##    log.streamingMethod is set to dual or direct
+## Local configurations has precedence over global.
+## Requires Log Transformer service.
+logShipper:
+  output:
+    logTransformer:
+      # The hostname of the log_transformer
+      host: "eric-log-transformer"
+  # logLevel, possible values: debug, info, warning and error
+  logLevel: "info"
+  # Configure storage requirements based on your producers logging
+  # configuration (i.e. Stdout Redirect)
+  storage:
+    path: "/logs"
+    size: "500Mi"
+    medium: "Ephemeral"
+  input:
+    files:
+    - enabled: true
+      paths:
+      - "kms-ca.log"
+      - "metrics.log"
+    - enabled: true
+      paths:
+      - "kms.log"
+      - "kms-mon.log"
+      - "shelter.log"
+## Security policies configurations
+
+# When both global and local values are provided, the global values are combined with the local values.
+# If no global settings are given, the local values will be used as-is.
+podSecurityContext:
+  supplementalGroups:
+## DR-D1123-134
+# securityPolicy.rolename, role name which is bound to service account
+securityPolicy:
+  kms:
+    rolename: eric-sec-key-management
+  bootstrapJob:
+    rolename: eric-sec-key-management
+  operator:
+    # -- The attribute sets the name of the security policy role that is bound to the service account
+    # @default -- ""
+    rolename: eric-sec-key-management
+  migrator:
+    # -- The attribute sets the name of the security policy role that is bound to the service account
+    # @default -- ""
+    rolename: eric-sec-key-management
+  hooklauncher:
+    rolename: eric-lcm-smart-helm-hooks
+## DR-D1123-127
+appArmorProfile:
+  # -- The profile type for all containers, one of 'unconfined', 'runtime/default', 'localhost'
+  type: ""
+  # -- The name of the local appArmor profile to be used, in case `type='localhost'`
+  localhostProfile: ""
+  # Container-specific configurations
+  kms-ca:
+    type: ""
+    localhostProfile: ""
+  kms-mon:
+    type: ""
+    localhostProfile: ""
+  kms:
+    type: ""
+    localhostProfile: ""
+  shelter:
+    type: ""
+    localhostProfile: ""
+  eric-sec-key-management-metrics:
+    type: ""
+    localhostProfile: ""
+  eric-sec-key-management-kms-configurator:
+    type: ""
+    localhostProfile: ""
+  logshipper:
+    type: ""
+    localhostProfile: ""
+  hooklauncher:
+    type: ""
+    localhostProfile: ""
+  operator:
+    # -- Container specific profile type, one of 'unconfined', 'runtime/default', 'localhost'
+    type: ""
+    # -- The name of the local appArmor profile to be used, in case `type='localhost'`
+    localhostProfile: ""
+  migrator:
+    # -- Container specific profile type, one of 'unconfined', 'runtime/default', 'localhost', ''
+    type: ""
+    # -- The name of the local appArmor profile to be used, in case `type='localhost'`
+    localhostProfile: ""
+## DR-D1123-128
+seccompProfile:
+  # -- The profile type for all containers, one of 'Unconfined', 'RuntimeDefault', 'Localhost'
+  type: ""
+  # -- The name of the local seccomp profile to be used, in case `type='Localhost'`
+  localhostProfile: ""
+  # Container-specific configurations
+  kms-ca:
+    type: ""
+    localhostProfile: ""
+  kms-mon:
+    type: ""
+    localhostProfile: ""
+  kms:
+    type: ""
+    localhostProfile: ""
+  shelter:
+    type: ""
+    localhostProfile: ""
+  eric-sec-key-management-metrics:
+    type: ""
+    localhostProfile: ""
+  eric-sec-key-management-kms-configurator:
+    type: ""
+    localhostProfile: ""
+  logshipper:
+    type: ""
+    localhostProfile: ""
+  hooklauncher:
+    type: ""
+    localhostProfile: ""
+  operator:
+    # -- Container specific profile type, one of 'Unconfined', 'RuntimeDefault', 'Localhost'
+    type: ""
+    # -- The name of the local seccomp profile to be used, in case `type='Localhost'`
+    localhostProfile: ""
+  migrator:
+    # -- Container specific profile type, one of 'Unconfined', 'RuntimeDefault', 'Localhost', ''
+    type: ""
+    # -- The name of the local seccomp profile to be used, in case `type='Localhost'`
+    localhostProfile: ""
+## Operator specific configurations
+
+## Operator common BR Agent configurations
+operator:
+  brAgent:
+    # -- BRA Backup/Restore raft snapshot command timeout
+    braCmdTimeout: 120
+## DR-D1121-120
+# -- Name of the kubernetes objects deployed from this Helm chart
+nameOverride:
+## DCED data migration to Raft
+dataMigration:
+  # -- Indicates whether data migration from DCED should be made or not
+  enabled: false
+  # -- Time to keep the migrator job after it finished before removing it
+  ttlAfterFinished: 86400
+  application:
+    # -- enable migration to Application KeyManagement. Must be set to true for the migration to take place
+    enabled: true
+    # -- coName must be set to the same value as in Application KeyManagement CO metadata.name. Mandatory if dataMigration.enabled is true
+    coName: "eric-sec-key-management"
+    persistentVolumeClaim:
+      # -- Size of PVC, must be set to same value as in Application KeyManagement CO resources.persistentStorage.mainVolume.persistentVolumeClaim.size.
+      #    Mandatory if dataMigration.enabled is true and dataMigration.application.enabled is true
+      size: "1Gi"
+      # -- Storage class name, must be set to the same value as in Application KeyManagement CO
+      #    resources.persistentStorage.mainVolume.persistentVolumeClaim.storageClassName
+      storageClassName:
+  siptls:
+    # -- enable migration to SIP-TLS KeyManagement. Must be set to true if shelter is used in legacy
+    enabled: true
+    # -- coName must be set to same value as in SIP-TLS KeyManagement CO metadata.name. Mandatory if dataMigration.siptls.enabled is true
+    coName: "eric-sec-key-management-siptls"
+    persistentVolumeClaim:
+      # -- Size of PVC, must be set to same value as in SIP-TLS KeyManagement CO resources.persistentStorage.mainVolume.persistentVolumeClaim.size.
+      #    Mandatory if dataMigration.enabled is true and dataMigration.siptls.enabled is true
+      size: "1Gi"
+      # -- Storage class name, must be set to the same value as in SIP-TLS KeyManagement CO
+      #    resources.persistentStorage.mainVolume.persistentVolumeClaim.storageClassName
+      storageClassName:

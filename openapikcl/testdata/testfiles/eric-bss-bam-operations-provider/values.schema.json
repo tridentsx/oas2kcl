@@ -1,0 +1,1269 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "properties": {
+    "affinity": {
+      "properties": {
+        "nodeAffinity": {
+          "default": "{}",
+          "description": "NodeAffinity rules",
+          "type": "object"
+        },
+        "podAntiAffinity": {
+          "default": "soft",
+          "description": "Pod Anti-affinity configuration for High Availability. Set to either \"hard\" or \"soft\".",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        },
+        "topologyKey": {
+          "default": "kubernetes.io/hostname",
+          "description": "TopologyKey to use",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "annotations": {
+      "default": "{}",
+      "description": "The key-prefix is optional and cannot exceed 253 characters with following character set: [a-z0-9A-Z.].The key cannot exceed 63 characters with following character set: [a-z0-9A-Z_.-]",
+      "type": "object"
+    },
+    "appArmorProfile": {
+      "properties": {
+        "operationsprovider": {
+          "properties": {
+            "localhostProfile": {
+              "default": "\"\"",
+              "description": "Localhost path to the apparmor profile for the operationsprovider container. Should only be set if appArmorProfile.operationsprovider.type is set to localhost",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "\"\"",
+              "description": "The AppArmor type for the operationsprovider container. Available options are \"unconfined\", \"runtime/default\", \"localhost\" and \"\" [default=\"\"]",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "config": {
+      "properties": {
+        "alarms": {
+          "properties": {
+            "enabled": {
+              "default": "true",
+              "description": "By default, it is enabled. This allows the service to raise alarms via kafka proxy",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            },
+            "kafka": {
+              "properties": {
+                "host": {
+                  "default": "eric-bss-kafka-proxy-http:80",
+                  "description": "Host name of the kafka proxy service along with port",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "cmAgent": {
+          "properties": {
+            "host": {
+              "default": "eric-bss-bam-cm-agent:5000",
+              "description": "Host name of the cm agent service along with port",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "iam": {
+          "properties": {
+            "admin": {
+              "properties": {
+                "passwordKey": {
+                  "default": "kcpasswd",
+                  "description": "Secret key name which store IAM admin user password",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "secret": {
+                  "default": "eric-sec-access-mgmt-creds",
+                  "description": "Secret name which store IAM admin user credentials",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "userKey": {
+                  "default": "kcadminid",
+                  "description": "Secret key name which store IAM admin user name",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "caCertSecret": {
+              "default": "eric-bss-bam-oam-oidc-ca-bundle",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "client": {
+              "properties": {
+                "enabled": {
+                  "default": "true",
+                  "description": "Enable clients configuration",
+                  "oneOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "enum": [
+                        "true",
+                        "false"
+                      ],
+                      "type": "string"
+                    }
+                  ]
+                },
+                "watcher": {
+                  "properties": {
+                    "label": {
+                      "default": "bam.ericsson.com/iam-client-sync",
+                      "description": "Label to watch config map containing rbac groups",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "clientScopeConfig": {
+              "properties": {
+                "enabled": {
+                  "default": "true",
+                  "description": "Enable client scopes configuration",
+                  "oneOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "enum": [
+                        "true",
+                        "false"
+                      ],
+                      "type": "string"
+                    }
+                  ]
+                },
+                "watcher": {
+                  "properties": {
+                    "label": {
+                      "default": "bam.ericsson.com/iam-client-scope-sync",
+                      "description": "Label to watch config map containing client scopes",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "enabled": {
+              "default": "true",
+              "description": "Enable iam configuration",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            },
+            "host": {
+              "default": "eric-sec-access-mgmt:8443",
+              "description": "IAM ingress FQDN service address",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "rbacGroup": {
+              "properties": {
+                "enabled": {
+                  "default": "true",
+                  "description": "Enable rbac groups configuration",
+                  "oneOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "enum": [
+                        "true",
+                        "false"
+                      ],
+                      "type": "string"
+                    }
+                  ]
+                },
+                "policyType": {
+                  "default": "g",
+                  "description": "Policy type to use when creating groups",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "watcher": {
+                  "properties": {
+                    "label": {
+                      "default": "bam.ericsson.com/rbac-group-sync",
+                      "description": "Label to watch config map containing rbac groups",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "watcherTimeOut": {
+              "default": "60",
+              "description": "Configmap watcher timeout",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "log": {
+          "properties": {
+            "connectionTtlMinutes": {
+              "default": "120",
+              "description": "Log connection TTL (minutes) towards log transformer service. Connection will reset after configured number of minutes. Required when streamingMethod is set to direct or dual",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            },
+            "level": {
+              "default": "info",
+              "description": "Log level, possible values are: debug, info, error",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "queueSize": {
+              "default": "1000",
+              "description": "Size of the log queue for streaming. Required when streamingMethod is set to direct or dual",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            },
+            "streamingMethod": {
+              "default": "indirect",
+              "description": "The local parameter for specifying the streaming method of service logs. It can be ‘indirect', ‘direct', ‘dual', or null. If set to null, global.log.streamingMethod will be used to determine the streaming method",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "timeoutSeconds": {
+              "default": "5",
+              "description": "Timeout waiting for logs to be streamed (in seconds) before terminating. Required when streamingMethod is set to direct or dual",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            },
+            "transformerHost": {
+              "default": "eric-log-transformer:5024",
+              "description": "FQDN including port number of the log transformer service, don't include protocol. Required when streamingMethod is set to direct or dual",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "transformerNoTlsHost": {
+              "default": "eric-log-transformer:5025",
+              "description": "FQDN including port number of the log transformer non tls service, don't include protocol. Required when streamingMethod is set to direct or dual",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "operationsprovider": {
+          "properties": {
+            "trace": {
+              "properties": {
+                "activeJobsThreshold": {
+                  "default": "10",
+                  "description": "Number of active trace jobs per interface",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "forceCreateConfig": {
+                  "default": "false",
+                  "description": "Set to true to override an existing trace management configuration during any Helm operation.",
+                  "oneOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "enum": [
+                        "true",
+                        "false"
+                      ],
+                      "type": "string"
+                    }
+                  ]
+                },
+                "inactiveJobsRetentionPeriodInMinute": {
+                  "default": "2880",
+                  "description": "time elapse after which expired trace jobs are eligible for cleanup",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "traceLogsIndex": {
+                  "default": "tracelog",
+                  "description": "Name of search engine log index used to fetch trace logs",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "traceLogsSize": {
+                  "default": "100",
+                  "description": "trace log size",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "searchEngine": {
+          "properties": {
+            "enabled": {
+              "default": "true",
+              "description": "By default, it is enabled. This allows the fetch trace logs from search engine service",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            },
+            "host": {
+              "default": "eric-data-search-engine-tls:9200",
+              "description": "Host name of the search engine service along with port",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "server": {
+          "properties": {
+            "port": {
+              "default": "4141",
+              "description": "Port to expose the operation provider service",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "fullnameOverride": {
+      "default": "",
+      "description": "Overriding the full name",
+      "type": [
+        "string",
+        "integer",
+        "number"
+      ]
+    },
+    "global": {
+      "properties": {
+        "annotations": {
+          "default": "{}",
+          "description": "Global annotations. Global, service level, and resource-specific labels are merged, no conflicts are allowed",
+          "type": "object"
+        },
+        "fsGroup": {
+          "properties": {
+            "manual": {
+              "default": "\u003cempty\u003e",
+              "description": "Sets a fsGroup ID for all services. If manual set to empty namespace default configuration is used.",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            },
+            "namespace": {
+              "default": "\u003cempty\u003e",
+              "description": "Sets a fsGroup to use namespace default. The following values are possible: true, false and \"\". If global.fsGroup.namespace set to \"\" or false, namespace default configuration is used.",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "internalIPFamily": {
+          "default": "\"\"",
+          "description": "InternalIPFamily configures the IP address family used for cluster-internal IP address. Available values are: IPv4, IPv6, and empty.",
+          "enum": [
+            "IPv6",
+            "IPv4",
+            ""
+          ],
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "labels": {
+          "default": "{}",
+          "description": "Global labels. Global, service level, and resource-specific labels are merged, no conflicts are allowed",
+          "type": "object"
+        },
+        "log": {
+          "properties": {
+            "streamingMethod": {
+              "default": "indirect",
+              "description": "Global parameter for specifying the streaming method of service logs. It can be ‘indirect', ‘direct', ‘dual', or null. If both global.log.streamingMethod and log.streamingMethod are set to null, it will choose ‘indirect' by default",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "networkPolicy": {
+          "properties": {
+            "enabled": {
+              "default": "false",
+              "description": "Global network policy parameter",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "nodeSelector": {
+          "default": "{}",
+          "description": "Global node selectors",
+          "type": "object"
+        },
+        "podSecurityContext": {
+          "properties": {
+            "supplementalGroups": {
+              "default": "\"\"",
+              "description": "SupplementalGroups is used for setting the GID value(s) for volume data that is used by the services. The value will be merged if both global and local value are set. supplementalGroup will not be set in helmchart if both global and local value are not set",
+              "type": [
+                "array",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "pullSecret": {
+          "default": "\"\"",
+          "description": "PullSecret used when fetching the image",
+          "type": [
+            "string",
+            "integer",
+            "number",
+            "null"
+          ]
+        },
+        "registry": {
+          "properties": {
+            "imagePullPolicy": {
+              "default": "IfNotPresent",
+              "description": "Pull policy for the image",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "url": {
+              "default": "armdocker.rnd.ericsson.se",
+              "description": "Registry url to fetch image from",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "security": {
+          "properties": {
+            "tls": {
+              "properties": {
+                "enabled": {
+                  "default": "true",
+                  "description": "Configuration option to enable/disable TLS support",
+                  "oneOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "enum": [
+                        "true",
+                        "false"
+                      ],
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "securityPolicy": {
+          "properties": {
+            "rolekind": {
+              "default": "\"\"",
+              "description": "Configuration of the security policy role kind. The following values are possible: ClusterRole, Role and \"\". Rolebinding will not be created with value \"\"",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "timezone": {
+          "default": "UTC",
+          "description": "Timezone",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        },
+        "tolerations": {
+          "default": "[]",
+          "description": "Tolerations for pod assignment",
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "imageCredentials": {
+      "properties": {
+        "operationsprovider": {
+          "properties": {
+            "registry": {
+              "properties": {
+                "imagePullPolicy": {
+                  "default": "IfNotPresent",
+                  "description": "Specifies the image pull policy for containers in the operations-provider component's registry, determining when to fetch new images.",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number",
+                    "null"
+                  ]
+                },
+                "url": {
+                  "default": "\"\"",
+                  "description": "Registry url to fetch image from",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "repoPath": {
+              "default": "\"\"",
+              "description": "Repo where the image is located",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "pullSecret": {
+          "default": "\"\"",
+          "description": "PullSecret used when fetching the image",
+          "type": [
+            "string",
+            "integer",
+            "number",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "images": {
+      "default": "\u003cnil\u003e",
+      "description": "Docker image for operations-provider",
+      "type": [
+        "string",
+        "integer",
+        "number",
+        "null"
+      ]
+    },
+    "labels": {
+      "default": "{}",
+      "description": "A map for setting custom labels for all Kubernetes resources",
+      "type": "object"
+    },
+    "nameOverride": {
+      "default": "\"\"",
+      "description": "Overriding the full name",
+      "type": [
+        "string",
+        "integer",
+        "number"
+      ]
+    },
+    "networkPolicy": {
+      "properties": {
+        "egress": {
+          "properties": {
+            "accessLabels": {
+              "properties": {
+                "operationsprovider": {
+                  "default": "{}",
+                  "description": "This parameter is a placeholder for adding a list of egress traffic network policy labels. If this service wants to send traffic then it should add all its outgoing traffic network policy access labels using this parameter",
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "enabled": {
+          "default": "true",
+          "description": "The network policy will be enabled if both networkPolicy.enabled and global.networkPolicy.enabled are set to true",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "enum": [
+                "true",
+                "false"
+              ],
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "nodeSelector": {
+      "default": "{}",
+      "description": "Node labels for pod assignment",
+      "type": "object"
+    },
+    "podDisruptionBudget": {
+      "properties": {
+        "maxUnavailable": {
+          "default": "\u003cnil\u003e",
+          "description": "The maximum allowed number of unavailable pods during a planned disruption.",
+          "type": [
+            "string",
+            "integer",
+            "number",
+            "null"
+          ]
+        },
+        "minAvailable": {
+          "default": "1",
+          "description": "Minimum number of pods of fc evaluation service that must remain available during a planned disruption.",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "podPriority": {
+      "properties": {
+        "eric-bss-bam-operations-provider": {
+          "properties": {
+            "priorityClassName": {
+              "default": "“",
+              "description": "The pod priority for the service",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "podSecurityContext": {
+      "properties": {
+        "supplementalGroups": {
+          "default": "\"\"",
+          "description": "SupplementalGroups is used for setting the GID value(s) for volume data that is used by the services. The value will be merged if both global and local value are set. supplementalGroup will not be set in helmchart if both global and local value are not set",
+          "type": [
+            "array",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "probes": {
+      "properties": {
+        "operationsprovider": {
+          "properties": {
+            "livenessProbe": {
+              "properties": {
+                "failureThreshold": {
+                  "default": "3",
+                  "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "initialDelaySeconds": {
+                  "default": "30",
+                  "description": "Number of seconds after the container has started before probe is initiated",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "periodSeconds": {
+                  "default": "5",
+                  "description": "How often (in seconds) to perform the probe",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "timeoutSeconds": {
+                  "default": "10",
+                  "description": "Number of seconds after which the probe times out",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "startupProbe": {
+              "properties": {
+                "failureThreshold": {
+                  "default": "30",
+                  "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "initialDelaySeconds": {
+                  "default": "5",
+                  "description": "Number of seconds after the container has started before probe is initiated",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "periodSeconds": {
+                  "default": "5",
+                  "description": "How often (in seconds) to perform the probe",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "successThreshold": {
+                  "default": "1",
+                  "description": "Minimum consecutive successes for the probe to be considered successful after having failed",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "timeoutSeconds": {
+                  "default": "10",
+                  "description": "Number of seconds after which the probe times out",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "replicaCount": {
+      "default": "1",
+      "description": "The number of pods that must still be available after the voluntary eviction (e.g. drain node). minAvailable can be either an absolute number or a percentage. PodDisruptionBudget will be created but will not apply if replicaCount is 1",
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?\\d+$",
+          "type": "string"
+        }
+      ]
+    },
+    "resources": {
+      "properties": {
+        "operationsprovider": {
+          "properties": {
+            "limits": {
+              "properties": {
+                "cpu": {
+                  "default": "100m",
+                  "description": "The maximum amount of CPU to allocate to the operationsprovider container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "128Mi",
+                  "description": "The maximum amount of memory to allocate to the operationsprovider container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "requests": {
+              "properties": {
+                "cpu": {
+                  "default": "10m",
+                  "description": "The amount of CPU required by the operationsprovider container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "32Mi",
+                  "description": "The amount of memory required by the operationsprovider container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "seccompProfile": {
+      "properties": {
+        "operationsprovider": {
+          "properties": {
+            "localhostProfile": {
+              "default": "\"\"",
+              "description": "Localhost path to the seccomp profile for the operationsprovider container. Should only be set if seccompProfile.operationsprovider.type is set to localhost",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "\"\"",
+              "description": "Feature of the Linux kernel for secure computing mode for operationsprovider container. Available options are,,and \"\" [default=\"\"]",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "securityPolicy": {
+      "properties": {
+        "rolename": {
+          "default": "eric-bss-bam-operations-provider",
+          "description": "Rolename sets the name of the security policy role that is bound to the service account.",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "service": {
+      "properties": {
+        "port": {
+          "default": "5000",
+          "description": "Service port",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        },
+        "type": {
+          "default": "ClusterIp",
+          "description": "Service type",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "serviceAccount": {
+      "properties": {
+        "create": {
+          "default": "true",
+          "description": "Set whether to create the service account. Warning: Don't turn this off, the service requires it.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "enum": [
+                "true",
+                "false"
+              ],
+              "type": "string"
+            }
+          ]
+        },
+        "name": {
+          "default": "\"\"",
+          "description": "Name of the serviceaccount to be used",
+          "type": [
+            "string",
+            "integer",
+            "number",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "terminationGracePeriodSeconds": {
+      "default": "30",
+      "description": "Number of seconds after SIGTERM caught before shutting down",
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?\\d+$",
+          "type": "string"
+        }
+      ]
+    },
+    "tolerations": {
+      "default": "[]",
+      "description": "Tolerations for pod assignment, this supports the fullAPI",
+      "type": "array"
+    },
+    "topologySpreadConstraints": {
+      "default": "[]",
+      "description": "Describes constraints and rules for the spreading of components within a Kubernetes cluster to ensure optimal resource allocation and redundancy.",
+      "type": "array"
+    },
+    "updateStrategy": {
+      "properties": {
+        "operationsprovider": {
+          "properties": {
+            "type": {
+              "default": "Recreate",
+              "description": "Specifies the type of update strategy (e.g., RollingUpdate, Recreate) used by the operations provider.",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "type": "object"
+}

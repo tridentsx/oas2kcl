@@ -1,0 +1,550 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "properties": {
+    "affinity": {
+      "properties": {
+        "nodeAffinity": {
+          "default": "{}",
+          "description": "",
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "annotations": {
+      "default": "{}",
+      "description": "",
+      "type": "object"
+    },
+    "appArmorProfile": {
+      "properties": {
+        "faultmap-mutator": {
+          "properties": {
+            "localhostProfile": {
+              "default": "\"\"",
+              "description": "Localhost path to the AppArmor profile for the faultmap-mutator container. Should only be set if appArmorProfile.faultmap-mutator.type is set to localhost.",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "\"\"",
+              "description": "The AppArmor type for the faultmap-mutator container. Available options are \"unconfined\", \"runtime/default\", \"localhost\" and \"\" [default=\"\"].",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "cronjob": {
+      "properties": {
+        "failedJobsHistoryLimit": {
+          "default": "2",
+          "description": "",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        },
+        "schedule": {
+          "default": "*/5 * * * *",
+          "description": "",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        },
+        "successfulJobsHistoryLimit": {
+          "default": "1",
+          "description": "",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "global": {
+      "properties": {
+        "fsGroup": {
+          "properties": {
+            "manual": {
+              "default": "\u003cempty\u003e",
+              "description": "Sets a fsGroup ID for all services. If manual set to empty namespace default configuration is used.",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "namespace": {
+              "default": "\u003cempty\u003e",
+              "description": "Sets a fsGroup to use namespace default. The following values are possible: true, false and \"\". If global.fsGroup.namespace set to \"\" or false, namespace default configuration is used.",
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "log": {
+          "properties": {
+            "streamingMethod": {
+              "default": "indirect",
+              "description": "The global parameter for specifying the streaming method of service logs. It can be 'indirect', 'direct', 'dual', or null. If both global.log.streamingMethod and log.streamingMethod are set to null, it will choose 'indirect' by default",
+              "type": "string",
+              "enum": [ "indirect", "direct", "dual", "" ]
+            }
+          }
+        },
+        "podSecurityContext": {
+          "properties": {
+            "supplementalGroups": {
+              "default": "\u003cempty\u003e",
+              "description": "SupplementalGroups is used for setting the GID value(s) for volume data that is used by the services. The value will be merged if both global and local value are set. supplementalGroup will not be set in helmchart if both global and local value are not set.",
+              "type": [
+                "array",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "registry": {
+          "properties": {
+            "repoPath": {
+              "default": "\u003cempty\u003e",
+              "description": "Repo where the image is located",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "securityPolicy": {
+          "properties": {
+            "rolekind": {
+              "default": "\"\"",
+              "description": "Configuration of the security policy role kind. The following values are possible: ClusterRole, Role and \"\". Rolebinding will not be created with value \"\".",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "tolerations": {
+          "default": "[]",
+          "description": "Tolerations for pod assignment, this supports the fullAPI",
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "imageCredentials": {
+      "properties": {
+        "faultmapMutator": {
+          "properties": {
+            "registry": {
+              "properties": {
+                "imagePullPolicy": {
+                  "default": "\u003cnil\u003e",
+                  "description": "",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number",
+                    "null"
+                  ]
+                },
+                "url": {
+                  "default": "\u003cnil\u003e",
+                  "description": "",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "repoPath": {
+              "default": "\u003cnil\u003e",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "images": {
+      "properties": {
+        "faultmapMutator": {
+          "properties": {
+            "name": {
+              "default": "\u003cnil\u003e",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "restartPolicy": {
+              "default": "Never",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "tag": {
+              "default": "\u003cnil\u003e",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "kafkaHost": {
+      "default": "eric-bss-kafka-proxy-http:80",
+      "description": "",
+      "type": [
+        "string",
+        "integer",
+        "number"
+      ]
+    },
+    "labels": {
+      "default": "{}",
+      "description": "",
+      "type": "object"
+    },
+    "logConnectionTtlMinutes": {
+      "default": "15",
+      "description": "Log connection TTL (minutes) towards log transformer service. Connection will reset after configured number of minutes. Required when streamingMethod is set to direct or dual",
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?\\d+$",
+          "type": "string"
+        }
+      ]
+    },
+    "logLevel": {
+      "default": "info",
+      "description": "Set the logging level",
+      "type": [
+        "string",
+        "integer",
+        "number"
+      ]
+    },
+    "log": {
+      "properties": {
+        "streamingMethod": {
+          "default": "indirect",
+          "description": "The local parameter for specifying the streaming method of service logs. It can be 'indirect', 'direct', 'dual', or null. If set to null, global.log.streamingMethod will be used to determine the streaming method",
+          "type": "string",
+          "enum": [ "indirect", "direct", "dual", "" ]
+        }
+      }
+    },
+    "logQueueSize": {
+      "default": "100",
+      "description": "Size of the log queue for streaming. Required when streamingMethod is set to direct or dual",
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?\\d+$",
+          "type": "string"
+        }
+      ]
+    },
+    "logTimeoutSeconds": {
+      "default": "5",
+      "description": "Timeout waiting for logs to be streamed (in seconds) before terminating. Required when streamingMethod is set to direct or dual",
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?\\d+$",
+          "type": "string"
+        }
+      ]
+    },
+    "logTransformerHost": {
+      "default": "eric-log-transformer:5024",
+      "description": "FQDN including port number of the log transformer service, don't include protocol. Required when streamingMethod is set to direct or dual",
+      "type": [
+        "string",
+        "integer",
+        "number"
+      ]
+    },
+    "logTransformerNoTlsHost": {
+      "default": "eric-log-transformer:5025",
+      "description": "FQDN including port number of the log transformer non tls service, don't include protocol. Required when streamingMethod is set to direct or dual",
+      "type": [
+        "string",
+        "integer",
+        "number"
+      ]
+    },
+    "networkPolicy": {
+      "properties": {
+        "egress": {
+          "properties": {
+            "accessLabels": {
+              "properties": {
+                "faultmapMutator": {
+                  "default": "{}",
+                  "description": "This parameter is a placeholder for adding a list of egress traffic network policy labels. If this service wants to send traffic then it should add all its outgoing traffic network policy access labels using this parameter.",
+                  "type": "object"
+                },
+                "fmmCleanup": {
+                  "default": "\"\"",
+                  "description": "This parameter is a placeholder for adding a list of egress traffic network policy labels. If this service wants to send traffic then it should add all its outgoing traffic network policy access labels using this parameter.",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "nodeSelector": {
+      "default": "{}",
+      "description": "",
+      "type": "object"
+    },
+    "podPriority": {
+      "properties": {
+        "eric-bss-bam-faultmap-mutator": {
+          "properties": {
+            "priorityClassName": {
+              "default": "\u003cnil\u003e",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "podSecurityContext": {
+      "properties": {
+        "supplementalGroups": {
+          "default": "\u003cempty\u003e",
+          "description": "SupplementalGroups is used for setting the GID value(s) for volume data that is used by the services. The value will be merged if both global and local value are set. supplementalGroup will not be set in helmchart if both global and local value are not set.",
+          "type": [
+            "array",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "resources": {
+      "properties": {
+        "faultmap-mutator": {
+          "properties": {
+            "limits": {
+              "properties": {
+                "cpu": {
+                  "default": "100m",
+                  "description": "",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "64Mi",
+                  "description": "",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "requests": {
+              "properties": {
+                "cpu": {
+                  "default": "50m",
+                  "description": "",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "32Mi",
+                  "description": "",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "seccompProfile": {
+      "properties": {
+        "faultmap-mutator": {
+          "properties": {
+            "localhostProfile": {
+              "default": "\"\"",
+              "description": "Localhost path to the seccomp profile for the faultmap-mutator container. Should only be set if seccompProfile.faultmap-mutator.type is set to Localhost.",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "\"\"",
+              "description": "Feature of the Linux kernel for secure computing mode for faultmap-mutator container. Available options are `Unconfined`, `RuntimeDefault` and `Localhost` and \"\" [default=\"\"].",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "securityPolicy": {
+      "properties": {
+        "rolename": {
+          "default": "eric-bss-bam-faultmap-mutator",
+          "description": "Rolename sets the name of the security policy role that is bound to the service account.",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "sourceConfigMapLabel": {
+      "default": "bss.ericsson.com/bamFaultmapDelegate",
+      "description": "",
+      "type": [
+        "string",
+        "integer",
+        "number"
+      ]
+    },
+    "targetConfigMapName": {
+      "default": "eric-bss-bam-alarm-handler-faultmappings",
+      "description": "",
+      "type": [
+        "string",
+        "integer",
+        "number"
+      ]
+    },
+    "terminationGracePeriodSeconds": {
+      "default": "30",
+      "description": "",
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?\\d+$",
+          "type": "string"
+        }
+      ]
+    },
+    "tolerations": {
+      "default": "[]",
+      "description": "Toleration rules",
+      "type": "array"
+    }
+  },
+  "type": "object"
+}

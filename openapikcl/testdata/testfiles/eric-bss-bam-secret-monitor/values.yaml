@@ -1,0 +1,161 @@
+replicaCount: 1
+
+imageCredentials:
+  #pullSecret:
+  repoPath:
+  registry:
+    url:
+    imagePullPolicy:
+
+#global:
+#  labels: {}
+#  annotations: {}
+#  pullSecret:
+#  nodeSelector: {}
+#  tolerations: []
+#  registry:
+#    url: armdocker.rnd.ericsson.se
+#    imagePullPolicy:
+#    repoPath:
+#  networkPolicy:
+#    enabled: false
+#  securityPolicy:
+#    rolekind: ""
+#  podSecurityContext:
+#    supplementalGroups:
+#  fsGroup:
+#    manual:
+#    namespace:
+#  internalIPFamily:
+#  log:
+#    streamingMethod: "indirect"
+
+images:
+  bamsecretmonitor:
+    name:
+    tag:
+
+nameOverride: ""
+fullnameOverride: ""
+
+
+serviceAccount:
+  create: true
+  name: secretreader
+
+secretmonitor:
+  # The interval at which all monitored secrets are inspected for certificate validity.
+  # Take care not to set this interval too high, or short lived certificates may never
+  # raise an alarm before it expires.
+  interval: "24h"
+  # Thresholds are expressed as percentage of total validity period already gone by.
+  # So if the starting validity was 10 days and 3 are left, it's 70%.
+  # Set to -1 to turn off alarms of that particular severity.
+  warningThreshold: 70
+  minorThreshold: 80
+  majorThreshold: 90
+  criticalThreshold: 100
+
+service:
+  tlsport: 5005
+
+security:
+  tls:
+    mutual: true
+    kafkaProxy:
+      enabled: true
+      issuer: eric-bss-kafka-proxy-ca
+
+networkPolicy:
+  enabled: true
+  egress:
+    accessLabels:
+      secretmonitor: {}
+
+kafkaProxy:
+  serviceName: "eric-bss-kafka-proxy-http"
+  port: "80"
+faultMapping:
+  serviceName: "eric-bss-bam-secret-monitor"
+
+logLevel: "info"
+log:
+  streamingMethod: ""
+logTransformerHost: "eric-log-transformer:5024"
+logTransformerNoTlsHost: "eric-log-transformer:5025"
+logTimeoutSeconds: 5
+logQueueSize: 1000
+logConnectionTtlMinutes: 120
+
+resources:
+  # Below commented out resource config is also supported but
+  # deprecated in BAM 3.3. If boths ways are configured the
+  # deprecated values has precedence.
+  #
+  #requests:
+  #  cpu:
+  #  memory:
+  #limits:
+  #  cpu:
+  #  memory:
+  bamsecretmonitor:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+updateStrategy:
+  bamsecretmonitor:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 50%
+      maxSurge: 50%
+
+labels: {}
+nodeSelector: {}
+
+annotations: {}
+
+affinity:
+  nodeAffinity: {}
+
+tolerations: []
+
+probes:
+  bamsecretmonitor:
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 1
+      periodSeconds: 10
+      timeoutSeconds: 2
+    startupProbe:
+      failureThreshold: 60
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 2
+
+terminationGracePeriodSeconds: 30
+
+podPriority:
+  eric-bss-bam-secret-monitor:
+    priorityClassName:
+topologySpreadConstraints: [] # Configuration for topology-spread constraints.
+
+seccompProfile:
+  bamsecretmonitor:
+    type: ""
+    localhostProfile: ""
+
+appArmorProfile:
+  bamsecretmonitor:
+    type: ""
+    localhostProfile: ""
+
+securityPolicy:
+  rolename: ""
+
+podSecurityContext:
+  supplementalGroups:

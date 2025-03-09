@@ -10,91 +10,62 @@ import (
 	"unicode"
 
 	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/tridentsx/oas2kcl/openapikcl/jsonschema"
+	"github.com/tridentsx/oas2kcl/openapikcl/oas"
+	"gopkg.in/yaml.v2"
 )
 
-// Add debugMode variable if it doesn't exist
 var debugMode bool
 
-// SchemaType represents the type of schema being processed
-type SchemaType int
+// SpecFormat defines the format of a specification
+type SpecFormat int
 
 const (
-	SchemaTypeUnknown SchemaType = iota
-	SchemaTypeOpenAPI2
-	SchemaTypeOpenAPI3
-	SchemaTypeOpenAPI31
-	SchemaTypeJSONSchema
+	// SpecFormatUnknown represents an unknown specification format
+	SpecFormatUnknown SpecFormat = iota
+	// SpecFormatOpenAPIV2 represents OpenAPI 2.0 (Swagger)
+	SpecFormatOpenAPIV2
+	// SpecFormatOpenAPIV3 represents OpenAPI 3.0
+	SpecFormatOpenAPIV3
+	// SpecFormatOpenAPIV31 represents OpenAPI 3.1
+	SpecFormatOpenAPIV31
+	// SpecFormatJSONSchema represents JSON Schema
+	SpecFormatJSONSchema
 )
 
-// String returns the string representation of the schema type
-func (st SchemaType) String() string {
-	switch st {
-	case SchemaTypeOpenAPI2:
-		return "OpenAPI 2.0 (Swagger)"
-	case SchemaTypeOpenAPI3:
+// String returns a string representation of the SpecFormat
+func (s SpecFormat) String() string {
+	switch s {
+	case SpecFormatOpenAPIV2:
+		return "OpenAPI 2.0"
+	case SpecFormatOpenAPIV3:
 		return "OpenAPI 3.0"
-	case SchemaTypeOpenAPI31:
+	case SpecFormatOpenAPIV31:
 		return "OpenAPI 3.1"
-	case SchemaTypeJSONSchema:
+	case SpecFormatJSONSchema:
 		return "JSON Schema"
 	default:
 		return "Unknown"
 	}
 }
 
-// DetectSchemaType determines the type of schema from a document
-// This could be either an OpenAPI document or a JSON Schema document
-func DetectSchemaType(doc *openapi3.T, rawSchema map[string]interface{}) SchemaType {
-	// Check if it's an OpenAPI document
+// GenerateKCLSchemas generates KCL schemas from an OpenAPI document
+func GenerateKCLSchemas(doc *openapi3.T, outputDir string, packageName string, version OpenAPIVersion, jsonSchemaPayload []byte) error {
+	log.Printf("Starting KCL schema generation")
+
+	// Check if we have an OpenAPI document
 	if doc != nil {
-		// Check for OpenAPI version
-		if doc.OpenAPI != "" {
-			// OpenAPI 3.x
-			if strings.HasPrefix(doc.OpenAPI, "3.1") {
-				return SchemaTypeOpenAPI31
-			}
-			return SchemaTypeOpenAPI3
-		}
-
-		// Check for Swagger version (OpenAPI 2.0)
-		if rawSchema != nil {
-			if _, hasSwagger := rawSchema["swagger"]; hasSwagger {
-				return SchemaTypeOpenAPI2
-			}
-		}
+		// We have an OpenAPI document, use the oas package
+		return oas.GenerateSchemas(doc, outputDir, packageName, version)
 	}
 
-	// Check for JSON Schema
-	if rawSchema != nil {
-		if schemaURL, hasSchema := rawSchema["$schema"]; hasSchema {
-			schemaStr, ok := schemaURL.(string)
-			if ok && (strings.Contains(schemaStr, "json-schema.org") ||
-				strings.Contains(schemaStr, "schema.json")) {
-				return SchemaTypeJSONSchema
-			}
-		}
+	// Check if we have JSON Schema data
+	if jsonSchemaPayload != nil && len(jsonSchemaPayload) > 0 {
+		// We have JSON Schema data, use the jsonschema package
+		return jsonschema.GenerateSchemas(jsonSchemaPayload, outputDir, packageName)
 	}
 
-	return SchemaTypeUnknown
-}
-
-// GenerateKCLSchemas generates KCL schemas from either an OpenAPI spec or a JSON Schema
-func GenerateKCLSchemas(doc *openapi3.T, outputDir string, packageName string, version OpenAPIVersion, rawSchema map[string]interface{}) error {
-	log.Printf("starting KCL schema generation")
-
-	// Determine the schema type
-	schemaType := DetectSchemaType(doc, rawSchema)
-	log.Printf("detected schema type: %s", schemaType)
-
-	// Handle different schema types
-	switch schemaType {
-	case SchemaTypeOpenAPI2, SchemaTypeOpenAPI3, SchemaTypeOpenAPI31:
-		return generateOpenAPISchemas(doc, outputDir, packageName, version)
-	case SchemaTypeJSONSchema:
-		return generateJSONSchemas(rawSchema, outputDir, packageName)
-	default:
-		return fmt.Errorf("unable to determine schema type or unsupported schema type")
-	}
+	return fmt.Errorf("no valid schema provided")
 }
 
 // formatSchemaName ensures the schema name is properly formatted for KCL
@@ -222,80 +193,137 @@ func GenerateTestMainK(outputDir string, schemas []string) error {
 	return nil
 }
 
-// SpecFormat represents the format of a specification
-type SpecFormat int
-
-const (
-	UnknownSpec SpecFormat = iota
-	OpenAPISpec
-	JSONSchemaSpec
-)
-
-// detectSpecFormat identifies if a document is OpenAPI or JSON Schema
-func detectSpecFormat(data []byte) SpecFormat {
-	var doc map[string]interface{}
-	if err := json.Unmarshal(data, &doc); err != nil {
-		return UnknownSpec
-	}
-
-	// Check for OpenAPI indicators
-	if _, hasOpenAPI := doc["openapi"]; hasOpenAPI {
-		return OpenAPISpec
-	}
-	if _, hasSwagger := doc["swagger"]; hasSwagger {
-		return OpenAPISpec
-	}
-
-	// Check for JSON Schema indicators
-	if schemaURL, hasSchema := doc["$schema"]; hasSchema {
-		schemaStr, ok := schemaURL.(string)
-		if ok && (strings.Contains(schemaStr, "json-schema.org") ||
-			strings.Contains(schemaStr, "schema.json")) {
-			return JSONSchemaSpec
-		}
-	}
-
-	return UnknownSpec
-}
-
-// GenerateKCL is a convenience function to generate KCL schemas from a file
-func GenerateKCL(schemaFilePath, outputDir, packageName string) error {
+// GenerateKCL generates KCL schemas from a schema file (OpenAPI or JSON Schema)
+func GenerateKCL(schemaFile string, outputDir string, packageName string) error {
 	// Read the schema file
-	data, err := os.ReadFile(schemaFilePath)
+	schemaData, err := os.ReadFile(schemaFile)
 	if err != nil {
-		return fmt.Errorf("failed to read schema file: %w", err)
+		return fmt.Errorf("error reading schema file: %w", err)
 	}
 
-	// Detect spec format
-	format := detectSpecFormat(data)
+	// Detect the specification format
+	format, err := DetectSpecFormat(schemaData)
+	if err != nil {
+		return fmt.Errorf("error detecting specification format: %w", err)
+	}
 
-	// Process based on format
+	// Process based on the detected format
 	switch format {
-	case OpenAPISpec:
-		// Load as OpenAPI
-		doc, version, err := LoadOpenAPISchema(schemaFilePath, LoadOptions{
-			FlattenSpec: true,
-			SkipRemote:  false,
-			MaxDepth:    100,
-		})
+	case SpecFormatJSONSchema:
+		log.Printf("Detected JSON Schema format, processing with JSON Schema generator")
+		return jsonschema.GenerateSchemas(schemaData, outputDir, packageName)
+
+	case SpecFormatOpenAPIV2, SpecFormatOpenAPIV3, SpecFormatOpenAPIV31:
+		log.Printf("Detected OpenAPI format (%s), processing with OpenAPI generator", format)
+
+		// Try to parse as OpenAPI
+		loader := openapi3.NewLoader()
+		doc, err := loader.LoadFromData(schemaData)
 		if err != nil {
-			return fmt.Errorf("failed to load OpenAPI schema: %w", err)
+			return fmt.Errorf("error parsing OpenAPI document: %w", err)
 		}
 
-		// Generate KCL from OpenAPI
-		return GenerateKCLSchemas(doc, outputDir, packageName, version, nil)
-
-	case JSONSchemaSpec:
-		// Parse JSON Schema
-		var rawSchema map[string]interface{}
-		if err := json.Unmarshal(data, &rawSchema); err != nil {
-			return fmt.Errorf("failed to parse JSON Schema: %w", err)
+		// Determine the OpenAPI version
+		version, err := oas.DetectOpenAPIVersion(schemaData)
+		if err != nil {
+			return fmt.Errorf("error detecting OpenAPI version: %w", err)
 		}
 
-		// Generate KCL from JSON Schema
-		return generateJSONSchemas(rawSchema, outputDir, packageName)
+		// Generate schemas using the oas package
+		return oas.GenerateSchemas(doc, outputDir, packageName, version)
 
 	default:
-		return fmt.Errorf("unknown or unsupported specification format")
+		return fmt.Errorf("unsupported specification format")
 	}
+}
+
+// DetectSpecFormat detects the format of the specification from raw data.
+func DetectSpecFormat(data []byte) (SpecFormat, error) {
+	// First, check if it's an OpenAPI specification by trying to detect the version
+	openAPIVersion, err := oas.DetectOpenAPIVersion(data)
+	if err == nil {
+		// It's an OpenAPI spec, determine which version
+		switch openAPIVersion {
+		case oas.OpenAPIV2:
+			return SpecFormatOpenAPIV2, nil
+		case oas.OpenAPIV3:
+			return SpecFormatOpenAPIV3, nil
+		case oas.OpenAPIV31:
+			return SpecFormatOpenAPIV31, nil
+		}
+	}
+
+	// If it's not recognized as an OpenAPI spec, check for JSON schema
+	var jsonSchema map[string]interface{}
+	if err := json.Unmarshal(data, &jsonSchema); err != nil {
+		return SpecFormatUnknown, fmt.Errorf("failed to parse as JSON: %w", err)
+	}
+
+	// Check for JSON Schema specific patterns
+	if schemaURI, ok := jsonSchema["$schema"].(string); ok {
+		if strings.Contains(schemaURI, "json-schema.org") {
+			return SpecFormatJSONSchema, nil
+		}
+	}
+
+	// Check for common JSON Schema properties
+	if _, ok := jsonSchema["properties"]; ok {
+		if _, ok := jsonSchema["type"]; ok {
+			if typ, ok := jsonSchema["type"].(string); ok && typ == "object" {
+				return SpecFormatJSONSchema, nil
+			}
+		}
+	}
+
+	return SpecFormatUnknown, fmt.Errorf("unrecognized specification format")
+}
+
+// ParseSpecYAMLorJSON parses the spec as either YAML or JSON.
+func ParseSpecYAMLorJSON(content []byte, out interface{}) error {
+	if err := yaml.Unmarshal(content, out); err != nil {
+		// Try JSON if YAML parsing fails
+		if err := json.Unmarshal(content, out); err != nil {
+			return fmt.Errorf("failed to parse as YAML or JSON: %w", err)
+		}
+	}
+	return nil
+}
+
+// GenerateTestCaseOutput generates KCL schemas for a specific test case directory
+func GenerateTestCaseOutput(testCaseDir string) error {
+	// Check if the test case directory exists
+	if _, err := os.Stat(testCaseDir); os.IsNotExist(err) {
+		return fmt.Errorf("test case directory %s does not exist", testCaseDir)
+	}
+
+	// Determine the schema file path based on the directory
+	var schemaFile string
+	schemaFormats := []string{".json", ".yaml", ".yml"}
+	for _, format := range schemaFormats {
+		candidate := filepath.Join(testCaseDir, "schema"+format)
+		if _, err := os.Stat(candidate); err == nil {
+			schemaFile = candidate
+			break
+		}
+	}
+
+	if schemaFile == "" {
+		return fmt.Errorf("no schema file found in test case directory %s", testCaseDir)
+	}
+
+	// Create the output directory
+	outputDir := filepath.Join(testCaseDir, "output")
+	if err := os.MkdirAll(outputDir, 0755); err != nil {
+		return fmt.Errorf("failed to create output directory: %w", err)
+	}
+
+	// Get a simple package name from the directory name
+	packageName := filepath.Base(testCaseDir)
+
+	// Generate KCL schemas
+	if err := GenerateKCL(schemaFile, outputDir, packageName); err != nil {
+		return fmt.Errorf("failed to generate KCL schemas: %w", err)
+	}
+
+	return nil
 }

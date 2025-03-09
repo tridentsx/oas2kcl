@@ -1,0 +1,91 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ObjectTypes",
+  "type": "object",
+  "description": "A schema demonstrating different object patterns in JSON Schema",
+  "properties": {
+    "simpleObject": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "age": { "type": "integer" }
+      },
+      "description": "A simple object with primitive properties"
+    },
+    "nestedObject": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "contact": {
+              "type": "object",
+              "properties": {
+                "email": { "type": "string" },
+                "phone": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "description": "An object with nested object properties"
+    },
+    "additionalPropsObject": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" }
+      },
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "An object with additional string properties allowed"
+    },
+    "typedAdditionalPropsObject": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" }
+      },
+      "additionalProperties": {
+        "type": "number"
+      },
+      "description": "An object with additional number properties allowed"
+    },
+    "booleanAdditionalPropsObject": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" }
+      },
+      "additionalProperties": true,
+      "description": "An object with any additional properties allowed"
+    },
+    "noAdditionalPropsObject": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" }
+      },
+      "additionalProperties": false,
+      "description": "An object with no additional properties allowed"
+    },
+    "objectWithRef": {
+      "type": "object",
+      "properties": {
+        "person": {
+          "$ref": "#/definitions/Person"
+        }
+      },
+      "description": "An object with a property referencing a definition"
+    }
+  },
+  "definitions": {
+    "Person": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "age": { "type": "integer" }
+      },
+      "required": ["name"]
+    }
+  }
+} 

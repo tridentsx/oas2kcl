@@ -1,0 +1,159 @@
+{
+  "affinity": {
+    "sunt91a": "reprehenderit aliqua dolor proident minim",
+    "commodo_655": 3051524.5249421895,
+    "Duis8f": 77080825.90778154,
+    "nodeAffinity": {
+      "sunt3e": -75698328.0863667,
+      "Duisc": false,
+      "culpa_2_5": -80271002,
+      "ut_5": "consectetur fugiat proident",
+      "nulla_043": 18430414.520626172
+    }
+  },
+  "annotations": {
+    "minim_d": "elit"
+  },
+  "appArmorProfile": {
+    "aliqua_5": "exercitation velit",
+    "amet_a_5": -2005373.2870972157,
+    "bamcli": {
+      "fugiate": "cillum quis"
+    }
+  },
+  "config": {
+    "ad6": true,
+    "dolore98_": "fugiat do est dolor veniam",
+    "et_c": 45513337,
+    "dolore_ee5": "sit irure Ut ullamco sed",
+    "nisi2": "nulla",
+    "aliquab3": "pariatur",
+    "dolor6a0": false,
+    "labore_6": "pariatur",
+    "sit_3": "irure dolor",
+    "ad_f56": "incididunt magna occaecat sit Lorem",
+    "logQueueSize": "82862"
+  },
+  "fullnameOverride": "adipisicing magna et",
+  "global": {
+    "velit24b": -84334369,
+    "fsGroup": {
+      "manual": 64055469,
+      "namespace": null
+    },
+    "networkPolicy": {
+      "dolor4": "ad in laborum",
+      "uta__": "adipisicing ipsum dolor",
+      "eu_d": "velit",
+      "enabled": true
+    },
+    "nodeSelector": {
+      "idcc": false
+    }
+  },
+  "imageCredentials": {
+    "pullSecret": 27738756,
+    "registry": {
+      "deserunt_aa": true,
+      "url": 70504833
+    },
+    "repoPath": 57419521
+  },
+  "images": {
+    "Excepteur_4a6": true,
+    "bamcli": {
+      "name": -50231774.13643163,
+      "tag": -90765470
+    }
+  },
+  "ingress": {
+    "enabled": "false",
+    "hostname": "dolor qui",
+    "ingressClass": 25457443,
+    "secretName": "aliquip aliqua",
+    "tls": {
+      "in_852": -36484842.912971295,
+      "id_6": -59706462,
+      "nisi_7f": 42842219.05368066,
+      "occaecat_293": -48987515.55674141,
+      "veniam8": -79706706,
+      "adipisicing8": "laborum sunt irure"
+    }
+  },
+  "labels": {
+    "nulla1": false
+  },
+  "nameOverride": "incididunt aute",
+  "networkPolicy": {
+    "egress": {
+      "Lorem2a2": false,
+      "sit_395": 64583552,
+      "labore_bfb": "pariatur",
+      "ullamco1": 81766659.8755764,
+      "accessLabels": {
+        "dolor_b9": true,
+        "incididunt_c_5": 89233923.63186887,
+        "id96": "ex ea"
+      }
+    },
+    "enabled": true
+  },
+  "nodeSelector": {
+    "mollit_c4": 65640530,
+    "ullamco_e5": "ex aliqua voluptate ipsum magna"
+  },
+  "podPriority": {
+    "laborisf": -2428446.493920207,
+    "dolore7": 17342318.92992595,
+    "quic3": "sint"
+  },
+  "podSecurityContext": {
+    "in_3": 39885915.88083041,
+    "dolore83e": true
+  },
+  "probes": {
+    "ut_3": true,
+    "velit_9": 19159614.621901527
+  },
+  "replicaCount": "172",
+  "resources": {
+    "consectetur_9a4": -63062494,
+    "reprehenderit15e": false
+  },
+  "seccompProfile": {
+    "ad_5": -68982337.56328031,
+    "Duis5": "culpa reprehenderit",
+    "Excepteur_3": -91769931.78833017,
+    "voluptate_fe": false,
+    "bamcli": {
+      "nostrud3b": 7446767.921781078,
+      "Ut_97": true,
+      "localhostProfile": "in mollit nulla ipsum",
+      "type": 5128443
+    }
+  },
+  "securityPolicy": {
+    "consequat6c": true,
+    "velit_2f4": 79464012.71006146,
+    "incididunt1": 24207982
+  },
+  "service": {
+    "consequat0": false,
+    "dolore_2": 69294544,
+    "commodo92": 66738656,
+    "port": "71993"
+  },
+  "serviceAccount": {
+    "pariatur_d0b": "laboris esse dolore Excepteur",
+    "name": "mollit ex id minim culpa"
+  },
+  "terminationGracePeriodSeconds": "-0590600808",
+  "tolerations": [],
+  "topologySpreadConstraints": [],
+  "updateStrategy": {
+    "in1": false,
+    "cillum_c": "tempor ullamco Lorem",
+    "labore_a": "nulla velit",
+    "voluptate48": -50187202
+  }
+}

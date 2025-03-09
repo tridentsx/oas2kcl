@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Shipping",
+  "type": "object",
+  "properties": {
+    "country": {
+      "type": "string",
+      "description": "The shipping country"
+    },
+    "zipCode": {
+      "type": "string",
+      "description": "The postal/zip code"
+    },
+    "stateCode": {
+      "type": "string",
+      "description": "State code (for US addresses)"
+    }
+  },
+  "required": ["country"],
+  "if": {
+    "properties": {
+      "country": { "enum": ["US"] }
+    }
+  },
+  "then": {
+    "required": ["zipCode", "stateCode"],
+    "properties": {
+      "zipCode": {
+        "pattern": "^\\d{5}(-\\d{4})?$"
+      },
+      "stateCode": {
+        "pattern": "^[A-Z]{2}$"
+      }
+    }
+  },
+  "else": {
+    "properties": {
+      "zipCode": {
+        "pattern": "^[A-Za-z0-9\\s-]{3,10}$"
+      }
+    }
+  },
+  "description": "A shipping schema that uses if-then-else for country-specific validation"
+} 

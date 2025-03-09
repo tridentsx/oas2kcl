@@ -1,0 +1,111 @@
+imageCredentials:
+  pmConfigAggregator:
+    repoPath:
+    imagePullPolicy:
+
+#global:
+#  labels: {}
+#  annotations: {}
+#  registry:
+#    url: armdocker.rnd.ericsson.se
+#    imagePullPolicy:
+#    repoPath:
+#  securityPolicy:
+#    rolekind: ""
+#  tolerations: []
+#  podSecurityContext:
+#    supplementalGroups:
+#  fsGroup:
+#    manual:
+#    namespace:
+#  log:
+#    streamingMethod: "indirect"
+
+images:
+  pmConfigAggregator:
+    name:
+    tag:
+    restartPolicy: Never
+
+config:
+  sourceConfigMap:
+    labels:
+      pmJobs: "bss.ericsson.com/bamPMconfigAggregator"
+      recordingRules: "bss.ericsson.com/bamPMconfigCustomization"
+  targetConfigMap:
+    recordingRules: eric-bss-bam-pm-config-aggregator-recording-rules
+
+logLevel: info
+log:
+  streamingMethod: ""
+logTransformerHost: "eric-log-transformer:5024"
+logTransformerNoTlsHost: "eric-log-transformer:5025"
+
+logTimeoutSeconds: 5
+logQueueSize: 100
+logConnectionTtlMinutes: 15
+cmMediatorHost: "eric-cm-mediator:5004"
+cmMediatorNoTlsHost: "eric-cm-mediator:5003"
+kafkaHost: "eric-bss-kafka-proxy-http:80"
+
+cronjob:
+  schedule: "*/5 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+
+resources:
+  # Below commented out resource config is also supported but
+  # deprecated in BAM 3.3. If boths ways are configured the
+  # deprecated values has precedence.
+  #
+  #pmConfigAggregator:
+  #  requests:
+  #    cpu:
+  #    memory:
+  #  limits:
+  #    cpu:
+  #    memory:
+  pm-config-aggregator:
+    requests:
+      cpu: 50m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 64Mi
+
+labels: {}
+
+annotations: {}
+
+tolerations: []
+
+nodeSelector: {}
+affinity:
+  nodeAffinity: {}
+
+terminationGracePeriodSeconds: 30
+
+podPriority:
+  eric-bss-bam-pm-config-aggregator:
+    priorityClassName:
+
+networkPolicy:
+  egress:
+    accessLabels:
+      pmConfigAggregator: {}
+
+seccompProfile:
+  pm-config-aggregator:
+    type: ""
+    localhostProfile: ""
+
+appArmorProfile:
+  pm-config-aggregator:
+    type: ""
+    localhostProfile: ""
+
+securityPolicy:
+  rolename: ""
+
+podSecurityContext:
+  supplementalGroups:

@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AdvancedFormats",
+  "type": "object",
+  "description": "A schema demonstrating all advanced string formats",
+  "properties": {
+    "dateTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "RFC 3339 date-time format"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date in YYYY-MM-DD format"
+    },
+    "time": {
+      "type": "string",
+      "format": "time",
+      "description": "Time in HH:MM:SS format"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "Email address"
+    },
+    "hostname": {
+      "type": "string",
+      "format": "hostname",
+      "description": "Hostname (domain name)"
+    },
+    "ipv4": {
+      "type": "string",
+      "format": "ipv4",
+      "description": "IPv4 address"
+    },
+    "ipv6": {
+      "type": "string",
+      "format": "ipv6",
+      "description": "IPv6 address"
+    },
+    "uri": {
+      "type": "string",
+      "format": "uri",
+      "description": "URI with scheme"
+    },
+    "uuid": {
+      "type": "string",
+      "format": "uuid",
+      "description": "UUID in standard format"
+    }
+  },
+  "required": ["email"]
+} 

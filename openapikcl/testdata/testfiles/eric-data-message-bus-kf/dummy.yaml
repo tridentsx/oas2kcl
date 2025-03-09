@@ -1,0 +1,31 @@
+{
+  "proidente": true,
+  "commodo6": false,
+  "topologySpreadConstraints": [
+    {
+      "maxSkew": 48057648,
+      "topologyKey": "adipisicing sint cillum exercitation",
+      "whenUnsatisfiable": "DoNotSchedule"
+    },
+    {
+      "maxSkew": 38134168,
+      "topologyKey": "ex officia et",
+      "whenUnsatisfiable": "ScheduleAnyway"
+    },
+    {
+      "maxSkew": 84504949,
+      "topologyKey": "Ut fugiat voluptate labore minim",
+      "whenUnsatisfiable": "ScheduleAnyway"
+    },
+    {
+      "maxSkew": 15804507,
+      "topologyKey": "commodo ad elit enim",
+      "whenUnsatisfiable": "DoNotSchedule"
+    },
+    {
+      "maxSkew": 80437206,
+      "topologyKey": "consectetur dolore fugiat",
+      "whenUnsatisfiable": "ScheduleAnyway"
+    }
+  ]
+}

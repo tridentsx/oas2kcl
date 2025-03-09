@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Person",
+  "description": "A schema representing a person",
+  "type": "object",
+  "properties": {
+    "firstName": {
+      "type": "string",
+      "description": "The person's first name"
+    },
+    "lastName": {
+      "type": "string",
+      "description": "The person's last name"
+    },
+    "age": {
+      "type": "integer",
+      "description": "The person's age in years",
+      "minimum": 0
+    },
+    "email": {
+      "type": "string",
+      "description": "The person's email address",
+      "format": "email"
+    },
+    "address": {
+      "type": "object",
+      "description": "The person's address",
+      "properties": {
+        "street": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "zipCode": {
+          "type": "string",
+          "pattern": "^[0-9]{5}(-[0-9]{4})?$"
+        }
+      },
+      "required": ["street", "city", "state", "zipCode"]
+    },
+    "phoneNumbers": {
+      "type": "array",
+      "description": "The person's phone numbers",
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9]{3}-[0-9]{3}-[0-9]{4}$"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    }
+  },
+  "required": ["firstName", "lastName", "age"]
+} 

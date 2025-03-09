@@ -1,0 +1,45 @@
+{
+  "affinity": {
+    "laboris_2": "ea",
+    "elit169": -21261600.27602206,
+    "non_f77": false,
+    "id7c4": 84241839,
+    "culpa_736": "sed sit irure minim culpa",
+    "nodeAffinity": {
+      "veniam_d5": -80575446.77709849
+    }
+  },
+  "annotations": {
+    "eiusmodc": true,
+    "qui_259": false,
+    "magna_4": 51013227.23129806
+  },
+  "labels": {
+    "in8": "exercitation culpa ea enim",
+    "voluptate_f4_": -96147248
+  },
+  "nodeSelector": {
+    "ullamco_b51": "officia anim labore dolor"
+  },
+  "replicaCount": 19587755,
+  "securityPolicy": {
+    "ea92": 14684017.05500777,
+    "laboris_056": "voluptate consectetur",
+    "dolore_6c5": 96140720.6203878,
+    "rolename": 45188826.12623778
+  },
+  "serviceAccount": {
+    "create": "true",
+    "name": null
+  },
+  "terminationGracePeriodSeconds": -66125572,
+  "tolerations": [],
+  "updateStrategy": {
+    "enim_14": true,
+    "topologymanager": {
+      "doloref3": -19154124,
+      "adipisicing24": 88953681.87325454,
+      "type": -37962593.399637036
+    }
+  }
+}

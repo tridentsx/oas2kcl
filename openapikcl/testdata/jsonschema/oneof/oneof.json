@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Payment",
+  "type": "object",
+  "required": ["type"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "description": "The type of payment",
+      "enum": ["credit_card", "bank_transfer"]
+    }
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "type": {
+          "enum": ["credit_card"]
+        },
+        "cardNumber": {
+          "type": "string",
+          "description": "The credit card number"
+        }
+      },
+      "required": ["cardNumber"]
+    },
+    {
+      "properties": {
+        "type": {
+          "enum": ["bank_transfer"]
+        },
+        "accountNumber": {
+          "type": "string",
+          "description": "The bank account number"
+        }
+      },
+      "required": ["accountNumber"]
+    }
+  ],
+  "description": "A payment schema with different possible types"
+} 

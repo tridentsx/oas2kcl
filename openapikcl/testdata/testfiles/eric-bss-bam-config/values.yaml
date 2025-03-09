@@ -1,0 +1,260 @@
+# Default values for eric-bss-bam-config.
+# This is a YAML-formatted file.
+# global:
+#  labels: {}
+#  annotations: {}
+#  registry:
+#    url: armdocker.rnd.ericsson.se
+#    imagePullPolicy: IfNotPresent
+#    repoPath:
+#  timezone: UTC
+#  ericsson:
+#    licensing:
+#      licenseDomains:  # Mandatory, change at deploy time.
+#        - productType: "BAM"
+#          swltId: "BAMTargetId"
+#          customerId: "123456789"
+#        - productType: "Charging"
+#          swltId: "ChargingTargetId"
+#          customerId: "123456789"
+#  tolerations: []
+#  securityPolicy:
+#    rolekind: ""
+#  podSecurityContext:
+#    supplementalGroups:
+#  fsGroup:
+#    manual:
+#    namespace:
+#  log:
+#    streamingMethod: "indirect"
+
+imageCredentials:
+  fcresourceloader:
+    repoPath:
+    registry:
+      url:
+      imagePullPolicy:
+  pullSecret:
+
+images:
+  fcresourceloader:
+    # name:
+    # tag:
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  name:
+
+labels: {}
+annotations: {}
+terminationGracePeriodSeconds: 30
+nodeSelector: {}
+tolerations: []
+
+networkPolicy:
+  egress:
+    accessLabels:
+      sfcPostinstall: {}
+      sfcPostrollback: {}
+      sfcPostupgrade: {}
+      sfcPredelete: {}
+
+ahSnmpTrapsConfigMap: |
+  {"trapTargets": [{"address":"10.100.110.10","community":"public"}]}
+
+ahFmConfigmap:
+  bamMappings:
+    - name: eric-sec-certm.json
+      data: |-
+        [
+            {
+                "faultName": "CertMCertificateToExpire",
+                "vendor": 193,
+                "code": 9699329,
+                "defaultDescription": "The certificate will expire in [x] days and should be renewed to prevent service failure",
+                "defaultExpiration": 1800,
+                "defaultSeverity": "Warning",
+                "probableCause": 351,
+                "category": "ProcessingErrorAlarm",
+                "specificProblem": "Certificate Management, Certificate is about to Expire"
+            },
+            {
+                "faultName": "CertMTrustedCertificateToExpire",
+                "vendor": 193,
+                "code": 9699330,
+                "defaultDescription": "The trusted certificate will expire in [x] days and should be renewed to prevent service failure",
+                "defaultExpiration": 1800,
+                "defaultSeverity": "Warning",
+                "probableCause": 351,
+                "category": "ProcessingErrorAlarm",
+                "specificProblem": "Certificate Management, Trusted Certificate is about to Expire"
+            },
+            {
+                "faultName": "CertMAutomaticEnrollmentFailed",
+                "vendor": 193,
+                "code": 9699331,
+                "defaultDescription": "Automatic certificate renewal failed due to local misconfiguration or remote enrollment service denial",
+                "defaultExpiration": 1800,
+                "defaultSeverity": "Warning",
+                "probableCause": 307,
+                "category": "ProcessingErrorAlarm",
+                "specificProblem": "Certificate Management, Automatic Enrollment Failed"
+            }
+        ]
+    - name: eric-sec-sip-tls.json
+      data: |-
+        [
+         {
+              "faultName": "InternalCAInternalCertificateCreationFailure",
+              "vendor": 193,
+              "code": 10223618,
+              "defaultSeverity": "Major",
+              "probableCause": 302,
+              "defaultDescription": "",
+              "specificProblem": "Internal CA Internal Certificate Creation Failure",
+              "category": "ProcessingErrorAlarm"
+          }
+        ]
+    - name: eric-lm-combined-server.json
+      data: |-
+        [
+          {
+            "faultName": "LicenseManagerAutonomousModeActivated",
+            "vendor": 193,
+            "code": 17301506,
+            "defaultExpiration": 3600,
+            "defaultSeverity": "Major",
+            "probableCause": 306,
+            "category": "QualityOfServiceAlarm",
+            "specificProblem": "License Manager Autonomous Mode Activated",
+            "createAlarm": true
+          },
+          {
+            "faultName": "LicenseManagerLicenseGracePeriodActivated",
+            "vendor": 193,
+            "code": 17301511,
+            "defaultDescription": "License Key [LICENSE_KEY] belonging to License Domain [LICENSE_DOMAIN] will be deleted",
+            "defaultSeverity": "Major",
+            "probableCause": 1,
+            "category": "CommunicationsAlarm",
+            "specificProblem": "License Manager License Grace Period Activated",
+            "createAlarm": true
+          }
+        ]
+pmConfigMap:
+  pod_scrape_config:
+    - scrape_interval: 10 # scrape interval in seconds
+      scrape_regex: interval1 # this regex to be present in Pod's label for custom scrapping. Example : bss.ericsson.com/scrape: "interval1"
+    - scrape_interval: 60
+      scrape_regex: interval2
+
+currentLocation:
+  name: ""
+
+resources:
+  fc-install-resourceloader:
+    requests:
+      cpu: 40m
+      memory: 32Mi
+    limits:
+      cpu: 400m
+      memory: 128Mi
+  fc-upgrade-resourceloader:
+    requests:
+      cpu: 40m
+      memory: 32Mi
+    limits:
+      cpu: 400m
+      memory: 128Mi
+  fc-rollback-resourceloader:
+    requests:
+      cpu: 40m
+      memory: 32Mi
+    limits:
+      cpu: 400m
+      memory: 128Mi
+  fc-delete-resourceloader:
+    requests:
+      cpu: 40m
+      memory: 32Mi
+    limits:
+      cpu: 400m
+      memory: 128Mi
+
+eric-pm-server:
+  deprecatedLabels:
+    enabled: false
+  replaceLabels:
+    enabled: false
+  config:
+    recording_rules: { }
+    cil_recording_rules:
+      groups:
+        - name: cil
+          rules:
+            - record: cil_data_disk_low_sliding_window_ratio
+              expr: (cassandra_storage_filesystem_bytes_total - max_over_time(cassandra_storage_filesystem_usable_bytes[30m])) / cassandra_storage_filesystem_bytes_total
+            - record: cil_gc_pause_percentage
+              expr: sum by(cassandra_datacenter, cassandra_node) (rate(cassandra_jvm_gc_estimated_collection_duration_seconds_total[30s]))*100
+    remote_write: [ ]
+  service:
+    endpoints:
+      scrapeTargets:
+        tls:
+          enforced: required
+
+logLevel: info
+log:
+  streamingMethod: ""
+logTransformerHost: "eric-log-transformer:5024"
+logTransformerNoTlsHost: "eric-log-transformer:5025"
+logTimeoutSeconds: 5
+logQueueSize: 1000
+logConnectionTtlMinutes: 120
+
+alarms:
+  enabled: true
+  kafka:
+    host: eric-bss-kafka-proxy-http:80
+
+seccompProfile:
+  fc-delete-resourceloader:
+    type: ""
+    localhostProfile: ""
+  fc-install-resourceloader:
+    type: ""
+    localhostProfile: ""
+  fc-rollback-resourceloader:
+    type: ""
+    localhostProfile: ""
+  fc-upgrade-resourceloader:
+    type: ""
+    localhostProfile: ""
+
+appArmorProfile:
+  fc-install-resourceloader:
+    type: ""
+    localhostProfile: ""
+  fc-upgrade-resourceloader:
+    type: ""
+    localhostProfile: ""
+  fc-rollback-resourceloader:
+    type: ""
+    localhostProfile: ""
+  fc-delete-resourceloader:
+    type: ""
+    localhostProfile: ""
+
+securityPolicy:
+  rolename: ""
+
+podSecurityContext:
+  supplementalGroups:
+
+config:
+  iam:
+    claimName: groups

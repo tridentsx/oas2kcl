@@ -1,0 +1,1009 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "properties": {
+    "affinity": {
+      "properties": {
+        "nodeAffinity": {
+          "default": "{}",
+          "description": "NodeAffinity rules",
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "annotations": {
+      "default": "{}",
+      "description": "The key-prefix is optional and cannot exceed 253 characters with following character set: [a-z0-9A-Z.].The key cannot exceed 63 characters with following character set: [a-z0-9A-Z_.-]",
+      "type": "object"
+    },
+    "appArmorProfile": {
+      "properties": {
+        "xdcbridge": {
+          "properties": {
+            "localhostProfile": {
+              "default": "\"\"",
+              "description": "Localhost path to the apparmor profile for the xdcbridge container. Should only be set if appArmorProfile.xdcbridge.type is set to localhost",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "\"\"",
+              "description": "The AppArmor type for the xdcbridge container. Available options are \"unconfined\", \"runtime/default\", \"localhost\" and \"\" [default=\"\"]",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "config": {
+      "properties": {
+        "additionalCrdGroups": {
+          "default": "[]",
+          "description": "The additional custom resources that XDC service needs to collect based on the custom resource definition group. It is an array where the name paramter is the group name and the resources parameter is an array of resources associated to the group. The group and resources name can be found out from kubectl api-resources command. Example:\nadditionalCrdGroups:\n- name: wcdbcd.data.ericsson.com\nresources:\n- cassandraclusters",
+          "type": "array"
+        },
+        "alarms": {
+          "properties": {
+            "enabled": {
+              "default": "true",
+              "description": "By default, it is enabled. This allows the service to raise alarms via kafka proxy",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            },
+            "kafka": {
+              "properties": {
+                "host": {
+                  "default": "eric-bss-kafka-proxy-http:80",
+                  "description": "Host name of the kafka proxy service along with port",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "logConnectionTtlMinutes": {
+          "default": "120",
+          "description": "Log connection TTL (minutes) towards log transformer service. Connection will reset after configured number of minutes. Required when streamingMethod is set to direct or dual",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        },
+        "logLevel": {
+          "default": "info",
+          "description": "Log level, possible values are: debug, info, error",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        },
+        "log": {
+          "properties": {
+            "streamingMethod": {
+              "default": "indirect",
+              "description": "The local parameter for specifying the streaming method of service logs. It can be 'indirect', 'direct', 'dual', or null. If set to null, global.log.streamingMethod will be used to determine the streaming method",
+              "type": "string",
+              "enum": [ "indirect", "direct", "dual", "" ]
+            }
+          }
+        },
+        "logQueueSize": {
+          "default": "1000",
+          "description": "Size of the log queue for streaming. Required when streamingMethod is set to direct or dual",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        },
+        "logTimeoutSeconds": {
+          "default": "5",
+          "description": "Timeout waiting for logs to be streamed (in seconds) before terminating. Required when streamingMethod is set to direct or dual",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        },
+        "logTransformerHost": {
+          "default": "eric-log-transformer:5024",
+          "description": "FQDN including port number of the log transformer service, don't include protocol. Required when streamingMethod is set to direct or dual",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        },
+        "logTransformerNoTlsHost": {
+          "default": "eric-log-transformer:5025",
+          "description": "FQDN including port number of the log transformer non tls service, don't include protocol. Required when streamingMethod is set to direct or dual",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        },
+        "metrics": {
+          "properties": {
+            "caSecret": {
+              "default": "eric-pm-server-ca-cert",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "enabled": {
+              "default": "true",
+              "description": "By default, it is enabled. This allows the service to increment counters.",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            },
+            "host": {
+              "default": "eric-pm-server",
+              "description": "Host name of the pm server. this is used for pm metrics access if network policies are in use",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "serviceName": {
+              "default": "xdc_bridge",
+              "description": "The subsystem name for all the metrics generated by the service to be prefixed",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "server": {
+          "properties": {
+            "caSecret": {
+              "default": "xdc-bridge-client-root-ca-cert",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "certSecret": {
+              "default": "xdc-bridge-server-cert-secret",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "port": {
+              "default": "4141",
+              "description": "Port to expose the XDC Bridge service",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "storage": {
+          "properties": {
+            "localPath": {
+              "default": "/tmp",
+              "description": "The local path inside the pod where the data collected are stored temporarily. Mainly used during synchronous data collections",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "maxAge": {
+              "default": "60",
+              "description": "The time after which XDC service performs housekeeping. This time is in minutes",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            },
+            "rootPath": {
+              "default": "/var/run/data",
+              "description": "The path in which the data collected are persisted in the pvc",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "fs",
+              "description": "The storage type where the collected data are persisted",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "upstream": {
+          "properties": {
+            "caSecret": {
+              "default": "upstream-ca-secret",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "certSecret": {
+              "default": "upstream-xdc-client-cert",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "fullnameOverride": {
+      "default": "",
+      "description": "",
+      "type": [
+        "string",
+        "integer",
+        "number"
+      ]
+    },
+    "global": {
+      "properties": {
+        "annotations": {
+          "default": "{}",
+          "description": "Global annotations. Global, service level, and resource-specific labels are merged, no conflicts are allowed",
+          "type": "object"
+        },
+        "fsGroup": {
+          "properties": {
+            "manual": {
+              "default": "\"\"",
+              "description": "Sets a fsGroup ID for all services. If manual set to empty namespace default configuration is used.",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "namespace": {
+              "default": "\"\"",
+              "description": "Sets a fsGroup to use namespace default. The following values are possible: true, false and \"\". If global.fsGroup.namespace set to \"\" or false, namespace default configuration is used.",
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "internalIPFamily": {
+          "default": "\"\"",
+          "description": "InternalIPFamily configures the IP address family used for cluster-internal IP address. Available values are: IPv4, IPv6, and empty.",
+          "enum": [
+            "IPv6",
+            "IPv4",
+            ""
+          ],
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "labels": {
+          "default": "{}",
+          "description": "Global labels. Global, service level, and resource-specific labels are merged, no conflicts are allowed",
+          "type": "object"
+        },
+        "log": {
+          "properties": {
+            "streamingMethod": {
+              "default": "indirect",
+              "description": "The global parameter for specifying the streaming method of service logs. It can be 'indirect', 'direct', 'dual', or null. If both global.log.streamingMethod and log.streamingMethod are set to null, it will choose 'indirect' by default",
+              "type": "string",
+              "enum": ["indirect", "direct", "dual", ""]
+            }
+          }
+        },
+        "networkPolicy": {
+          "properties": {
+            "enabled": {
+              "default": "false",
+              "description": "Global network policy parameter",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "nodeSelector": {
+          "default": "{}",
+          "description": "Global node selectors",
+          "type": "object"
+        },
+        "podSecurityContext": {
+          "properties": {
+            "supplementalGroups": {
+              "default": "\"\"",
+              "description": "SupplementalGroups is used for setting the GID value(s) for volume data that is used by the services. The value will be merged if both global and local value are set. supplementalGroup will not be set in helmchart if both global and local value are not set",
+              "type": [
+                "array",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "pullSecret": {
+          "default": "\"\"",
+          "description": "PullSecret used when fetching the image",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        },
+        "registry": {
+          "properties": {
+            "imagePullPolicy": {
+              "default": "IfNotPresent",
+              "description": "Pull policy for the image",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "url": {
+              "default": "armdocker.rnd.ericsson.se",
+              "description": "Registry url to fetch image from",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "security": {
+          "properties": {
+            "tls": {
+              "properties": {
+                "enabled": {
+                  "default": "true",
+                  "description": "Configuration option to enable/disable TLS support",
+                  "oneOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "enum": [
+                        "true",
+                        "false"
+                      ],
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "timezone": {
+          "default": "UTC",
+          "description": "Timezone",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        },
+        "tolerations": {
+          "default": "[]",
+          "description": "Tolerations for pod assignment, this supports the fullAPI",
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "imageCredentials": {
+      "properties": {
+        "pullSecret": {
+          "default": "\"\"",
+          "description": "PullSecret used when fetching the image",
+          "type": [
+            "string",
+            "integer",
+            "number",
+            "null"
+          ]
+        },
+        "xdcbridge": {
+          "properties": {
+            "registry": {
+              "properties": {
+                "imagePullPolicy": {
+                  "default": "IfNotPresent",
+                  "description": "Pull policy for the image",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number",
+                    "null"
+                  ]
+                },
+                "url": {
+                  "default": "\"\"",
+                  "description": "Registry url to fetch image from",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "repoPath": {
+              "default": "\"\"",
+              "description": "Repo where the image is located",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "images": {
+      "default": "\u003cnil\u003e",
+      "description": "",
+      "type": [
+        "string",
+        "integer",
+        "number",
+        "null"
+      ]
+    },
+    "labels": {
+      "default": "{}",
+      "description": "A map for setting custom labels for all Kubernetes resources",
+      "type": "object"
+    },
+    "nameOverride": {
+      "default": "",
+      "description": "",
+      "type": [
+        "string",
+        "integer",
+        "number"
+      ]
+    },
+    "networkPolicy": {
+      "properties": {
+        "egress": {
+          "properties": {
+            "accessLabels": {
+              "properties": {
+                "xdcbridge": {
+                  "default": "{}",
+                  "description": "This parameter is a placeholder for adding a list of egress traffic network policy labels. If this service wants to send traffic then it should add all its outgoing traffic network policy access labels using this parameter",
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "enabled": {
+          "default": "true",
+          "description": "The network policy will be enabled if both networkPolicy.enabled and global.networkPolicy.enabled are set to true",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "enum": [
+                "true",
+                "false"
+              ],
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "nodeSelector": {
+      "default": "{}",
+      "description": "Node labels for pod assignment",
+      "type": "object"
+    },
+    "persistence": {
+      "properties": {
+        "persistentVolumeClaim": {
+          "properties": {
+            "size": {
+              "default": "1Gi",
+              "description": "The storage size to allocate",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "storageClassName": {
+              "default": "\"\"",
+              "description": "The storage class to use",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "podPriority": {
+      "properties": {
+        "eric-bss-bam-xdc-bridge": {
+          "properties": {
+            "priorityClassName": {
+              "default": "“",
+              "description": "The pod priority for the service",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "podSecurityContext": {
+      "properties": {
+        "supplementalGroups": {
+          "default": "\"\"",
+          "description": "SupplementalGroups is used for setting the GID value(s) for volume data that is used by the services. The value will be merged if both global and local value are set. supplementalGroup will not be set in helmchart if both global and local value are not set",
+          "type": [
+            "array",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "probes": {
+      "properties": {
+        "xdcbridge": {
+          "properties": {
+            "livenessProbe": {
+              "properties": {
+                "failureThreshold": {
+                  "default": "3",
+                  "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "initialDelaySeconds": {
+                  "default": "1",
+                  "description": "Number of seconds after the container has started before probe is initiated",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "periodSeconds": {
+                  "default": "10",
+                  "description": "How often (in seconds) to perform the probe",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "timeoutSeconds": {
+                  "default": "2",
+                  "description": "Number of seconds after which the probe times out",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "startupProbe": {
+              "properties": {
+                "failureThreshold": {
+                  "default": "60",
+                  "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "initialDelaySeconds": {
+                  "default": "5",
+                  "description": "Number of seconds after the container has started before probe is initiated",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "periodSeconds": {
+                  "default": "5",
+                  "description": "How often (in seconds) to perform the probe",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "successThreshold": {
+                  "default": "1",
+                  "description": "Minimum consecutive successes for the probe to be considered successful after having failed",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "timeoutSeconds": {
+                  "default": "10",
+                  "description": "Number of seconds after which the probe times out",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "replicaCount": {
+      "default": "1",
+      "description": "",
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?\\d+$",
+          "type": "string"
+        }
+      ]
+    },
+    "resources": {
+      "properties": {
+        "xdcbridge": {
+          "properties": {
+            "limits": {
+              "properties": {
+                "cpu": {
+                  "default": "100m",
+                  "description": "The maximum amount of CPU to allocate to the xdcbridge container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "256Mi",
+                  "description": "The maximum amount of memory to allocate to the xdcbridge container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "requests": {
+              "properties": {
+                "cpu": {
+                  "default": "10m",
+                  "description": "The amount of CPU required by the xdcbridge container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "32Mi",
+                  "description": "The amount of memory required by the xdcbridge container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "seccompProfile": {
+      "properties": {
+        "xdcbridge": {
+          "properties": {
+            "localhostProfile": {
+              "default": "\"\"",
+              "description": "Localhost path to the seccomp profile for the xdcbridge container. Should only be set if seccompProfile.xdcbridge.type is set to localhost",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "\"\"",
+              "description": "Feature of the Linux kernel for secure computing mode for xdcbridge container. Available options are,,and \"\" [default=\"\"]",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "securityPolicy": {
+      "properties": {
+        "rolename": {
+          "default": "eric-bss-bam-xdc-bridge",
+          "description": "Rolename sets the name of the security policy role that is bound to the service account.",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "service": {
+      "properties": {
+        "port": {
+          "default": "5000",
+          "description": "Service port",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        },
+        "type": {
+          "default": "ClusterIp",
+          "description": "Service type",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "serviceAccount": {
+      "properties": {
+        "create": {
+          "default": "true",
+          "description": "Set whether to create the service account. Warning: Don't turn this off, the XDC Bridge requires it.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "enum": [
+                "true",
+                "false"
+              ],
+              "type": "string"
+            }
+          ]
+        },
+        "name": {
+          "default": "\"\"",
+          "description": "Name of the serviceaccount to be used",
+          "type": [
+            "string",
+            "integer",
+            "number",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "terminationGracePeriodSeconds": {
+      "default": "30",
+      "description": "Number of seconds after SIGTERM caught before shutting down",
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?\\d+$",
+          "type": "string"
+        }
+      ]
+    },
+    "tolerations": {
+      "default": "[]",
+      "description": "Tolerations for pod assignment, this supports the fullAPI",
+      "type": "array"
+    }
+  },
+  "type": "object"
+}

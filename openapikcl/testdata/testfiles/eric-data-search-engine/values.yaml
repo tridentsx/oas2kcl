@@ -1,0 +1,860 @@
+# Default values for eric-data-search-engine.
+# This is a YAML-formatted file.
+
+# For every fields mentioned here, service.schema.json and values.schema.json must be updated
+
+#global:
+#  podSecurityContext:
+#    supplementalGroups: null  #list of integer[100021576813]
+#  registry:
+#    repoPath: # overrides repoPath from eric-product-info.yaml
+#    imagePullPolicy: "IfNotPresent"
+#    url: "IMAGE_URL" # overrides registry url from eric-product-info.yaml
+#  timezone: "UTC"
+#  security:
+#    policyBinding:
+#      create: false
+#    policyReferenceMap:
+#      default-restricted-security-policy: "default-restricted-security-policy"
+#      plc-9c20871f9bf62c7b09fd0c684ac651: "plc-9c20871f9bf62c7b09fd0c684ac651"
+#  securityPolicy:
+#    rolekind: "" # possible values: "ClusterRole", "Role", ""
+#    tls:
+#      enabled: true
+#      trustedInternalRootCa:
+#        secret: eric-sec-sip-tls-trusted-root-cert
+#  fsGroup:
+#    manual: null          # accepted values{ range='0..max'}(only positive integers) (default=null )
+#    namespace: null       # accepted values{'true', 'false'} (default=null )
+#  tolerations: []
+#  nodeSelector: {}
+#  pullSecret:
+#  internalIPFamily:
+#  networkPolicy:
+#     enabled: false
+#  logShipper:
+#    deployment:
+#      model: ""
+
+affinity:
+  podAntiAffinity: "soft"
+  topologyKey: "kubernetes.io/hostname"
+
+labels: {}
+
+annotations: {}
+
+acceptDataLossAtDowngrade: false
+
+indicesToBackupAtDowngrade: ['*']
+
+autoSetRequiredWorkerNodeSysctl: false
+
+# Default is 3m even if it is not specified here
+unassignedNode_leftDelayed_timeout: 3m
+
+
+imageCredentials:
+  repoPath:  # overrides repoPath from eric-product-info.yaml
+  registry:
+    imagePullPolicy: # overrides global image pull policy
+    url:  # overrides registry url from global & eric-product-info.yaml
+  pullSecret: # overrides global pull secret
+  searchengine:
+    registry:
+      url:  # overrides registry url from global, imageCredentials.registry.url & eric-product-info.yaml
+    repoPath:  # overrides repoPath from global, imageCredentials.repoPath & eric-product-info.yaml
+  metrics:
+    registry:
+      url:  # overrides registry url from global, imageCredentials.registry.url & eric-product-info.yaml
+    repoPath:  # overrides repoPath from global, imageCredentials.repoPath & eric-product-info.yaml
+  tlsproxy:
+    registry:
+      url:  # overrides registry url from global, imageCredentials.registry.url & eric-product-info.yaml
+    repoPath:  # overrides repoPath from global, imageCredentials.repoPath & eric-product-info.yaml
+  bragent:
+    registry:
+      url:  # overrides registry url from global, imageCredentials.registry.url & eric-product-info.yaml
+    repoPath:  # overrides repoPath from global, imageCredentials.repoPath & eric-product-info.yaml
+  helmtest:
+    registry:
+      url:  # overrides registry url from global, imageCredentials.registry.url & eric-product-info.yaml
+    repoPath:  # overrides repoPath from global, imageCredentials.repoPath & eric-product-info.yaml
+  hooklauncher:
+    registry:
+      url:  # overrides registry url from global, imageCredentials.registry.url & eric-product-info.yaml
+      imagePullPolicy:
+    repoPath:  # overrides repoPath from global, imageCredentials.repoPath & eric-product-info.yaml
+
+service:
+  name: "eric-data-search-engine"
+  network:
+    protocol:
+      IPv6: false
+  endpoints:
+    internode:
+      tls:
+        verifyClientHostname: false
+    rest:
+      tls:
+        enforced: required
+        verifyClientCertificate: required
+        verifyClientHostname: false
+
+securityPolicy:
+  searchengine:
+    rolename: eric-data-search-engine
+  searchenginehelmtest:
+    rolename: eric-data-search-engine
+  hooklauncher:
+    rolename: eric-lcm-smart-helm-hooks
+  downgrade:
+    rolename: eric-data-search-engine
+
+podSecurityContext:
+  supplementalGroups: [143743,232772] # {value='0..max'} (default=null)
+
+securityEventLogs:
+  modificationAllowedIndices: []
+
+accessMgmt:
+  # Enable/Disable access management
+  # Will be effective only if `global.security.tls.enabled` is set to `true`
+  enabled: false
+  # Enable/Disable anonymous authentication
+  # 'anonymous' role will be given to all users
+  # Users with 'anonymous' role will have full cluster and index permissions except permissions dedicated only to admin
+  anonymous_auth_enabled: false
+  # Order of authentication in a list
+  # If more than one authentication backend is present, SE tries to authenticate the user sequentially against each until one succeeds.
+  # Possible values are 'openid','jwt' and 'client_cert'
+  order_of_authentication:
+  - "openid"
+  - "jwt"
+  - "client_cert"
+  # Configmap containing roles and mappings
+  authorizationRules_configMapName: ""
+  # Sample Authorization Configmap
+  # apiVersion: v1
+  # kind: ConfigMap
+  # metadata:
+  #   name: opensearch-authorizationrules
+  # data:
+  #   # user_names is mandatory to map users to 'default-readonly' role
+  #   # It should contain array of names
+  #   # Common Name can be considered as user_name if client certificate is provided
+  #   user_names: |
+  #     ["eric-microservice-a", "eric-microservice-b"]
+  #   # roles.yml is mandatory to create roles
+  #   # It should contain roles in the same structure as mentioned in
+  #   # https://opensearch.org/docs/1.2/security-plugin/configuration/yaml#rolesyml
+  #   # without '_meta' section
+  #   roles.yml: |
+  #     cnom_read_all_indices:
+  #       reserved: false
+  #       description : "Provide the minimum required permissions for CNOM to read all indices"
+  #       index_permissions:
+  #         - index_patterns:
+  #             - '*'
+  #           allowed_actions:
+  #             - "read"
+  #   # roles_mapping.yml is mandatory to create roles_mapping
+  #   # It should contain roles_mapping in the same structure as mentioned in
+  #   # https://opensearch.org/docs/1.2/security-plugin/configuration/yaml#rolesyml
+  #   # without '_meta' section
+  #   roles_mapping.yml: |
+  #     cnom_read_all_indices:
+  #       reserved: false
+  #       description : "Map user 'eric-cnom-server' to the role 'cnom_read_all_indices'"
+  #       users:
+  #       - "eric-cnom-server"
+
+  # Authentication via JSON Web Token (JWT - JSON-based access token)
+  jwt_auth:
+    # Enable/Disable JWT authentication
+    enabled: false
+    # Public signing key used to verify the JSON Web Token sent by the client
+    signingKey: |-
+      -----BEGIN PUBLIC KEY-----
+      MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu65wSeF6bZsBc8aJfbC5t1qm9FGpkQ2CmCsUVFUWHBXJLuX8oMjw5XV3wos8yNofzUYVtkzUVGamqqcjk3/4cd8GRTjX2vxnutBNpjxqSJkzffUaxEnnbZPeSOMHvw4H/GozieWDs90zu0lorJOwHYjFqzDJGHlASuTt8OWq3Uea/roX3MemI+3kyGA29gtkUlNzlGgeDj/1jHiyzKgUJtnbqO+RuumwsmmqnB1X/JondgwpCIKavi0+YsXFytWilRoiwXbzBT1JTFidRFMJsUcDkERSoFJ45fjBd0L1UrBUSB+PhNnoPptebxJEzZP9+kSYQOptNLWGf8Ili2kdCQIDAQAB
+      -----END PUBLIC KEY-----
+    # Header from JSON payload that contains Bearer token
+    # Default is 'Authorization'
+    header: ""
+    # Key from JSON payload that contains username
+    # NOTE: Data from nested key (e.g., json.key) cannot be read by OpenSearch. Key should be in root level of JSON data
+    # Default is 'preferred_username'
+    subjectKey: ""
+    # Key from JSON payload that contains roles for the above user
+    # NOTE: Data from nested key (e.g., json.key) cannot be read by OpenSearch. Key should be in root level of JSON data
+    # Default is 'roles'
+    rolesKey: ""
+
+  # Authentication via OpenID Connect (JWT - JSON-based access token)
+  openid_auth:
+    # Enable/Disable OpenID Authentication
+    enabled: false
+    iam:
+      # Hostname of the ADP IAM service
+      host: eric-sec-access-mgmt
+      # Port number in which ADP IAM service is running.
+      port: 8443
+      # ADP IAM's Realm name where users and roles required by Search Engine is stored
+      realm: master
+      tls:
+        # Establish TLS connection towards ADP IAM
+        enabled: true
+        # Verify the hostnames of the ADP IAM's TLS certificate
+        verify_hostnames: true
+        # Whether to use TLS client authentication for the ADP IAM service
+        sendClientCertificate: true
+    # Header from JSON payload that contains Bearer token
+    # Default is 'Authorization'
+    header: ""
+    # Key from JSON payload that contains username
+    # NOTE: Data from nested key (e.g., json.key) cannot be read by OpenSearch. Key should be in root level of JSON data
+    # Default is 'preferred_username'
+    subjectKey: ""
+    # Key from JSON payload that contains roles for the above user
+    # NOTE: Data from nested key (e.g., json.key) cannot be read by OpenSearch. Key should be in root level of JSON data
+    # Default is 'roles'
+    rolesKey: ""
+
+  roles:
+    # - name: "cnom_read_all_indices"
+    #   description: "Provide the minimum required permissions for CNOM to read all indices"
+    #   index_permissions:
+    #     - index_patterns:
+    #         - "*"
+    #       allowed_actions:
+    #         - "read"
+    # - name: "role_1" # Role name should match with one of the below rolesmapping
+    #   description: "Description"
+    #   index_permissions:
+    #     - index_patterns:
+    #         - "*"
+    #       allowed_actions:
+    #         - "read"
+    #   cluster_permissions:
+    #     - "cluster:monitor/health"
+
+  rolesMapping:
+    # - name: "cnom_read_all_indices"
+    #   description: "Map user 'eric-cnom-server' to the role 'cnom_read_all_indices'"
+    #   users:
+    #     - "eric-cnom-server" # CN of Client certificate used by CNOM Server while connecting SE
+    # - name: "role_1" # Role mapping name should match with one of the above roles
+    #   description: "Description"
+    #   users: # User name of clients connecting to SE
+    #     - "user1"
+    #   backend_roles: # Map external users coming with backend role 'readall' to role 'role_1'
+    #     - "readall"
+
+index_management:
+  enabled: true
+  job_interval_in_minutes: 1
+  policies:
+    - description: "Delete adp-app-logs after 15 days"
+      indices:
+        - adp-app-logs*
+      priority: 1
+      states:
+        - name: init
+          transitions:
+            - condition: min_index_age=15d
+              destination_state: delete
+        - name: delete
+          actions:
+            - delete
+    - description: "Delete adp-app-audit-logs and adp-app-asi-logs after 30 days"
+      indices:
+        - adp-app-audit-logs*
+        - adp-app-asi-logs*
+      priority: 1
+      states:
+        - name: init
+          transitions:
+            - condition: min_index_age=30d
+              destination_state: delete
+        - name: delete
+          actions:
+            - delete
+    - description: "Delete adp-app-debug-logs after 3 days"
+      indices:
+        - adp-app-debug-logs*
+      priority: 1
+      states:
+        - name: init
+          transitions:
+            - condition: min_index_age=3d
+              destination_state: delete
+        - name: delete
+          actions:
+            - delete
+  delete_indices_by_diskspace:
+#   - index: adp-app-logs-*
+#     size: 1gb
+#   - index: adp-audit-logs-*
+#     size: 200mb
+terminationGracePeriodSeconds:
+  bragent: 30
+  data: 480
+  ingest: 30
+  master: 30
+
+indices:
+  query_bool_max_clause_count: 2048
+
+tolerations:
+  bragent:
+    - key: node.kubernetes.io/not-ready
+      operator: Exists
+      effect: NoExecute
+      tolerationSeconds: 0
+    - key: node.kubernetes.io/unreachable
+      operator: Exists
+      effect: NoExecute
+      tolerationSeconds: 0
+  data: []
+  ingest: []
+  master: []
+  preupgradehook: []
+  downgradeCreatePVC: []
+  downgradePreDump: []
+  downgradeCleanPreUpgradeHook: []
+  downgradeTriggerPostDump: []
+  downgradePostDump: []
+  helmtest: []
+  hooklauncher: []
+
+logLevel: "info"
+
+topologySpreadConstraints:
+  master: []
+  ingest: []
+  data: []
+
+networkPolicy:
+  enabled: true
+
+bandwidth:
+  data:
+    maxEgressRate: ""
+  ingest:
+    maxEgressRate: ""
+  master:
+    maxEgressRate: ""
+  bragent:
+    maxEgressRate: ""
+
+updateStrategy:
+  ingest:
+    type: "RollingUpdate"
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 2
+  master:
+    type: "RollingUpdate"
+    rollingUpdate:
+      partition: 0
+  data:
+    type: "RollingUpdate"
+    rollingUpdate:
+      partition: 0
+  bragent:
+    type: "RollingUpdate"
+
+replicaCount:
+  ingest: 1
+  master: 3
+  data: 2
+
+nodeSelector:
+  ingest: {}
+  master: {}
+  data: {}
+  bragent: {}
+  preupgradehook: {}
+  downgradeCreatePVC: {}
+  downgradePreDump: {}
+  downgradeCleanPreUpgradeHook: {}
+  downgradeTriggerPostDump: {}
+  downgradePostDump: {}
+  helmtest: {}
+  hooklauncher: {}
+
+podPriority:
+  data:
+    priorityClassName: "" # No priority set
+  ingest:
+    priorityClassName: "" # No priority set
+  master:
+    priorityClassName: "" # No priority set
+  bragent:
+    priorityClassName: "" # No priority set
+  preupgradehook:
+    priorityClassName: "" # No priority set
+  downgradeCreatePVC:
+    priorityClassName: "" # No priority set
+  downgradePreDump:
+    priorityClassName: "" # No priority set
+  downgradeCleanPreUpgradeHook:
+    priorityClassName: "" # No priority set
+  downgradeTriggerPostDump:
+    priorityClassName: "" # No priority set
+  downgradePostDump:
+    priorityClassName: "" # No priority set
+  helmtest:
+    priorityClassName: "" # No priority set
+  hooklauncher:
+    priorityClassName: "" # No priority set
+
+probes:
+  ingest:
+    livenessProbe:
+      periodSeconds: 30
+      timeoutSeconds: 15
+      successThreshold: 1
+      failureThreshold: 3
+    startupProbe:
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 15
+      successThreshold: 1
+      failureThreshold: 100
+  master:
+    livenessProbe:
+      periodSeconds: 30
+      timeoutSeconds: 15
+      successThreshold: 1
+      failureThreshold: 3
+    startupProbe:
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 15
+      successThreshold: 1
+      failureThreshold: 100
+  data:
+    livenessProbe:
+      periodSeconds: 30
+      timeoutSeconds: 15
+      successThreshold: 1
+      failureThreshold: 3
+    startupProbe:
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 15
+      successThreshold: 1
+      failureThreshold: 3000
+  bragent:
+    livenessProbe:
+      initialDelaySeconds: 300
+      timeoutSeconds: 5
+    readinessProbe:
+      initialDelaySeconds: 15
+      timeoutSeconds: 5
+  metrics:
+    livenessProbe:
+      periodSeconds: 10
+      timeoutSeconds: 15
+      successThreshold: 1
+      failureThreshold: 3
+    startupProbe:
+      initialDelaySeconds: 20
+      periodSeconds: 10
+      timeoutSeconds: 15
+      successThreshold: 1
+      failureThreshold: 300
+  tlsproxy:
+    livenessProbe:
+      periodSeconds: 10
+      timeoutSeconds: 15
+      successThreshold: 1
+      failureThreshold: 3
+    readinessProbe:
+      periodSeconds: 10
+      timeoutSeconds: 15
+      successThreshold: 1
+      failureThreshold: 3
+    startupProbe:
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 15
+      successThreshold: 1
+      failureThreshold: 300
+  logshipper:
+    livenessProbe:
+      initialDelaySeconds: 90
+      timeoutSeconds: 10
+      periodSeconds: 10
+      successThreshold: 1
+      failureThreshold: 3
+
+jvmHeap:
+  ingest: "512m"
+  master: "512m"
+  data: "1024m"
+
+resources:
+  ingest:
+    limits:
+      cpu: "500m"
+      memory: "1Gi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+  master:
+    limits:
+      cpu: "500m"
+      memory: "1Gi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+  data:
+    limits:
+      cpu: "500m"
+      memory: "2Gi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+    requests:
+      cpu: "500m"
+      memory: "2Gi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+  bragent:
+    limits:
+      cpu: "500m"
+      memory: "1Gi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+  metrics:
+    limits:
+      cpu: "100m"
+      memory: "128Mi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+    requests:
+      cpu: "25m"
+      memory: "64Mi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+  tlsproxy:
+    limits:
+      cpu: "100m"
+      memory: "128Mi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+    requests:
+      cpu: "25m"
+      memory: "64Mi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+  logshipper:
+    limits:
+      memory: "100Mi"
+      cpu: "40m"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+    requests:
+      memory: "50Mi"
+      cpu: "30m"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+  sysctl:
+    limits:
+      cpu: "100m"
+      memory: "128Mi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+    requests:
+      cpu: "25m"
+      memory: "64Mi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+  preupgradehook:
+    limits:
+      cpu: "100m"
+      memory: "128Mi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+    requests:
+      cpu: "25m"
+      memory: "64Mi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+  downgradeCreatePVC:
+    limits:
+      cpu: "25m"
+      memory: "64Mi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+    requests:
+      cpu: "25m"
+      memory: "64Mi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details
+  downgradePreDump:
+    limits:
+      cpu: "2000m"
+      memory: "8Gi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+    requests:
+      cpu: "2000m"
+      memory: "8Gi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+  downgradeTriggerPostDump:
+    limits:
+      cpu: "25m"
+      memory: "64Mi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+    requests:
+      cpu: "25m"
+      memory: "64Mi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+  downgradeCleanPreUpgradeHook:
+    limits:
+      cpu: "100m"
+      memory: "128Mi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+    requests:
+      cpu: "25m"
+      memory: "64Mi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+  downgradePostDump:
+    limits:
+      cpu: "1000m"
+      memory: "4Gi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+    requests:
+      cpu: "1000m"
+      memory: "4Gi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+  helmtest:
+    limits:
+      cpu: "100m"
+      memory: "128Mi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+    requests:
+      cpu: "25m"
+      memory: "64Mi"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+  hooklauncher:
+    requests:
+      memory: "50Mi"
+      cpu: "50m"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+    limits:
+      memory: "100Mi"
+      cpu: "100m"
+      ephemeral-storage: # Experimental feature. Specifying incorrect ephemeral-storage may cause unexpected pod evictions. See User Guide for more details.
+
+persistence:
+  data:
+    persistentVolumeClaim:
+      size: "1Gi"
+      storageClassName:
+  backup:
+    persistentVolumeClaim:
+      size: "1Gi"
+      storageClassName:
+  master:
+    persistentVolumeClaim:
+      size: "64Mi"
+      storageClassName:
+  downgrade:
+    persistentVolumeClaim:
+      size: "2Gi"
+      storageClassName:
+
+podDisruptionBudget:
+  data:
+    maxUnavailable: 1
+  ingest:
+    maxUnavailable: 1
+  master:
+    maxUnavailable: 1
+
+brAgent:
+  enabled: false
+  backupTypeList:
+  backupDataModelConfigMap:
+  orchestrator:
+    host: eric-ctrl-bro
+    grpcPort: 3000
+
+  cleanRestore: false
+
+  backupRepository:
+    type: "fs"
+    s3:
+      secretName:
+      userKey:
+      passKey:
+      endPoint:
+      bucketName:
+
+fastButUnsafeUpgrade:
+  enabled: false
+
+partialShardValidation:
+  enabled: false
+
+# A default index template will be created with priority=200,shards=5,replicas=1 for all indices
+# New index templates can be defined with high priority
+
+#index_templates:
+#  - index_patterns:
+#    - "adp-app-audit-logs*"
+#    priority: "201"
+#    shards: "3"
+#    replicas: "2"
+
+
+metrics:
+  enabled: true
+  pmServer: "eric-pm-server"
+
+clusterDomain: "cluster.local"
+
+logShipper:
+  logControlPath: "/opt/redirect/log-control-config"
+  logLevel: "info"
+  # runAndExit will be set to true for helmtest pod irrespective of value provided here
+  runAndExit: false
+  storage:
+    path: "/logs"
+    size: "190Mi"
+    medium: "Ephemeral"
+  multilines:
+    - name: "se-custom-multiline"
+      start:
+        pattern: '^(org.*)'
+        next: "cont1"
+      cont:
+        - name: "cont1"
+          pattern: '(^com.*|^\s\Scom.*|^at.*|^\s\Sat.*|^Caused by:.*|^\s\SCaused by:.*|^[a-zA-Z])'
+          next: "cont1"
+  input:
+    files:
+      - enabled: true
+#       exclusions[]:
+        paths:
+          - "sysctl.log"
+          - "searchengine.log"
+          - "helmtesthook.log"
+          - "bragent.log"
+          - "metrics.log"
+          - "tlsproxy.log"
+        multilines:
+          - "java"
+          - "se-custom-multiline"
+  output:
+    logTransformer:
+      # This hostname is used in network policy
+      # This hostname is used to provide the minimum required permissions if accessMgmt.enabled is set to true
+      host: eric-log-transformer
+
+log:
+  # Supported values ["indirect", "direct", "dual", null]
+  streamingMethod: null
+
+curator:
+  host: eric-data-search-engine-curator
+
+seccompProfile:
+  type: "" # { choice='Unconfined, RuntimeDefault, Localhost, "" ' } [ default="" ]
+  localhostProfile:
+  #data:
+  #  type:
+  #  localhostProfile:
+  #ingest:
+  #  type:
+  #  localhostProfile:
+  #master:
+  #  type:
+  #  localhostProfile:
+  #metrics:
+  #  type:
+  #  localhostProfile:
+  #tlsproxy:
+  #  type:
+  #  localhostProfile:
+  #bragent:
+  #  type:
+  #  localhostProfile:
+  #logshipper:
+  #  type:
+  #  localhostProfile:
+  #sysctl:
+  #  type:
+  #  localhostProfile:
+  #preupgradehook:
+  #  type:
+  #  localhostProfile:
+  #downgradeCreatePVC:
+  #  type:
+  #  localhostProfile:
+  #downgradePreDump:
+  #  type:
+  #  localhostProfile:
+  #downgradeCleanPreUpgradeHook:
+  #  type:
+  #  localhostProfile:
+  #downgradeTriggerPostDump:
+  #  type:
+  #  localhostProfile:
+  #downgradePostDump:
+  #  type:
+  #  localhostProfile:
+  #helmtest:
+  #  type:
+  #  localhostProfile:
+  #hooklauncher:
+  #  type:
+  #  localhostProfile:
+
+appArmorProfile:
+  type: "" # { choice='unconfined, runtime/default, localhost, "" '  } [ default="" ]
+  localhostProfile:
+  #data:
+  #  type:
+  #  localhostProfile:
+  #ingest:
+  #  type:
+  #  localhostProfile:
+  #master:
+  #  type:
+  #  localhostProfile:
+  #metrics:
+  #  type:
+  #  localhostProfile:
+  #tlsproxy:
+  #  type:
+  #  localhostProfile:
+  #bragent:
+  #  type:
+  #  localhostProfile:
+  #logshipper:
+  #  type:
+  #  localhostProfile:
+  #sysctl:
+  #  type:
+  #  localhostProfile:
+  #preupgradehook:
+  #  type:
+  #  localhostProfile:
+  #downgradeCreatePVC:
+  #  type:
+  #  localhostProfile:
+  #downgradePreDump:
+  #  type:
+  #  localhostProfile:
+  #downgradeCleanPreUpgradeHook:
+  #  type:
+  #  localhostProfile:
+  #downgradeTriggerPostDump:
+  #  type:
+  #  localhostProfile:
+  #downgradePostDump:
+  #  type:
+  #  localhostProfile:
+  #helmtest:
+  #  type:
+  #  localhostProfile:
+  #hooklauncher:
+  #  type:
+  #  localhostProfile:
+

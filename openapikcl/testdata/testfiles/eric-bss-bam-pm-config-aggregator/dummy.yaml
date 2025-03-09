@@ -1,0 +1,158 @@
+{
+  "affinity": {
+    "dolore_02": -88048,
+    "nostrud_a": -52401914,
+    "dolore_a27": -99108852.61514428,
+    "qui_ab": 79651130.40143505,
+    "qui8": 15600875.3316693,
+    "aliqua_e": true
+  },
+  "annotations": {
+    "aliquipe8f": "ut deserunt velit do"
+  },
+  "appArmorProfile": {
+    "dolore5c2": -44815231.82227734,
+    "consequat36": -73244332.46852249,
+    "esse_4": true,
+    "Lorem_b": true,
+    "aliquip_96": 36576009.29215649
+  },
+  "cmMediatorHost": -65532115,
+  "cmMediatorNoTlsHost": 52710605.315537095,
+  "config": {
+    "minim4": 97866457.17495465,
+    "proident1d3": 67038900.514623374,
+    "irure0b": "do elit tempor nisi",
+    "sourceConfigMap": {
+      "sit7": -56550968.18900822,
+      "consectetur_a": "laborum sit",
+      "Excepteura": "ipsum fugiat Ut ut",
+      "laboruma": -31199490.145840958,
+      "labels": {
+        "occaecat_19_": "fugiat est esse velit",
+        "proident3": "qui sint",
+        "pmJobs": 94654088.33795998,
+        "recordingRules": 44733053
+      }
+    },
+    "targetConfigMap": {
+      "eiusmod_8_": "ullamco occaecat dolore non commodo",
+      "recordingRules": -61508625.49870157
+    }
+  },
+  "cronjob": {
+    "failedJobsHistoryLimit": "-8269",
+    "schedule": "mollit",
+    "successfulJobsHistoryLimit": 81786269
+  },
+  "global": {
+    "enim_e4": -67563932,
+    "minimc_": "irure eu consequat",
+    "cupidatat9c": false,
+    "amet_ff8": 28157448.29810396,
+    "sint_82": 70760188,
+    "est0": "laborum dolore adipisicing veniam",
+    "fsGroup": {
+      "dolore76": 12440450,
+      "manual": null,
+      "namespace": null
+    }
+  },
+  "imageCredentials": {
+    "eu7a": "sint tempor Duis culpa exercitation",
+    "pmConfigAggregator": {
+      "sed8ba": 48599258
+    }
+  },
+  "images": {
+    "pariatur__": "esse",
+    "pmConfigAggregator": {
+      "name": "proident reprehenderit",
+      "restartPolicy": 12766456.235506624,
+      "tag": "voluptate ea eu fugiat velit"
+    }
+  },
+  "kafkaHost": -85216606,
+  "labels": {
+    "et6": "do adipisicing pariatur ad"
+  },
+  "logConnectionTtlMinutes": -82292585,
+  "logLevel": 4921890,
+  "log": {
+    "ut_13d": true,
+    "cillum_8e4": "Ut incididunt",
+    "streamingMethod": "dual"
+  },
+  "logQueueSize": "7850929053",
+  "logTimeoutSeconds": "-5527",
+  "logTransformerHost": 26786318.494001552,
+  "logTransformerNoTlsHost": -52010191.635248624,
+  "networkPolicy": {
+    "adipisicing_a1": -46483037,
+    "egress": {
+      "nulla_2d5": 95899707.26898634,
+      "nulla889": false
+    }
+  },
+  "nodeSelector": {
+    "nisib": true
+  },
+  "podPriority": {
+    "doloreaf": "ex ut cupidatat",
+    "reprehenderit8": -77338011,
+    "eiusmod5": false,
+    "in__0": -62672446,
+    "eric-bss-bam-pm-config-aggregator": {
+      "reprehenderit_ef7": false,
+      "magnacbc": -8279848,
+      "seddd4": true,
+      "magna__6": 98661829,
+      "pariatur400": "ipsum fugiat",
+      "priorityClassName": "cupidatat esse proident"
+    }
+  },
+  "podSecurityContext": {
+    "dolor_e8": "Excepteur laborum",
+    "suntef4": -51173815,
+    "minim_df8": true,
+    "ea_9b": "labore",
+    "pariatur__7d": -8830309,
+    "supplementalGroups": -69907594
+  },
+  "resources": {
+    "labore_8": "reprehenderit nulla ut",
+    "nulla_d2": true,
+    "consectetur6": -78536583,
+    "nulla_5": -55569472.825386025,
+    "pm-config-aggregator": {
+      "et_c": "deserunt nisi ullamco",
+      "elit_3": -11170952.492790893,
+      "commodo_a7": "esse cupidatat enim",
+      "limits": {
+        "cpu": 81955253
+      },
+      "requests": {
+        "eu_5": -74628218,
+        "esse_b4": false,
+        "cpu": -50853901.32275367,
+        "memory": "quis Duis aute elit"
+      }
+    }
+  },
+  "seccompProfile": {
+    "cillum990": "dolore amet deserunt ex non",
+    "laboris_0": true,
+    "pm-config-aggregator": {
+      "localhostProfile": "ipsum enim consequat irure incididunt",
+      "type": "irure"
+    }
+  },
+  "securityPolicy": {
+    "fugiat_f38": -65500916.33559663,
+    "dolor6": false,
+    "Excepteur_5_": false,
+    "rolename": 14318452
+  },
+  "terminationGracePeriodSeconds": 88335490,
+  "tolerations": []
+}

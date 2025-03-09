@@ -1,0 +1,19 @@
+## Default values for eric-sec-sip-tls-crd.
+## This is a YAML-formatted file.
+## Declare variables to be passed into your templates.
+
+# global:
+#  annotations: {}
+#  labels: {}
+#  featureGates:
+#    # turn on or off schema validation of Helm parameter values
+#    helmSchemaValidation: false
+
+# # Name of the kubernetes objects deployed from this Helm chart
+# nameOverride:
+
+## Additional labels to be attached by an Application Design Engineer or an Application Deployment Engineer
+labels: {}
+
+## Additional annotations to be attached by an Application Design Engineer or an Application Deployment Engineer
+annotations: {}

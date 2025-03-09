@@ -1,0 +1,739 @@
+# Default values for eric-fh-alarm-handler.
+# This is a YAML-formatted file.
+
+replicaCount: 2
+
+##Global registry
+# global:
+#   tolerations: []
+#   pullSecret:
+#   registry:
+#     url:
+#     imagePullPolicy: IfNotPresent
+#     repoPath:
+#   timezone: UTC
+#   nodeSelector:
+#   networkPolicy:
+#     enabled: false
+#   securityPolicy:
+#     rolekind:
+#   podSecurityContext:
+#     supplementalGroups: ~
+#   fsGroup:
+#     manual: null
+#     namespace: null
+#   log:
+#     streamingMethod: "direct"
+#   hooklauncher:
+#     executor: service
+#   logShipper:
+#     deployment:
+#       type: "sidecar"
+#       model: "static"
+#   security:
+#     tls:
+#       enabled: true
+#     policyBinding:
+#       create: false
+#     policyReferenceMap:
+#       default-restricted-security-policy: "default-restricted-security-policy"
+#   internalIPFamily:
+
+imageCredentials:
+  pullSecret: # optional pullsecret, overrides global.pullSecret
+  repoPath: # optional repoPath,overrides global.repoPath
+  # Specific images
+  alarmhandler:
+    registry: {}
+      # url: # overrides global.registry.url
+      # imagePullPolicy: # overrides global.registry.imagePullPolicy
+    repoPath: # overrides repoPath from eric-product-info.yaml,imageCredentials.repoPath and global.registry.repoPath
+
+  topiccreator:
+    registry: {}
+      # url: # overrides global.registry.url
+      # imagePullPolicy: # overrides global.registry.imagePullPolicy
+    repoPath: # overrides repoPath from eric-product-info.yaml,imageCredentials.repoPath and global.registry.repoPath
+
+  logshipper:
+    registry: {}
+      # url: # overrides global.registry.url
+      # imagePullPolicy: # overrides global.registry.imagePullPolicy
+    repoPath: # overrides repoPath from eric-product-info.yaml
+
+  ericsecoauthproxy:
+    registry: {}
+      # url: # service specific Docker registry url, overrides the global setting when set
+      # imagePullPolicy: # service specific policy, overrides the global setting when set
+    repoPath: # image level container repository path
+
+  ericsecoauthsap:
+    registry: {}
+      # url: # service specific Docker registry url, overrides the global setting when set
+      # imagePullPolicy: # overrides global.registry.imagePullPolicy
+    repoPath: # image level container repository path
+
+  hooklauncher:
+    registry: {}
+      # url: # overrides global.registry.url
+      # imagePullPolicy: # overrides global.registry.imagePullPolicy
+    repoPath:
+
+# All k8s probes parameters are optional.
+probes:
+  alarmHandler:
+    livenessProbe:
+      initialDelaySeconds: 0
+      periodSeconds: 17
+      timeoutSeconds: 15
+      successThreshold: 1
+      failureThreshold: 3
+    readinessProbe:
+      initialDelaySeconds: 0
+      periodSeconds: 10
+      timeoutSeconds: 10
+      successThreshold: 1
+      failureThreshold: 5
+    startupProbe:
+      initialDelaySeconds: 0
+      failureThreshold: 30
+      periodSeconds: 5
+      timeoutSeconds: 5
+  logshipper:
+    livenessProbe:
+      timeoutSeconds: 10
+      periodSeconds: 10
+      failureThreshold: 3
+      initialDelaySeconds: 1
+  ericsecoauthproxy:
+    startupProbe:
+      initialDelaySeconds: 0
+      failureThreshold: 25
+      periodSeconds: 5
+      timeoutSeconds: 5
+    livenessProbe:
+      initialDelaySeconds: 0
+      failureThreshold: 2
+      periodSeconds: 5
+      timeoutSeconds: 5
+    readinessProbe:
+      initialDelaySeconds: 0
+      failureThreshold: 1
+      periodSeconds: 5
+      timeoutSeconds: 5
+      successThreshold: 1
+
+# pm server
+pmServer:
+  serviceName: "eric-pm-server"
+  # PM Server certificate authority secret
+  caSecret: "eric-pm-server-ca"
+
+# siptls
+siptls:
+  rootCertSecret: "eric-sec-sip-tls-trusted-root-cert"
+
+service:
+  endpoints:
+    fiapi:
+      tls:
+        enforced: required
+        verifyClientCertificate: required
+    restapi:
+      tls:
+        enforced: required
+        verifyClientCertificate: required
+    metrics:
+      enabled: false
+      tls:
+        # - If 'optional': HTTP only
+        # - If 'required': HTTPS only
+        # For metrics we won't have both HTTP and HTTPS at same time
+        enforced: required
+        verifyClientCertificate: required
+    probes:
+      tls:
+        # - If 'optional': HTTP only
+        # - If 'required': HTTPS only
+        # For probes we won't have both HTTP and HTTPS at same time
+        enforced: required
+        # For probes endpoint is not recommended to verify client
+        # certificate due to k8s cluster migrations.
+        # verifyClientCertificate: required
+    authorizationProxy:
+      tls:
+        # - If 'optional': HTTP only
+        # - If 'required' or <not defined>: HTTPS only
+        # The AuthorizationProxy does not allow both HTTP and HTTPS at same time
+        # options: 'optional' or 'required'
+        enforced: required
+
+        # Enabled/Disable client certificate validation (mTLS) in
+        # Authorization proxy server endpoint.
+        # Effective only IF global.security.tls.enabled == true AND
+        # service.endpoints.authorizationProxy.tls.enforced != optional
+        # - If 'optional': Client certificate verification is not done (no mTLS towards ICCR)
+        # - If 'required': Client certificate verification is performed (mTLS towards ICCR)
+        verifyClientCertificate: required
+
+alarmhandler:
+  alarmExpirationTimer: 30
+  cmmNameSuffix: ""
+  logLevel: "Info"
+  configmap:
+    faultmappings: "eric-fh-alarm-handler-faultmappings"
+  alarmHistorySize: "10"
+  asi:
+    writer: "kafka"
+    producerConfig: "" # TODO: should be removed
+    topic:
+      partitions: 1
+      replicationFactor: 3
+      configCLIParams: "retention.ms=172800000"
+  ali:
+    # writer: "kafka" // Note: ALI writer is inherited from ASI
+    topic:
+      partitions: 1
+      replicationFactor: 3
+      configCLIParams: "retention.ms=172800000"
+  alert:
+    groupingInterval:
+      duration: "60s"
+
+documentDatabasePG:
+  customObject:
+    enabled: true
+      # The custom object for Document Database PG supports various configurable fields. Refer to
+      # the Document Database PG documentation. You can configure all these fields directly here
+      # under 'documentDatabasePG'.
+      # Some of these  fields are configurable via Helm parameters belonging to this 'documentDatabasePG.customObject' parameter section.
+      # There also some other CR fields that are configured by using other Helm parameters.
+
+      # 1. List of Helm parameters belonging to 'documentDatabasePG.customObject' parameter section
+      # Such Helm parameters are mapped to the corresponding fields values in the AH-owned CR manifest.
+      # The CR fields names have been used also as Helm parameters names in this section, unless differently specified.
+
+      # The documentDatabasePG.customObject.databaseServerConfig.settings Helm parameter list allows defining DDB-PG runtime configuration sub-parameters at deployment time.
+      # There is no default setting.
+      # Refer to DDB-PG documentation for a list and explanation of values.
+
+      # The documentDatabasePG.customObject.instanceName Helm parameter allows to specify the DDB cluster name, if the instanceName is not specified, the metadata.name will be taken.
+      # By default it is set to "eric-data-document-database-pg".
+
+      # The documentDatabasePG.customObject.replicaCount Helm parameter allows defining the number of replicas to be instantiated.
+      # It is mapped to replicas CR field.
+      # By default it is set to 2.
+
+      # The documentDatabasePG.customObject.resources.flavor Helm parameter is to specify the name of flavor defined in DDB PG Operator.
+      # By default it is set to "typical".
+
+      # The documentDatabasePG.customObject.resources.persistentStorage.housekeepingThresholdPercentage Helm parameter is a feature provided by Document Database PG service.
+      # By default it is set to 100.
+
+      # The documentDatabasePG.customObject.resources.persistentStorage.documentDatabasePGVolume.persistentVolumeClaim.size Helm parameter refers to DDB-PG CO storage limit for volume.
+      # By default it is set to "8Gi".
+
+      # The documentDatabasePG.customObject.resources.persistentStorage.documentDatabasePGVolume.persistentVolumeClaim.storageClassName Helm parameter refers to DDB-PG CO storage configuration.
+      # By default it is set to "".
+
+      # 2. List of Helm parameters NOT belonging to 'documentDatabasePG.customObject' parameter section
+
+      # The backend.dbname Helm parameter specifies the hostname or IP address of the external PostgreSQL database server.
+      # There is no default setting.
+
+      # The metrics.enabled Helm parameter specifies if the metrics functionality will be enabled or not.
+      # By default it is set to "true".
+backend:
+  type: postgres
+  hostname: "eric-data-document-database-pg"
+  dbname: adp_gs_ah
+  dbuser: ah
+  port: 5432
+
+cmm:
+  enabled: false
+  hostname: "eric-cm-mediator"
+  port: 5003
+  tlsport: 5004
+  subscription:
+    leaseSeconds: 3600
+
+messageBusKF:
+  # Settings used when Alarm Handler is deployed with Message Bus KF in operator mode.
+  enabled: true
+  # Helm parameter `clusterName` MUST be set to the name of the cluster provided by the
+  # (Message Bus KF) service provider.
+  clusterName:
+  # If custom secret is used to create the User CO, Helm parameter `clientCertSecret` MUST point
+  # to said secret. The default value is derived from the Alarm Handler service name, e.g.
+  # `eric-fh-alarm-handler-tls-kafka-client-secret`. Default value: `<SERVICE_NAME>-tls-kafka-client-secret`.
+  clientCertSecret:
+  port: 9092
+  tlsport: 9093
+  # The User and KafkaTopic Custom Object (CO) for Message Bus KF supports various configurable
+  # fields. Refer to the Message Bus KF documentation. You can configure all these fields directly
+  # under respective 'customObject', but only a subset of the feilds from the CRDs are supported.
+  # Note that the 'enabled' parameter is not part of the CO fields.
+  # These are the supported Helm parameters, their defaults, and optionally how they map to the
+  # CO fields (denoted in ()) if the Helm value path is different from the CO path.
+  #   - 'topicAdpAlarmStateIndicationCustomObject'
+  #     - NOTE: (topicName) is hardcoded to 'AdpAlarmStateIndication' and is not configurable
+  #         through any Helm parameter. If customized KafkaTopic CO is provided, then (topicName)
+  #         MUST be set to 'AdpAlarmStateIndication'
+  #     - 'defaultTopicPartition': 1 (partitions)
+  #     - 'defaultTopicConfig': retention.ms: 172800000 (config), this Helm parameter should be
+  #         a list of key:value pairs. If commented out, it uses the defaults set in the CRD
+  #   - 'topicAdpAlertIndicationCustomObject'
+  #     - NOTE: (topicName) is hardcoded to 'AdpAlertIndication' and is not configurable
+  #         through any Helm parameter. If customized KafkaTopic CO is provided, then (topicName)
+  #         MUST be set to 'AdpAlertIndication'
+  #     - 'defaultTopicPartition': 1 (partitions)
+  #     - 'defaultTopicConfig': retention.ms: 172800000 (config), this Helm parameter should be
+  #         a list of key:value pairs. If commented out, it uses the defaults set in the CRD
+  #   - 'userCustomObject'
+  #     - 'clusterName': null (messageBusKFClusters), this field re-uses the 'clusterName' Helm
+  #         parameter defined under 'messageBusKF'. It MUST be set to the name of the cluster
+  #         provided by the (Message Bus KF) service provider.
+  topicAdpAlarmStateIndicationCustomObject:
+    enabled: true
+    defaultTopicPartitions: 1
+    defaultTopicConfig:
+      retention.ms: 172800000
+  topicAdpAlertIndicationCustomObject:
+    enabled: true
+    defaultTopicPartitions: 1
+    defaultTopicConfig:
+      retention.ms: 172800000
+  userCustomObject:
+    enabled: true
+
+# To be depreacted
+kafka:
+  serviceName: "eric-data-message-bus-kf"
+  hostname: "eric-data-message-bus-kf-client"
+  port: 9092
+  tlsport: 9093
+  # Timeout in seconds when waiting for Kafka availability in InitContainer
+  connectTimeout: 300
+  # Deprecated: Use fields under messageBusKF instead
+  operator:
+    # Note: messageBusKF.clusterName will have precedence over this parameter
+    clusterName: "eric-data-message-bus-kf-cluster"
+    # Note: If following parameter set to false, it will override
+    # messageBusKF.topicAdpAlarmStateIndicationCustomObject.enabled=true
+    deployDefaultTopicCO: true
+    # Note: If following parameter set to false, it will override
+    # messageBusKF.userCustomObject.enabled=true
+    deployDefaultUserCO: true
+
+keyValueDatabaseRD:
+  enabled: false
+  clusterName: eric-cloud-native-kvdb-rd-operand
+  port: 6379
+  tlsPort: 6380
+  asi:
+    streamMaxLength: 300
+  ali:
+    streamMaxLength: 300
+  acl:
+    user: ah-user
+
+redis:
+  hostname: "eric-data-key-value-database-rd-operand"
+  port: 6379
+  tlsport: 6380
+  clustermode: true
+  asi:
+    streamMaxLength: 300
+  ali:
+    streamMaxLength: 300
+  acl:
+    enabled: true
+    user: default
+    userKey: "username"
+    passKey: "password"
+
+resources:
+  alarmhandler:
+    requests:
+      memory: "384Mi"
+      cpu: "500m"
+      ephemeral-storage: "2Gi"
+    limits:
+      memory: "512Mi"
+      cpu: "1000m"
+      ephemeral-storage: "4Gi"
+  topiccreator:
+    requests:
+      memory: "384Mi"
+      cpu: "500m"
+      ephemeral-storage: "1Gi"
+    limits:
+      memory: "512Mi"
+      cpu: "1000m"
+      ephemeral-storage: "2Gi"
+  logshipper:
+    requests:
+      cpu: "20m"
+      memory: "30Mi"
+    limits:
+      cpu: "50m"
+      memory: "50Mi"
+  ericsecoauthproxy:
+    requests:
+      memory: 130Mi
+      cpu: 50m
+      ephemeral-storage: ""
+    limits:
+      memory: 256Mi
+      cpu: 150m
+      ephemeral-storage: ""
+  ericsecoauthsap:
+    requests:
+      memory: 130Mi
+      cpu: 50m
+      ephemeral-storage: ""
+    limits:
+      memory: 150Mi
+      cpu: 50m
+      ephemeral-storage: ""
+  hooklauncher:
+    requests:
+      memory: "50Mi"
+      cpu: "20m"
+      ephemeral-storage: ""
+    limits:
+      memory: "100Mi"
+      cpu: "100m"
+      ephemeral-storage: ""
+
+nodeSelector:
+  alarmhandler: {}
+  hooklauncher: {}
+
+## Tolerations to influence scheduling decisions made by Kubernetes scheduler
+## If deployed as a single replica, it is recommended to use the following tolerations
+tolerations:
+  hooklauncher: []
+  alarmhandler: []
+  #- key: node.kubernetes.io/not-ready
+  #  operator: Exists
+  #  effect: NoExecute
+  #  tolerationSeconds: 0
+  #- key: node.kubernetes.io/unreachable
+  #  operator: Exists
+  #  effect: NoExecute
+  #  tolerationSeconds: 0
+terminationGracePeriodSeconds: 30
+
+topologySpreadConstraints: []
+
+networkPolicy:
+  enabled: true
+
+updateStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 50%
+    maxSurge: 50%
+
+credentials:
+  kubernetesSecretName: "eric-data-document-database-pg"
+  keyForUserId: "custom-user"
+  keyForUserPw: "custom-pwd"
+  keyForSuperPw: "super-pwd"
+
+readinessProbe:
+  logshipper:
+    timeoutSeconds: 15
+    periodSeconds: 30
+    successThreshold: 1
+    failureThreshold: 3
+
+logshipper:
+  runAndExit:
+  shutdownDelay:
+  storageMedium:
+  storagePath: "/logs"
+  storageAllocation: "500Mi"
+  harvester:
+    closeTimeout: "5m"
+    logData:
+      - subPaths:
+          - "/alarm-handler.log"
+        additionalFields:
+          project: "alarm-handler-log"
+        multiline:
+          pattern: '^{'
+          negate: true
+          match: after
+      - subPaths:
+          - "/topic-creator.log"
+        additionalFields:
+          project: "topic-creator-log"
+        multiline:
+          pattern: '^{'
+          negate: true
+          match: after
+  logTransformer:
+    host: eric-log-transformer
+logShipper:
+  logLevel: info
+  runAndExit: false
+  shutdownDelay: 10
+  input:
+    files:
+      - enabled: true
+        paths:
+          - "alarm-handler.log"
+          - "topic-creator.log"
+  storage:
+    path: "/logs"
+    size: "500Mi"
+  output:
+    logTransformer:
+      host: eric-log-transformer
+log:
+  logshipper:
+    level:
+  streamingMethod: #supported values "indirect, direct, dual, null"
+
+labels: {}
+
+annotations: {}
+
+podDisruptionBudget:
+  minAvailable: 50%
+
+affinity:
+  # Pod Anti Affinity - "soft" or "hard"
+  podAntiAffinity: "hard"
+  topologyKey: "kubernetes.io/hostname"
+
+autoScaling:
+  alarmHandler:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 5
+
+# DR-D1123-135
+podSecurityContext:
+  supplementalGroups: ~
+
+appArmorProfile:
+  type: ""
+  localhostProfile: ""
+  alarmHandler:
+    type: ""
+    localhostProfile: ""
+  topiccreator:
+    type: ""
+    localhostProfile: ""
+  logshipper:
+    type: ""
+    localhostProfile: ""
+  hooklauncher:
+    type: ""
+    localhostProfile: ""
+  ericsecoauthsap:
+    type: ""
+    localhostProfile: ""
+  ericsecoauthproxy:
+    type: ""
+    localhostProfile: ""
+
+# DR-D1123-128
+seccompProfile:
+  type: ""
+  localhostProfile: ""
+  alarmHandler:
+    type: ""
+    localhostProfile: ""
+  topiccreator:
+    type: ""
+    localhostProfile: ""
+  logshipper:
+    type: ""
+    localhostProfile: ""
+  hooklauncher:
+    type: ""
+    localhostProfile: ""
+  ericsecoauthsap:
+    type: ""
+    localhostProfile: ""
+  ericsecoauthproxy:
+    type: ""
+    localhostProfile: ""
+
+
+ingress:
+  enabled: false
+  # If true, a Contour HTTPProxy will be used as ingress (required for authorization)
+  # If false, a Kubernetes nginx ingress will be used.
+  useHttpProxy: true
+  # Mandatory, if ingress.enabled=true
+  hostname: ""
+  ingressClass:
+  tls:
+    # Optional
+    # If true, TLS connection will be terminated at Alarm Handler pod
+    # instead of ingress controller.
+    passthrough: false
+    # Optional
+    # If true, ingress will require external client to provide client certificate
+    # which will be verified against the CA provided in ingress.certificates.trustedCertificateListName,
+    # or ingress.certificates.caSecret if provided.
+    verifyClientCertificate: true
+
+  certificates:
+    # External certificate, should be on format <keyName>/<certName>
+    asymmetricKeyCertificateName: "fh-alarm-http-server/fh-alarm-http-server"
+    # Name of the certificates list instance according to ietf-truststore configuration.
+    trustedCertificateListName: "fh-alarm-http-server"
+    # Name of secret, holding the cert/key used instead of asymmetricKeyCertificateName
+    secretName: ""
+    # Name of secret, holding the ca.crt file with all trusted certificates used instead of trustedCertificateListName
+    caSecret: ""
+    # DR-D1123-137
+    # ingress.certificates.crlEnabled enable (true) or disable (false) the CRL file based certificate revocation check
+    # Note: Certificate revocation check is not performed by proxy in passthrough mode, but internally in AH
+    crlEnabled: false
+
+  # Optional
+  # Additional annotation to add to HTTPProxy/Ingress resource
+  annotations: {}
+
+  # The path to match from the external request
+  path: /
+
+# ----------------------------------------------------------------------
+# The rest of authorization proxy parameters are enclosed inside
+# 'authorizationProxy:' struct
+# ----------------------------------------------------------------------
+authorizationProxy:
+
+  # Optional.
+  # Is Authorization Proxy enabled or not
+  enabled: true
+
+  # Conditional, if ADP IAM Server is installed with non-default chart name
+  # The name of the ADP IAM Server service (chart)
+  adpIamServiceName: eric-sec-access-mgmt # Default value
+
+  # Sets the logLevel of authorizationProxy, available values: debug, info, error
+  logLevel: info
+
+  # Conditional, if ADP PM Server is deployed with non-default chart name
+  adpPmServiceName: eric-pm-server
+
+  # Conditional, if ADP SIP TLS is deployed with non-default chart name
+  adpSipTlsServiceName: eric-sec-sip-tls
+
+  ## Conditional, if ADP ICCR Ingress is installed with non-default chart name
+  ## The name of the ADP ICCR Ingress service (chart)
+  adpIccrServiceName: eric-tm-ingress-controller-cr # Default value
+
+  # Conditional, if ADP ICCR is deployed with Envoy client certificates enabled
+  # and Envoy client certificate CA(s) is stored in non-default k8s secret.
+  # If this parameter is set then authorizationProxy.adpIccrServiceName is obsolete.
+  #
+  # The name of the k8s secret which contains ADP ICCR Envoy client certificate CAs
+  # adpIccrCaSecret: "" # Default value
+
+  # Conditional, if ADP IAM Server cluster internal service port has a
+  # non-default value. In IAM server this implies the following parameters:
+  # .values.service.tls.port and .values.service.port
+  # (IAM server has different port numbers depending on if TLS is enabled/disabled)
+  # adpIamServicePort: 443 # Example value.
+  adpIamServicePort: ""  # Default value.
+
+  # Alternative ADP IAM kubernetes service port when IAM server Admin console is blocked
+  adpIamAdminConsolePort: 8444
+
+  # Conditional, if ADP IAM Server uses different realm name for Admin User Management.
+  # The name of the IAM server realm used by authorization proxy:
+  adpIamRealm: oam # Default value
+
+  # Optional
+  # The container port number for authorization proxy sidecar
+  port: 8888 # Default value
+
+  # Optional
+  # The suffix part of the service provider specific Authorization Proxy k8s service name.
+  # The service name format is <service-provider-chart-name> + "-" + suffixOverride
+  suffixOverride: authproxy # Default value
+
+  # Optional
+  # The name of k8s secret providing IAM client credentials. Relevant only
+  # when TLS is disabled (TLS shouldn't be disabled in production, only in
+  # customer demos and similar).
+  # Must have the same value as authenticationProxy.clientCredentialSecret
+  # in IAM server.
+  adpIamClientCredentialSecret: "eric-sec-access-mgmt-aapxy-creds" # Default value
+
+  # Optional
+  # The name of k8s secret providing IAM Server Admin credentials.
+  # Must have the same value as statefulset.adminSecret
+  # in IAM server.
+  adpIamAdminSecret: "eric-sec-access-mgmt-aapxy-creds" # Default value
+
+  # Optional
+  # Timeout for HTTP request which is forwarded to the Service Provider.
+  # Authorization proxy waits for reply spRequestTimeout seconds after
+  # which it replies with 503 code to downstream.
+  spRequestTimeout: 8
+
+  # Optional
+  # Timeout for authorization interrogation which is sent to IAM server.
+  # Authorization proxy waits for reply iamRequestTimeout seconds after
+  # which it replies with 503 code to downstream.
+  iamRequestTimeout: 8
+
+  authzLog:
+    # Log Transformer host i.e Kubernetes Service name of the Log Transformer
+    logtransformer:
+      host: "eric-log-transformer"
+
+  # sipoauth2:
+  #    # Optional
+  #    # Enables or disables authorization proxy to use IAM sip-oauth2 api
+  #    # to get identity when communicating with IAM.
+  #    # Deprecated
+  #    enabled: false
+
+  # Optional
+  # If false, metrics will not be scraped
+  metrics:
+    enabled: false
+
+# DR-D1126-030
+# Pod priority configuration for deployment
+podPriority:
+  alarmHandler:
+    priorityClassName: "" # No priority set
+  hooklauncher:
+    priorityClassName: ""
+
+# The configuration here can be useful for testing and debugging hooklauncher.
+hooklauncher:
+  cleanup: true
+  terminateEarlyOnFailure: true
+  backoffLimit: 6
+
+# DR-D1123-134
+securityPolicy:
+  hooklauncher:
+    rolename: eric-lcm-smart-helm-hooks
+  alarmhandler:
+    rolename: eric-fh-alarm-handler
+
+# O1 interface
+o1:
+  enabled: false
+  transformerHost: eric-data-transformer-json
+  service:
+    endpoints:
+      o1Admin:
+        tls:
+          enforced: required
+          verifyClientCertificate: required

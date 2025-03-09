@@ -1,0 +1,10 @@
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "type": "business",
+  "region": "EU",
+  "companyName": "Example Corp",
+  "vatNumber": "GB123456789",
+  "gdprConsent": true,
+  "contactMethod": "email",
+  "email": "contact@example.com"
+} 

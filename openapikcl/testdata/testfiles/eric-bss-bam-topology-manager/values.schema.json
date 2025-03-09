@@ -1,0 +1,1375 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "properties": {
+    "affinity": {
+      "properties": {
+        "nodeAffinity": {
+          "default": "{}",
+          "description": "nodeAffinity rules",
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "alarms": {
+      "properties": {
+        "kafkaProxy": {
+          "properties": {
+            "host": {
+              "default": "eric-bss-kafka-proxy-http",
+              "description": "Host Configuration for Kafka Proxy Alarms",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "port": {
+              "default": "80",
+              "description": "The kafka proxy server port",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "annotations": {
+      "default": "{}",
+      "description": "The key-prefix is optional and cannot exceed 253 characters with following character set: [a-z0-9A-Z\\.] The key cannot exceed 63 characters with following character set: [a-z0-9A-Z\\_\\.\\-]",
+      "type": "object"
+    },
+    "appArmorProfile": {
+      "properties": {
+        "topologymanager": {
+          "properties": {
+            "localhostProfile": {
+              "default": "\"\"",
+              "description": "Localhost path to the AppArmor profile for the topologymanager container. Should only be set if appArmorProfile.topologymanager.type is set to localhost.",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "\"\"",
+              "description": "The AppArmor type for the topologymanager container. Available options are \"unconfined\", \"runtime/default\", \"localhost\" and \"\" [default=\"\"].",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "global": {
+      "properties": {
+        "annotations": {
+          "default": "nil",
+          "description": "Global annotations. Global, service level, and resource-specific annotations are merged, no conflicts are allowed.",
+          "type": "object"
+        },
+        "fsGroup": {
+          "properties": {
+            "manual": {
+              "default": "\u003cempty\u003e",
+              "description": "Sets a fsGroup ID for all services. If manual set to empty namespace default configuration is used.",
+              "type": [
+                "null",
+                "integer"
+              ]
+            },
+            "namespace": {
+              "default": "\u003cempty\u003e",
+              "description": "Sets a fsGroup to use namespace default. The following values are possible: true, false and \"\". If global.fsGroup.namespace set to \"\" or false, namespace default configuration is used.",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "internalIPFamily": {
+          "default": "\u003cempty\u003e",
+          "description": "InternalIPFamily configures the IP address family used for cluster-internal IP address. Available values are: IPv4, IPv6, and empty.",
+          "enum": [
+            "IPv6",
+            "IPv4",
+            ""
+          ],
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "labels": {
+          "default": "nil",
+          "description": "Global labels. Global, service level, and resource-specific labels are merged, no conflicts are allowed.",
+          "type": "object"
+        },
+        "log": {
+          "properties": {
+            "streamingMethod": {
+              "default": "indirect",
+              "description": "The global parameter for specifying the streaming method of service logs. It can be 'indirect', 'direct', 'dual', or null. If both global.log.streamingMethod and log.streamingMethod are set to null, it will choose 'indirect' by default",
+              "type": "string",
+              "enum": [ "indirect", "direct", "dual", "" ]
+            }
+          }
+        },
+        "networkPolicy": {
+          "properties": {
+            "enabled": {
+              "default": "false",
+              "description": "Global network policy parameter",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "nodeSelector": {
+          "default": "{}",
+          "description": "Global node selectors",
+          "type": "object"
+        },
+        "podSecurityContext": {
+          "properties": {
+            "supplementalGroups": {
+              "default": "\u003cempty\u003e",
+              "description": "SupplementalGroups is used for setting the GID value(s) for volume data that is used by the services. The value will be merged if both global and local value are set. supplementalGroup will not be set in helmchart if both global and local value are not set.",
+              "type": [
+                "null",
+                "array"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "pullSecret": {
+          "default": "\u003cempty\u003e",
+          "description": "PullSecret used when fetching the image",
+          "type": [
+            "string",
+            "integer",
+            "number",
+            "null"
+          ]
+        },
+        "registry": {
+          "properties": {
+            "imagePullPolicy": {
+              "default": "IfNotPresent",
+              "description": "Pull policy for the image",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "repoPath": {
+              "default": "\u003cempty\u003e",
+              "description": "Repo where the image is located",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "url": {
+              "default": "armdocker.rnd.ericsson.se",
+              "description": "Registry url to fetch image from",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "security": {
+          "properties": {
+            "tls": {
+              "properties": {
+                "enabled": {
+                  "default": "true",
+                  "description": "Configuration option to enable/disable TLS support",
+                  "oneOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "enum": [
+                        "true",
+                        "false"
+                      ],
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "securityPolicy": {
+          "properties": {
+            "rolekind": {
+              "default": "\"\"",
+              "description": "Configuration of the security policy role kind. The following values are possible: ClusterRole, Role and \"\". Rolebinding will not be created with value \"\".",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "timezone": {
+          "default": "UTC",
+          "description": "Timezone",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        },
+        "tolerations": {
+          "default": "[]",
+          "description": "Tolerations for pod assignment, this supports the fullAPI",
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "imageCredentials": {
+      "properties": {
+        "registry": {
+          "properties": {},
+          "type": "object"
+        },
+        "topologyManager": {
+          "properties": {
+            "registry": {
+              "properties": {
+                "imagePullPolicy": {
+                  "description": "Image Pull Policy for Topology Manager Registry",
+                  "type": [
+                    "null",
+                    "string"
+                  ]
+                },
+                "url": {
+                  "default": "\u003cnil\u003e",
+                  "description": "URL for Topology Manager Registry",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "repoPath": {
+              "default": "\u003cnil\u003e",
+              "description": "Repository Path for Topology Manager Images",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "images": {
+      "properties": {
+        "topologyManager": {
+          "properties": {
+            "name": {
+              "default": "\u003cempty\u003e",
+              "description": "The name for the topologyManager",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "tag": {
+              "default": "\u003cempty\u003e",
+              "description": "The tag for the topologyManager",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "labels": {
+      "default": "{}",
+      "description": "Labels for Configuration",
+      "type": "object"
+    },
+    "networkPolicy": {
+      "properties": {
+        "egress": {
+          "properties": {
+            "accessLabels": {
+              "properties": {
+                "topologyManager": {
+                  "default": "{}",
+                  "description": "This parameter is a placeholder for adding a list of egress traffic network policy labels. If this service wants to send traffic then it should add all its outgoing traffic network policy access labels using this parameter.",
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "enabled": {
+          "default": "true",
+          "description": "Network policy. The network policy will be enabled if both networkPolicy.enabled and global.networkPolicy.enabled are set to true.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "enum": [
+                "true",
+                "false"
+              ],
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "nodeSelector": {
+      "default": "{}",
+      "description": "Node selectors",
+      "type": "object"
+    },
+    "persistence": {
+      "properties": {
+        "persistentVolumeClaim": {
+          "properties": {
+            "size": {
+              "default": "256Mi",
+              "description": "Size of Persistent Volume Claim for Persistence",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "podPriority": {
+      "properties": {
+        "eric-bss-bam-topology-manager": {
+          "properties": {
+            "priorityClassName": {
+              "default": "",
+              "description": "The pod priority for the service",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "podSecurityContext": {
+      "properties": {
+        "supplementalGroups": {
+          "default": "\u003cempty\u003e",
+          "description": "SupplementalGroups is used for setting the GID value(s) for volume data that is used by the services. The value will be merged if both global and local value are set. supplementalGroup will not be set in helmchart if both global and local value are not set.",
+          "type": [
+            "array",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "probes": {
+      "properties": {
+        "topologyManager": {
+          "properties": {
+            "livenessProbe": {
+              "properties": {
+                "failureThreshold": {
+                  "default": "3",
+                  "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "initialDelaySeconds": {
+                  "default": "1",
+                  "description": "Number of seconds after the container has started before probe is initiated",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "periodSeconds": {
+                  "default": "10",
+                  "description": "How often (in seconds) to perform the probe",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "timeoutSeconds": {
+                  "default": "2",
+                  "description": "Number of seconds after which the probe times out",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "startupProbe": {
+              "properties": {
+                "failureThreshold": {
+                  "default": "60",
+                  "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "initialDelaySeconds": {
+                  "default": "5",
+                  "description": "Number of seconds after the container has started before probe is initiated",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "periodSeconds": {
+                  "default": "5",
+                  "description": "How often (in seconds) to perform the probe",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "successThreshold": {
+                  "default": "1",
+                  "description": "Minimum consecutive successes for the probe to be considered successful after having failed",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "timeoutSeconds": {
+                  "default": "2",
+                  "description": "Number of seconds after which the probe times out",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "replicaCount": {
+      "default": "1",
+      "description": "Number of Replicas for the Application",
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?\\d+$",
+          "type": "string"
+        }
+      ]
+    },
+    "resources": {
+      "properties": {
+        "topologymanager": {
+          "properties": {
+            "limits": {
+              "properties": {
+                "cpu": {
+                  "default": "500m",
+                  "description": "The maximum amount of CPU to allocate to the topologymanager container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "700Mi",
+                  "description": "The maximum amount of memory to allocate to the topologymanager container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "requests": {
+              "properties": {
+                "cpu": {
+                  "default": "150m",
+                  "description": "The amount of CPU required by the topologymanager container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "512Mi",
+                  "description": "The amount of memory required by the topologymanager container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "seccompProfile": {
+      "properties": {
+        "topologymanager": {
+          "properties": {
+            "localhostProfile": {
+              "default": "\"\"",
+              "description": "Localhost path to the seccomp profile for the topologymanager container. Should only be set if seccompProfile.topologymanager.type is set to Localhost",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "\"\"",
+              "description": "Feature of the Linux kernel for secure computing mode for topologymanager container. Available options are `Unconfined`, `RuntimeDefault`, `Localhost` and \"\" [default=\"\"]",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "security": {
+      "properties": {
+        "kafkaProxy": {
+          "properties": {
+            "tls": {
+              "properties": {
+                "enabled": {
+                  "default": "true",
+                  "description": "Sets whether secure communication using TLS should be used when the topology manager talks to the kafka proxy.",
+                  "oneOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "enum": [
+                        "true",
+                        "false"
+                      ],
+                      "type": "string"
+                    }
+                  ]
+                },
+                "mutual": {
+                  "default": "true",
+                  "description": "Mutual TLS Configuration for Kafka Proxy Security",
+                  "oneOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "enum": [
+                        "true",
+                        "false"
+                      ],
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "watcher": {
+          "properties": {
+            "tls": {
+              "properties": {
+                "enabled": {
+                  "default": "true",
+                  "description": "Sets whether secure communication using TLS should be used when the topology manager talks to the peers during data sync.",
+                  "oneOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "enum": [
+                        "true",
+                        "false"
+                      ],
+                      "type": "string"
+                    }
+                  ]
+                },
+                "mutual": {
+                  "default": "true",
+                  "description": "Sets whether server certs should be validated when the topology manager talks to the peers during data sync.",
+                  "oneOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "enum": [
+                        "true",
+                        "false"
+                      ],
+                      "type": "string"
+                    }
+                  ]
+                },
+                "syncCaSecretName": {
+                  "default": "eric-bss-bam-topology-manager-sync-ca",
+                  "description": "Name of the secret with server CA. Expected CA cert bundle to be under key:ca.crt",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "syncCertSecretName": {
+                  "default": "eric-bss-bam-topology-manager-sync-client-cert",
+                  "description": "Name of the secret with client cert and key to be used during sync operation. Expected cert data key:cert.crt key data key:cert.key",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "securityPolicy": {
+      "properties": {
+        "rolename": {
+          "default": "eric-bss-bam-topology-manager",
+          "description": "Rolename sets the name of the security policy role that is bound to the service account.",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "service": {
+      "properties": {
+        "endpoints": {
+          "properties": {
+            "rest": {
+              "properties": {
+                "tls": {
+                  "properties": {
+                    "enforced": {
+                      "default": "required",
+                      "description": "If true service will accept secure communication only.",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    },
+                    "verifyClientCertificate": {
+                      "default": "required",
+                      "description": "If true service will accept only verified clients.",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "serviceAccount": {
+      "properties": {
+        "create": {
+          "default": "true",
+          "description": "Set whether to create the service account. Warning: Don't turn this off, the topology manager requires it.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "enum": [
+                "true",
+                "false"
+              ],
+              "type": "string"
+            }
+          ]
+        },
+        "name": {
+          "default": "Template name",
+          "description": "Name of the serviceaccount to be used",
+          "type": [
+            "string",
+            "integer",
+            "number",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "terminationGracePeriodSeconds": {
+      "default": "30",
+      "description": "Number of seconds after SIGTERM caught before shutting down",
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?\\d+$",
+          "type": "string"
+        }
+      ]
+    },
+    "tolerations": {
+      "default": "[]",
+      "description": "Toleration rules",
+      "type": "array"
+    },
+    "topologySpreadConstraints": {
+      "default": "[]",
+      "description": "Constraints for Topology Spread",
+      "type": "array"
+    },
+    "topologymanager": {
+      "properties": {
+        "alarmHandler": {
+          "properties": {
+            "enabled": {
+              "default": "true",
+              "description": "If it is Enabled, it will fetch all active alarms from alarm handler service and store in cache/disk",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            },
+            "host": {
+              "default": "eric-fh-alarm-handler:5006",
+              "description": "Host name and port of alarm handler service",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "noTlsHost": {
+              "default": "eric-fh-alarm-handler:5005",
+              "description": "Non-TLS host name and port of alarm handler service",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "currentLocation": {
+          "properties": {
+            "address": {
+              "properties": {
+                "fqdn": {
+                  "default": "eric-bss-bam-topology-manager-query-rbac-proxy",
+                  "description": "Fqdn to reach the topologymanager in this location",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "port": {
+                  "default": "443",
+                  "description": "Port to use when accessing sync interface",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "protocol": {
+                  "default": "https",
+                  "description": "Protocol to use in communication",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "clusterName": {
+              "description": "Cluster Name for Current Topology Location",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "dc": {
+              "default": "\u0026lt;empty\u0026gt;",
+              "description": "The name of the data center as string",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "name": {
+              "default": "\u0026lt;empty\u0026gt;",
+              "description": "The name of the location as string",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "region": {
+              "default": "\u0026lt;empty\u0026gt;",
+              "description": "The region of the location",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "siteId": {
+              "default": "\u0026lt;empty\u0026gt;",
+              "description": "Id of the site as int",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            },
+            "siteName": {
+              "default": "\u0026lt;empty\u0026gt;",
+              "description": "The name of the site as string",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "required": [
+            "name",
+            "siteId",
+            "siteName",
+            "dc",
+            "region"
+          ],
+          "type": "object"
+        },
+        "enrichmentLabel": {
+          "properties": {
+            "name": {
+              "default": "default-location-name",
+              "description": "Additional label to be placed on local resources",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "value": {
+              "default": "default-location-name",
+              "description": "Additional label to be placed on local resources",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "locationEnrollment": {
+          "properties": {
+            "serverCATrustSecret": {
+              "default": "eric-bss-bam-topology-manager-sync-ca",
+              "description": "The CA trust bundle secret which Topology Manager uses to authenticate remote servers",
+              "type": "string"
+            },
+            "clientCATrustSecret": {
+              "default": "eric-bss-bam-topology-manager-sync-ca",
+              "description": "The CA trust bundle secret which Topology Manager uses to authenticate remote clients",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "logConnectionTtlMinutes": {
+          "default": "120",
+          "description": "Log connection TTL (minutes) towards log transformer service. Connection will reset after configured number of minutes. Required when streamingMethod is set to direct or dual",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        },
+        "logLevel": {
+          "default": "info",
+          "description": "Log level, possible values are: debug, info, error",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        },
+        "log": {
+          "properties": {
+            "streamingMethod": {
+              "default": "indirect",
+              "description": "The local parameter for specifying the streaming method of service logs. It can be 'indirect', 'direct', 'dual', or null. If set to null, global.log.streamingMethod will be used to determine the streaming method",
+              "type": "string",
+              "enum": [ "indirect", "direct", "dual", "" ]
+            }
+          }
+        },
+        "logQueueSize": {
+          "default": "1000",
+          "description": "Size of the log queue for streaming. Required when streamingMethod is set to direct or dual",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        },
+        "logTimeoutSeconds": {
+          "default": "5",
+          "description": "Timeout waiting for logs to be streamed (in seconds) before terminating. Required when streamingMethod is set to direct or dual",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        },
+        "logTransformerHost": {
+          "default": "eric-log-transformer:5024",
+          "description": "FQDN including port number of the log transformer service, don't include protocol. Required when streamingMethod is set to direct or dual",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        },
+        "logTransformerNoTlsHost": {
+          "default": "eric-log-transformer:5025",
+          "description": "FQDN including port number of the log transformer non tls service, don't include protocol. Required when streamingMethod is set to direct or dual",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        },
+        "metrics": {
+          "properties": {
+            "enabled": {
+              "default": "true",
+              "description": "This allows the service to increment counters.",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            },
+            "host": {
+              "default": "eric-pm-server",
+              "description": "Host name of the pm server. this is used for pm metrics access if network policies are in use",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "serviceName": {
+              "default": "topology_manager",
+              "description": "The subsystem name for all the metrics generated by the service to be prefixed",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "minUnreachableCounter": {
+          "default": "5",
+          "description": "The threshold after which a warning will be raised about an unreachable location. It is expressed as scan interval count whichdid not yield successful synchronization",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        },
+        "podDownAlarmRaiseGrace": {
+          "default": "300",
+          "description": "The minimum age in seconds of a particular pod before evaluating raising PodDownAlarm for it.",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        },
+        "port": {
+          "default": "8080",
+          "description": "Unsecure port to rest interface",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        },
+        "remoteMirror": {
+          "properties": {
+            "enabled": {
+              "default": "true",
+              "description": "Enable mirroring of remote resources",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            },
+            "localArgs": {
+              "default": "{}",
+              "description": "Local arguments supplied to the remote mirror rendering of resources",
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "scanInterval": {
+          "default": "60",
+          "description": "The interval at which the topology manager will scan all the monitored k8s resources and connected locations. Value accepts integer and repesents interval in seconds",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        },
+        "searchEngine": {
+          "properties": {
+            "alarmHistorySizePerLocation": {
+              "default": "1000",
+              "description": "Number of clear alarms each location. By default, it fetches 1000 latest cleared alarms from search engine service of each location and store it in cache/disk",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            },
+            "enabled": {
+              "default": "true",
+              "description": "If it is Enabled, it will fetch clear alarm history from search engine service and store in cache/disk",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            },
+            "host": {
+              "default": "eric-data-search-engine-tls:9200",
+              "description": "Host name of search engine service",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "noTlsHost": {
+              "default": "eric-data-search-engine:9200",
+              "description": "Non-TLS host name of search engine service",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "tlsPort": {
+          "default": "8443",
+          "description": "Secure port to rest interface",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "updateStrategy": {
+      "properties": {
+        "topologymanager": {
+          "properties": {
+            "type": {
+              "default": "Recreate",
+              "description": "Update Strategy Type for Topology Manager",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    }
+  }
+}

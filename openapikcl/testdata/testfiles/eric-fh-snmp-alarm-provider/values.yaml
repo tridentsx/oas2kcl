@@ -1,0 +1,501 @@
+# Default values.
+# This is a YAML-formatted file.
+
+## Global registry
+# global:
+#   cm:
+#     architecture: "cm-v1"
+#   fsGroup:
+#     namespace: null
+#     manual: null
+#   hooklauncher
+#     executor: "service"
+#   keyValueDatabaseRD:
+#     newOperator:
+#       enabled: false
+#   timezone: "UTC"
+#   nodeSelector: {}
+#   podSecurityContext:
+#     supplementalGroups:
+#   pullSecret:
+#   registry:
+#     url: "armdocker.rnd.ericsson.se"
+#     imagePullPolicy: IfNotPresent
+#     repoPath:
+#   security:
+#     tls:
+#       enabled: true
+#       trustedInternalRootCa:
+#         secret: eric-sec-sip-tls-trusted-root-cert
+#     policyBinding:
+#       create: false
+#     policyReferenceMap:
+#       default-restricted-security-policy: "default-restricted-security-policy"
+#       plc-03ad10577718e69c935814b4f30054: "plc-03ad10577718e69c935814b4f30054"
+#   securityPolicy:
+#     rolekind:
+#   networkPolicy:
+#     enabled: false
+#   logShipper:
+#     deployment:
+#       model: ""
+#  tolerations: []
+
+### imageCredentials
+imageCredentials:
+  repoPath:
+  registry:
+    ## url, service specific Docker registry url, overrides the global value when set
+    url:
+    imagePullPolicy:
+  snmpAP:
+    # see default in eric-product-info.yaml, overrides global.registry.url
+    repoPath:
+    registry:
+      # see default in eric-product-info.yaml, overrides global.registry.url
+      url:
+      # overrides global.registry.imagePullPolicy, default is IfNotPresent
+      imagePullPolicy:
+  restartPolicy: "Never"
+  logshipper:
+    registry:
+      url:
+      imagePullPolicy:
+    repoPath: "proj-adp-log-released"
+  hooklauncher:
+    registry:
+      url:
+      imagePullPolicy:
+    repoPath:
+  # Secret must be manually created in the namespace, no default value
+  pullSecret:
+
+# images:
+#   snmpAP:
+#     # SNMP Alarm Provider image name
+#     name: eric-fh-snmp-alarm-provider
+#     # SNMP Alarm Provider image tag
+#     tag: VERSION
+#   logshipper:
+#     name: "eric-log-shipper"
+#     tag: "5.7.0-12"
+
+service:
+  allocateLoadBalancerNodePorts: false
+  externalIPv4 :
+    enabled:
+    loadBalancerIP:
+    servicePort: 161
+    annotations:
+      cloudProviderLB: {}
+      sharedVIPLabel: ""
+      addressPoolName: ""
+    loadBalancerSourceRanges: []
+  externalIPv6 :
+    enabled:
+    loadBalancerIP:
+    servicePort: 10161
+    annotations:
+      cloudProviderLB: {}
+      sharedVIPLabel: ""
+      addressPoolName: ""
+    loadBalancerSourceRanges: []
+  udp:
+    enabled: true
+    annotations:
+      # DR-D1125-025, The annotation is applicable in full stack deployment or any 3pp Kubernetes distribution with MetalLB implementation.
+      loadBalancerIPs: ""
+    # DR-D1125-033
+    externalIPFamily: ""
+    # DR-D1125-032
+    externalIPFamilyPolicy: ""
+  # IP address to assign to load balancer (if supported)
+  loadBalancerIP:
+  # List of IP CIDRs allowed access to load balancer (if supported)
+  loadBalancerSourceRanges: []
+  # Service type
+  type: "LoadBalancer"
+  # HTTP port used by readiness and liveness probes
+  httpPort: 5006
+  # SNMP Agent port
+  snmpAgentPort: 1161
+  # SNMP AP Service port
+  servicePort: 161
+  # SNMP extra JVM flags to be used
+  extraJvmOpts: ""
+  snmpPort:
+    dscp: 0
+  # Logging, enable or disable DEBUG log level
+  debug: false
+  replicas: 1
+  readinessTimeoutMinutes: 10
+  # The secret resource name to use for configuring the service
+  # secretName: ""
+  # support DR-HC-185
+  annotations:
+    addressPoolName: ""
+    cloudProviderLB: {}
+    loadBalancerIPs: ""
+    sharedVIPLabel: ""
+  maxAlertListCount: 10
+# DR-D1123-113
+  endpoints:
+    cmm-notification:
+      tls:
+        enforced: "required"
+        verifyClientCertificate: "required"
+
+multiNet:
+  snmpAP:
+    # External LoadBalancer service selector according to DR-D1125-105
+    # It shall be configured with extreme care as misconfiguration can
+    # break traffic
+    serviceSelector:
+    # Adds annotation to external access Network Policy according
+    # to DR-D1125-064
+    policyAnnotations:
+
+annotations: {}
+
+# Generic pod annotations according to DR-D1121-069
+podAnnotations:
+  snmpAP:
+
+#exposing configurable helm parameters for the probe. (DR-D1120-012 and DR-D1120-014)
+probes:
+  snmpAP:
+    livenessProbe:
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 15
+      failureThreshold: 6
+    readinessProbe:
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 15
+      successThreshold: 1
+      failureThreshold: 6
+  logshipper:
+    livenessProbe:
+      initialDelaySeconds: 1
+      timeoutSeconds: 10
+      periodSeconds: 10
+      failureThreshold: 3
+
+#SNMP protocol releted values - begin
+
+# MR: Support for new SNMP_v2c varbinds, ADPPRG-55306.
+# Possible values are 0(Unknown), 1(IPV4), 2(IPV6)
+sourceIdentifierType: 1
+# MR: Support for new SNMP_v2c varbinds, ADPPRG-55306.
+# Should be in IPv4 or IPv6 format, depends on SourceIdentifierType
+sourceIdentifier: "127.0.0.1"
+
+#SNMP protocol releted values - end
+
+resources:
+  alarmprovider:
+    requests:
+      # SNMP Alarm Provider container memory requests
+      memory: "384Mi"
+      # SNMP Alarm Provider container CPU requests
+      cpu: "0.1"
+      # SNMP Alarm Provider ephemeral storage
+      ephemeral-storage: "2Gi"
+    limits:
+      # SNMP Alarm Provider container memory limits
+      memory: "1.5Gi"
+      # SNMP Alarm Provider container CPU limits
+      cpu: "0.5"
+      # SNMP Alarm Provider ephemeral storage limits
+      ephemeral-storage: "4Gi"
+    jvm:
+      initialMemoryAllocationPercentage: 50
+      smallMemoryAllocationMaxPercentage: 70
+      largeMemoryAllocationMaxPercentage: 50
+  logshipper:
+    requests:
+      memory: "50Mi"
+      cpu: "20m"
+    limits:
+      memory: "100Mi"
+      cpu: "50m"
+  cmmJob:
+    requests:
+      memory: "100Mi"
+      cpu: "0.1"
+      ephemeral-storage: "10Mi"
+    limits:
+      memory: "200Mi"
+      cpu: "0.2"
+      ephemeral-storage: "20Mi"
+    jvm:
+      initialMemoryAllocationPercentage: 50
+      smallMemoryAllocationMaxPercentage: 70
+      largeMemoryAllocationMaxPercentage: 50
+  hooklauncher:
+    requests:
+      memory: "50Mi"
+      cpu: "50m"
+      ephemeral-storage: "100Mi"
+    limits:
+      memory: "100Mi"
+      cpu: "100m"
+      ephemeral-storage: "100Mi"
+
+#Network Policy DR-D1125-059
+networkPolicy:
+  enabled: true
+
+nodeSelector:
+  snmpAP: {}
+  cmmJob: {}
+  hooklauncher: {}
+
+# DR-D1121-068: allow additional labels to be attached
+labels: {}
+
+#service log settings
+log:
+  eric-fh-snmp-alarm-provider:
+    level: "info"
+  enabled3PPs: ""
+  streamingMethod:
+
+ah:
+  host: "eric-fh-alarm-handler"
+  port: 5005
+  portTls: 5006
+  # ah client certificate secret name
+  clientCertSecret: "eric-sec-snmp-ap-ah-cert"
+  # AH certificate authority
+  caName: "eric-fh-alarm-handler-ca"
+
+messageBusKF:
+  host: "eric-data-message-bus-kf-client"
+  port: 9092
+  portTls: 9093
+  # messageBusKF client certificate secret name
+  clientCertSecret: "eric-sec-snmp-ap-message-bus-kf-cert"
+  # messageBusKF certificate authority
+  caName: "eric-data-message-bus-kf-client-client-ca"
+  #To use in network policy because the host name is not equal to the service name
+  serviceName: "eric-data-message-bus-kf"
+  clusterName:
+  userCustomObject:
+    enabled: true
+#  messageBusKF.operator and the parameters under it are going to be deprecated
+  operator:
+    clusterName: "eric-data-message-bus-kf-cluster"
+    deployDefaultUserCO: true
+
+# Deprecated  ADPPRG-169774
+messageBusRd:
+  enabled: false
+  host: "eric-data-key-value-database-rd-operand"
+  portTls: 6380
+  port: 6379
+  # The mode could be one of these: cluster (for clusterServer mode), single (for single instance server mode)
+  mode: "cluster"
+  # MessageBusRedis client certificate secret name
+  clientCertSecret: "eric-fh-snmp-ap-message-bus-rd-cert"
+  # MessageBusRedis certificate authority
+  caName: "eric-data-key-value-database-rd-operand-client-ca"
+  acl:
+    enabled: true
+    user: "default"
+    userKey: "username"
+    passKey: "password"
+  # The no of netty threads used for communicating with redis per redis consumer
+  nettyConnections: 64
+  connectionPoolsize: 64
+
+keyValueDatabaseRD:
+  enabled: false
+  clusterName: "eric-data-key-value-database-rd-operand"
+  tlsPort: 6380
+  port: 6379
+  # MessageBusRedis client certificate secret name
+  clientCertSecret: "eric-fh-snmp-ap-message-bus-rd-cert"
+  # MessageBusRedis certificate authority
+  caName: "eric-data-key-value-database-rd-operand-redis-client-ca"
+  acl:
+    user: "snmp-user"
+  nettyConnections: 64
+  connectionPoolsize: 64
+
+cmm:
+  host: "eric-cm-mediator"
+  portTls: 5004
+  port: 5003
+  # SIP-TLS client certificate secret name
+  clientCertSecret: "eric-fh-snmp-ap-cmm-cert"
+  # CM Mediator certificate authority
+  caName: "eric-cm-mediator-ca"
+  # notification sercer to get update notification from CMM
+  notifyServerPort: 5008
+  notifyServerPortTls: 5009
+  notifyServerPortName: "http-notify"
+  notifyServerClientCaSecret: "eric-cm-mediator-tls-client-ca-secret"
+
+kms:
+  host: "eric-sec-key-management"
+  port: 8200
+
+vpnGw:
+  verboseMode:
+  vpnGwAddress:
+  vlanId:
+  sendFromAddress:
+  sendToAddress: # only used for ipv6
+
+logShipper:
+  logLevel: "info"
+  storage:
+    path: "/logs"
+    size: "500Mi"
+    medium: "Ephemeral"
+  input:
+    files:
+      - enabled: true
+        buffer:
+          maxSize: '32k'
+        skipLongLines: 'off'
+        paths:
+          - "snmp-alarm-provider.log"
+  output:
+    logTransformer:
+      host: "eric-log-transformer"
+
+# DR-D1123-127
+appArmorProfile:
+  type: ""
+  localhostProfile: ""
+  snmpAP:
+    type: ""
+    localhostProfile: ""
+  logshipper:
+    type: ""
+    localhostProfile: ""
+  cmmJob:
+    type: ""
+    localhostProfile: ""
+  hooklauncher:
+    type: ""
+    localhostProfile: ""
+
+# DR-D1123-128
+seccompProfile:
+  type: ""
+  localhostProfile: ""
+  snmpAP:
+    type: ""
+    localhostProfile: ""
+  logshipper:
+    type: ""
+    localhostProfile: ""
+  cmmJob:
+    type: ""
+    localhostProfile: ""
+  hooklauncher:
+    type: ""
+    localhostProfile: ""
+
+tolerations:
+  snmpAP:
+    - key: "node.kubernetes.io/not-ready"
+      operator: "Exists"
+      effect: "NoExecute"
+      tolerationSeconds: 0
+    - key: "node.kubernetes.io/unreachable"
+      operator: "Exists"
+      effect: "NoExecute"
+      tolerationSeconds: 0
+  cmmJob:
+    - key: "node.kubernetes.io/not-ready"
+      operator: "Exists"
+      effect: "NoExecute"
+      tolerationSeconds: 0
+    - key: "node.kubernetes.io/unreachable"
+      operator: "Exists"
+      effect: "NoExecute"
+      tolerationSeconds: 0
+  hooklauncher: []
+
+#Upper limit of graceful termination execution time (DR-D1120-080 )
+terminationGracePeriodSeconds: 30
+
+# Pod priority configuration for deployments
+podPriority:
+  snmpAP:
+    priorityClassName : ""
+  cmmJob:
+    priorityClassName : ""
+  hooklauncher:
+    priorityClassName: ""
+
+#Define SNMP configuration based on SNMP Yang to push to CMM
+yang:
+  enabled: false
+  removeByUninstall: true
+  readConfigFromSecret: true
+  data: "|"
+# administrative-state: unlocked
+# engine-id: 800000c10400000032
+# engine-boots: 0
+# heartbeat-interval: 60
+# snmp-target-v2c:
+#   id=snmp-target-v2c-0:
+#     id: snmp-target-v2c-0
+#     administrative-state: unlocked
+#     community: helmPublic
+#     host: my-fqdn-1.test.example
+#     port: 162
+# snmp-target-v3:
+#   id=snmp-target-v3-0:
+#     id: snmp-target-v3-0
+#     administrative-state: unlocked
+#     user: helmUser1
+#     host: 100.200.100.180
+#     port: 162
+#     snmp-security-level: auth-priv
+#     auth-protocol: md5
+#     auth-key: authpassword
+#     priv-protocol: des-cbc
+#     priv-key: privpassword
+
+# Bandwidth (DR-D1125-040)
+bandwidth:
+  snmpAP:
+    maxEgressRate: ""
+  cmmJob:
+    maxEgressRate: ""
+
+# The configuration here can be useful for testing and debugging hooklauncher.
+hooklauncher:
+  cleanup: "true"
+  terminateEarlyOnFailure: "true"
+  backoffLimit: 6
+
+# PM Server (Metrics)
+metrics:
+  enabled: false
+  caSecret: "eric-pm-server-ca"
+  host: "eric-pm-server"
+  port: 5003
+  portTls: 5004
+
+# DR-D1123-134
+securityPolicy:
+  hooklauncher:
+    rolename: "eric-lcm-smart-helm-hooks"
+  snmpAP:
+    rolename: "eric-fh-snmp-alarm-provider"
+  cmmJob:
+    rolename: "eric-fh-snmp-alarm-provider"
+  logshipper:
+    rolename: "eric-fh-snmp-alarm-provider"
+
+# DR-D1123-135 supplementalGroups
+podSecurityContext:
+  supplementalGroups:

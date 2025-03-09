@@ -1,0 +1,1107 @@
+{
+    "type": [
+        "object",
+        "null"
+    ],
+    "properties": {
+        "imageCredentials": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "properties": {
+                "repoPath": {
+                    "type": [
+                        "object",
+                        "string",
+                        "integer",
+                        "boolean",
+                        "array",
+                        "null"
+                    ]
+                },
+                "registry": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "properties": {
+                        "url": {
+                            "type": [
+                                "object",
+                                "string",
+                                "integer",
+                                "boolean",
+                                "array",
+                                "null"
+                            ]
+                        }
+                    }
+                },
+                "pullSecret": {
+                    "type": [
+                        "object",
+                        "string",
+                        "integer",
+                        "boolean",
+                        "array",
+                        "null"
+                    ]
+                },
+                "alarmhandler": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "properties": {
+                        "registry": {
+                            "type": [
+                                "object",
+                                "null"
+                            ],
+                            "properties": {
+                                "url": {
+                                    "type": [
+                                        "object",
+                                        "string",
+                                        "integer",
+                                        "boolean",
+                                        "array",
+                                        "null"
+                                    ]
+                                },
+                                "imagePullPolicy": {
+                                    "type": [
+                                        "object",
+                                        "string",
+                                        "integer",
+                                        "boolean",
+                                        "array",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "repoPath": {
+                            "type": [
+                                "object",
+                                "string",
+                                "integer",
+                                "boolean",
+                                "array",
+                                "null"
+                            ]
+                        }
+                    }
+                },
+                "initcontainer": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "properties": {
+                        "registry": {
+                            "type": [
+                                "object",
+                                "null"
+                            ],
+                            "properties": {
+                                "url": {
+                                    "type": [
+                                        "object",
+                                        "string",
+                                        "integer",
+                                        "boolean",
+                                        "array",
+                                        "null"
+                                    ]
+                                },
+                                "imagePullPolicy": {
+                                    "type": [
+                                        "object",
+                                        "string",
+                                        "integer",
+                                        "boolean",
+                                        "array",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "repoPath": {
+                            "type": [
+                                "object",
+                                "string",
+                                "integer",
+                                "boolean",
+                                "array",
+                                "null"
+                            ]
+                        }
+                    }
+                },
+                "hooklauncher": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "properties": {
+                        "registry": {
+                            "type": [
+                                "object",
+                                "null"
+                            ],
+                            "properties": {
+                                "url": {
+                                    "type": [
+                                        "object",
+                                        "string",
+                                        "integer",
+                                        "boolean",
+                                        "array",
+                                        "null"
+                                    ]
+                                },
+                                "imagePullPolicy": {
+                                    "type": [
+                                        "object",
+                                        "string",
+                                        "integer",
+                                        "boolean",
+                                        "array",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "repoPath": {
+                            "type": [
+                                "object",
+                                "string",
+                                "integer",
+                                "boolean",
+                                "array",
+                                "null"
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "updateStrategy": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "properties": {
+                "type": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "rollingUpdate": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "properties": {
+                        "maxUnavailable": {
+                            "$ref": "#/$defs/pdbValue"
+                        },
+                        "maxSurge": {
+                            "$ref": "#/$defs/pdbValue"
+                        }
+                    }
+                }
+            }
+        },
+        "replicaCount": {
+            "type": [
+                "integer",
+                "null"
+            ]
+        },
+        "topologySpreadConstraints": {
+            "if": {
+                "type": "array"
+            },
+            "then": {
+                "type": "array",
+                "items": {
+                    "type": "object"
+                }
+            },
+            "else": {
+                "type": ["object", "null"],
+                "properties": {
+                    "server": {
+                        "description": "TODO",
+                        "type": ["array", "null"],
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "hooklauncher": {
+                        "description": "TODO",
+                        "type": ["array", "null"],
+                        "items": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "nameOverride": {
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "fullnameOverride": {
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "service": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "properties": {
+                "type": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "port": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "endpoints": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "properties": {
+                        "analyzer": {
+                            "type": [
+                                "object",
+                                "null"
+                            ],
+                            "properties": {
+                                "tls": {
+                                    "type": [
+                                        "object",
+                                        "null"
+                                    ],
+                                    "properties": {
+                                        "enforced": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "verifyClientCertificate": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "metrics": {
+                            "type": [
+                                "object",
+                                "null"
+                            ],
+                            "properties": {
+                                "tls": {
+                                    "type": [
+                                        "object",
+                                        "null"
+                                    ],
+                                    "properties": {
+                                        "verifyClientCertificate": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "ingress": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "properties": {
+                "enabled": {
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
+                },
+                "annotations": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "properties": {}
+                },
+                "paths": {
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "hosts": {
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "hostname": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "tls": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "properties": {
+                        "passthrough": {
+                            "type": [
+                                "boolean",
+                                "null"
+                            ]
+                        },
+                        "ingresstls": {
+                            "type": [
+                                "array",
+                                "null"
+                            ],
+                            "items": {
+                                "type": [
+                                    "object",
+                                    "null"
+                                ],
+                                "properties": {
+                                    "secretName": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "hosts": {
+                                        "type": [
+                                            "array",
+                                            "null"
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "resources": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "properties": {
+                "alarmhandler": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "properties": {
+                        "limits": {
+                            "type": [
+                                "object",
+                                "null"
+                            ],
+                            "properties": {
+                                "cpu": {
+                                    "type": [
+                                        "string",
+                                        "number",
+                                        "null"
+                                    ]
+                                },
+                                "memory": {
+                                    "type": [
+                                        "string",
+                                        "number",
+                                        "null"
+                                    ]
+                                },
+                                "ephemeral-storage": {
+                                    "type": [
+                                        "string",
+                                        "number",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "requests": {
+                            "type": [
+                                "object",
+                                "null"
+                            ],
+                            "properties": {
+                                "cpu": {
+                                    "type": [
+                                        "string",
+                                        "number",
+                                        "null"
+                                    ]
+                                },
+                                "memory": {
+                                    "type": [
+                                        "string",
+                                        "number",
+                                        "null"
+                                    ]
+                                },
+                                "ephemeral-storage": {
+                                    "type": [
+                                        "string",
+                                        "number",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "jvm": {
+                            "type": [
+                                "object",
+                                "null"
+                            ],
+                            "properties": {
+                                "initialMemoryAllocationPercentage": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                },
+                                "smallMemoryAllocationMaxPercentage": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                },
+                                "largeMemoryAllocationMaxPercentage": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "initcontainer": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "properties": {
+                        "limits": {
+                            "type": [
+                                "object",
+                                "null"
+                            ],
+                            "properties": {
+                                "cpu": {
+                                    "type": [
+                                        "string",
+                                        "number",
+                                        "null"
+                                    ]
+                                },
+                                "memory": {
+                                    "type": [
+                                        "string",
+                                        "number",
+                                        "null"
+                                    ]
+                                },
+                                "ephemeral-storage": {
+                                    "type": [
+                                        "string",
+                                        "number",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "requests": {
+                            "type": [
+                                "object",
+                                "null"
+                            ],
+                            "properties": {
+                                "cpu": {
+                                    "type": [
+                                        "string",
+                                        "number",
+                                        "null"
+                                    ]
+                                },
+                                "memory": {
+                                    "type": [
+                                        "string",
+                                        "number",
+                                        "null"
+                                    ]
+                                },
+                                "ephemeral-storage": {
+                                    "type": [
+                                        "string",
+                                        "number",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "logshipper": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "properties": {
+                        "limits": {
+                            "type": [
+                                "object",
+                                "null"
+                            ],
+                            "properties": {
+                                "memory": {
+                                    "type": [
+                                        "string",
+                                        "number",
+                                        "null"
+                                    ]
+                                },
+                                "cpu": {
+                                    "type": [
+                                        "string",
+                                        "number",
+                                        "null"
+                                    ]
+                                },
+                                "ephemeral-storage": {
+                                    "type": [
+                                        "string",
+                                        "number",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "requests": {
+                            "type": [
+                                "object",
+                                "null"
+                            ],
+                            "properties": {
+                                "memory": {
+                                    "type": [
+                                        "string",
+                                        "number",
+                                        "null"
+                                    ]
+                                },
+                                "cpu": {
+                                    "type": [
+                                        "string",
+                                        "number",
+                                        "null"
+                                    ]
+                                },
+                                "ephemeral-storage": {
+                                    "type": [
+                                        "string",
+                                        "number",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "hooklauncher": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "properties": {
+                        "requests": {
+                            "type": [
+                                "object",
+                                "null"
+                            ],
+                            "properties": {
+                                "memory": {
+                                    "type": [
+                                        "string",
+                                        "number",
+                                        "null"
+                                    ]
+                                },
+                                "cpu": {
+                                    "type": [
+                                        "string",
+                                        "number",
+                                        "null"
+                                    ]
+                                },
+                                "ephemeral-storage": {
+                                    "type": [
+                                        "string",
+                                        "number",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "limits": {
+                            "type": [
+                                "object",
+                                "null"
+                            ],
+                            "properties": {
+                                "memory": {
+                                    "type": [
+                                        "string",
+                                        "number",
+                                        "null"
+                                    ]
+                                },
+                                "cpu": {
+                                    "type": [
+                                        "string",
+                                        "number",
+                                        "null"
+                                    ]
+                                },
+                                "ephemeral-storage": {
+                                    "type": [
+                                        "string",
+                                        "number",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "nodeSelector": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "properties": {}
+        },
+        "tolerations": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "properties": {
+                "alarmhandler": {
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "hooklauncher": {
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                }
+            }
+        },
+        "affinity": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "properties": {
+                "podAntiAffinity": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            }
+        },
+        "env": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "properties": {
+                "metrics": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "properties": {
+                        "port": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "podDisruptionBudget": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "properties": {
+                "minAvailable": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            }
+        },
+        "labels": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "properties": {}
+        },
+        "terminationGracePeriodSeconds": {
+            "type": [
+                "integer",
+                "null"
+            ]
+        },
+        "probes": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "properties": {
+                "maincontainer": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "properties": {
+                        "livenessProbe": {
+                            "type": [
+                                "object",
+                                "null"
+                            ],
+                            "properties": {
+                                "initialDelaySeconds": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                },
+                                "periodSeconds": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                },
+                                "timeoutSeconds": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                },
+                                "failureThreshold": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "readinessProbe": {
+                            "type": [
+                                "object",
+                                "null"
+                            ],
+                            "properties": {
+                                "initialDelaySeconds": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                },
+                                "periodSeconds": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                },
+                                "timeoutSeconds": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                },
+                                "successThreshold": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                },
+                                "failureThreshold": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "podPriority": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "properties": {
+                "alarmhandler": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "properties": {
+                        "priorityClassName": {
+                            "type": [
+                                "string",
+                                "null"
+                            ]
+                        }
+                    }
+                },
+                "hooklauncher": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "properties": {
+                        "priorityClassName": {
+                            "type": [
+                                "string",
+                                "null"
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "annotations": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "properties": {}
+        },
+        "logShipper": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "properties": {
+                "storage": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "properties": {
+                        "size": {
+                            "type": [
+                                "string",
+                                "null"
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "appArmorProfile": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "properties": {
+                "type": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "localhostProfile": {
+                    "type": [
+                        "object",
+                        "string",
+                        "integer",
+                        "boolean",
+                        "array",
+                        "null"
+                    ]
+                }
+            }
+        },
+        "seccompProfile": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "properties": {
+                "type": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "localhostProfile": {
+                    "type": [
+                        "object",
+                        "string",
+                        "integer",
+                        "boolean",
+                        "array",
+                        "null"
+                    ]
+                }
+            }
+        },
+        "global": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "properties": {
+                "timezone": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            }
+        },
+        "autoScaling": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "properties": {
+                "eric-fh-alarm-handler": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "properties": {
+                        "enabled": {
+                            "type": [
+                                "boolean",
+                                "null"
+                            ]
+                        },
+                        "minReplicas": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ]
+                        },
+                        "maxReplicas": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "$defs": {
+        "topologySpreadConstraintsValue": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/topologySpreadConstraintsItemValue"
+            }
+        },
+        "topologySpreadConstraintsItemValue": {
+            "type": "object",
+            "properties": {
+                "maxSkew": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "topologyKey": {
+                    "type": "string"
+                },
+                "whenUnsatisfiable": {
+                    "type": "string",
+                    "oneOf": [
+                        {
+                            "enum": [
+                                "DoNotSchedule",
+                                "ScheduleAnyway"
+                            ]
+                        }
+                    ]
+                }
+            },
+            "required": [
+                "maxSkew",
+                "topologyKey",
+                "whenUnsatisfiable"
+            ]
+        },
+        "pdbValue": {
+            "oneOf": [
+                {
+                    "type": "string",
+                    "pattern": "^(([0-9])|([1-9][0-9])|100)%$"
+                },
+                {
+                    "type": "number"
+                }
+            ]
+        }
+    }
+}

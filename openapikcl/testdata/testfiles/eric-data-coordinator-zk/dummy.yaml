@@ -1,0 +1,54 @@
+{
+  "bandwidth": {
+    "aliquip_339": -73196139,
+    "laborum_8aa": "sed in consectetur est do"
+  },
+  "broBragentCertValidity": {
+    "overrideLeadTime": null,
+    "overrideTtl": -97013364
+  },
+  "maxClientCnxns": -63335520,
+  "metrics": {
+    "eu_0d": 78362301.23651534,
+    "consectetur_66": "consectetur",
+    "enimdd": "eiusmod",
+    "non__": true,
+    "dolor_cc3": -13437855,
+    "enabled": true
+  },
+  "network": {
+    "datacoordinatorzk": {
+      "pariatur5_": -46134580,
+      "ea48": -25850427.98328559,
+      "qui0d": "qui mollit sint cupidatat",
+      "ut0_": "et fugiat",
+      "est_0_d": "laborum ea ipsum cupidatat",
+      "magna_9b": 47037709
+    }
+  },
+  "podDisruptionBudget": {
+    "maxUnavailable": "8%"
+  },
+  "readinessProbe": {
+    "cillum_65": false,
+    "officia__2": "occaecat non"
+  },
+  "security": {
+    "ex_2": true,
+    "labore__e": "voluptate",
+    "sasl": {
+      "aute_69": -91499791.8303095,
+      "quic04": -72160123,
+      "in_df": 56779496.4362489,
+      "est_8d7": false,
+      "credentials": {
+        "ametd": "sunt ipsum velit",
+        "quisdb7": -81836032.1676415,
+        "consectetur_7e": -85575651,
+        "consectetur_7": 37973164.01101619
+      }
+    }
+  },
+  "snapRetainCount": 47167427,
+  "syncLimit": -22797574
+}

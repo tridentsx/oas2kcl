@@ -1,0 +1,227 @@
+{
+  "global": {
+    "quisc31": 70855931.05742717,
+    "log": {
+      "culpa_85a": "officia est culpa Ut",
+      "streamingMethod": "direct"
+    }
+  },
+  "ahFmConfigmap": {
+    "do_782": -78259969,
+    "sunt_5a8": false,
+    "bamMappings": []
+  },
+  "ahSnmpTrapsConfigMap": 58345498,
+  "alarms": {
+    "enabled": true,
+    "kafka": {
+      "velit1": false,
+      "eiusmod79": 32508530,
+      "esse_e65": 17651154,
+      "suntee3": -26230985,
+      "esse_d6": -83888091
+    }
+  },
+  "annotations": {
+    "proident_fe8": "do",
+    "laborum_9": 43667389.177671015
+  },
+  "appArmorProfile": {
+    "sunt_5": -79001670.80184342,
+    "fc-delete-resourceloader": {
+      "non_7": "Lorem",
+      "id60": "veniam nulla anim ut",
+      "localhostProfile": 54869392.9748711,
+      "type": -6611250.558414564
+    },
+    "fc-install-resourceloader": {
+      "deserunt7": -82424726,
+      "fugiat524": "id labore velit Lorem laborum",
+      "aute_6b8": -75208615.40788415,
+      "laboref": true,
+      "incididunt6": -96559677,
+      "aliquip_f": false,
+      "nisi_0": true
+    },
+    "fc-rollback-resourceloader": {
+      "enimd": false,
+      "type": -72060888
+    },
+    "fc-upgrade-resourceloader": {
+      "veniam_5": 82172561.47306538,
+      "localhostProfile": 70029002,
+      "type": 92667071
+    }
+  },
+  "config": {
+    "proident_9a": -64735741,
+    "iam": {
+      "proident988": "et enim officia",
+      "in_3": true
+    }
+  },
+  "currentLocation": {
+    "enim__f": "laboris sit",
+    "dolore_2": "ut aute enim in",
+    "name": 94008116.3659758
+  },
+  "eric-pm-server": {
+    "config": {
+      "cil_recording_rules": {
+        "non_de": -38177955,
+        "nonc3": -70851729.39202735,
+        "dolor8": "sed laborum incididunt",
+        "velit_b8": 4695321.117060214,
+        "groups": []
+      },
+      "recording_rules": {
+        "nostrud_": -74954775,
+        "esse18": "adipisicing anim occaecat"
+      },
+      "remote_write": []
+    },
+    "deprecatedLabels": {
+      "enabled": false
+    },
+    "replaceLabels": {
+      "Ut6_b": false,
+      "amet_dff": 4516171.5780252665
+    },
+    "service": {
+      "ipsum9": -52808490,
+      "nulla_f": "ullamco laborum ipsum in",
+      "endpoints": {
+        "aliqua71": 41353746,
+        "ullamco_59e": true,
+        "scrapeTargets": {
+          "proident_5d4": 40027642,
+          "tls": {
+            "eiusmod_320": -6048643,
+            "sed678": "amet adipisicing dolor aliquip officia",
+            "enforced": "sed ipsum ad et"
+          }
+        }
+      }
+    }
+  },
+  "fullnameOverride": -49754023.60682146,
+  "imageCredentials": {
+    "occaecat_1": "qui fugiat",
+    "pullSecret": -24242327
+  },
+  "imagePullSecrets": [],
+  "images": {
+    "est_9": false,
+    "fcresourceloader": null
+  },
+  "labels": {
+    "ut1ef": 68569844,
+    "exercitation_809": "voluptate nostrud nulla dolore enim",
+    "magnaf": 81912955
+  },
+  "logConnectionTtlMinutes": -17229924,
+  "logLevel": "nostrud",
+  "log": {
+    "sunt_6": -81856381,
+    "dolor_5": 52375737.05934495,
+    "streamingMethod": "dual"
+  },
+  "logQueueSize": "-6919266",
+  "logTimeoutSeconds": -28066470,
+  "logTransformerHost": -17593677,
+  "logTransformerNoTlsHost": 70565439.43969387,
+  "nameOverride": 84788284,
+  "networkPolicy": {
+    "mollit__c": -12835915,
+    "esse_7a": "quis non aliquip nulla ipsum",
+    "anim1d5": "sunt amet enim proident tempor",
+    "et_e9": "aliquip sunt sit id",
+    "irure_8": true
+  },
+  "nodeSelector": {
+    "non_b": false
+  },
+  "pmConfigMap": {
+    "Ut_58": false,
+    "pod_scrape_config": []
+  },
+  "podSecurityContext": {
+    "enim_f39": 4423528.780267373,
+    "supplementalGroups": []
+  },
+  "resources": {
+    "magna9df": 15535178,
+    "consectetur_": 36854445.667099476,
+    "fc-delete-resourceloader": {
+      "limits": {
+        "reprehenderit_d": "consectetur dolor mollit non",
+        "ex5f": "Ut velit ea aliquip",
+        "cpu": "irure ea consectetur veniam dolor",
+        "memory": -57722709
+      },
+      "requests": {
+        "do_b": true,
+        "proident1_7": -22492779,
+        "enim_8c1": -57370346,
+        "cillum042": true,
+        "eu9": -27681280
+      }
+    },
+    "fc-install-resourceloader": {
+      "limits": {
+        "magnaf": "consequat tempor Ut occaecat",
+        "pariatur6f": false,
+        "est_b06": -10171170.69446157,
+        "memory": 41348436.48801038
+      },
+      "requests": {
+        "dolor_ef5": "magna deserunt"
+      }
+    },
+    "fc-upgrade-resourceloader": {
+      "limits": {
+        "cpu": "ipsum laboris adipisicing sunt",
+        "memory": "nisi dolor esse laboris"
+      },
+      "requests": {
+        "id_7_": -83273382
+      }
+    }
+  },
+  "seccompProfile": {
+    "sed5": -93604568.07979105,
+    "fc-delete-resourceloader": {
+      "cupidatatd": -42818990,
+      "cupidatatc97": 4797740,
+      "cupidatat___": "deserunt"
+    },
+    "fc-install-resourceloader": {
+      "adipisicing4_2": "ea culpa",
+      "eaca": true,
+      "Lorem0_": 29780175.91690953,
+      "magna__c1": 9484819,
+      "localhostProfile": -71615239,
+      "type": 77542886
+    },
+    "fc-rollback-resourceloader": {
+      "ut_43": -46964943.05072254,
+      "localhostProfile": "velit qui Lorem tempor"
+    },
+    "fc-upgrade-resourceloader": {
+      "sint5": "ut in nisi magna Ut",
+      "sint9b": false,
+      "localhostProfile": -20698368,
+      "type": -20180046
+    }
+  },
+  "securityPolicy": {
+    "rolename": "velit"
+  },
+  "serviceAccount": {
+    "tempor3": 76692803,
+    "create": "false",
+    "name": -79684015.60382086
+  },
+  "terminationGracePeriodSeconds": "81",
+  "tolerations": []
+}

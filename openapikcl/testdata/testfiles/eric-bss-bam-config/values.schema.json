@@ -1,0 +1,916 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "properties": {
+    "global": {
+      "properties": {
+        "log": {
+          "properties": {
+            "streamingMethod": {
+              "default": "indirect",
+              "description": "The global parameter for specifying the streaming method of service logs. It can be 'indirect', 'direct', 'dual', or null. If both global.log.streamingMethod and log.streamingMethod are set to null, it will choose 'indirect' by default",
+              "type": "string",
+              "enum": ["indirect", "direct", "dual", ""]
+            }
+          }
+        }
+      }
+    },
+    "ahFmConfigmap": {
+      "properties": {
+        "bamMappings": {
+          "default": "- name: eric-sec-certm.json\n  data: |-\n    [\n        {\n            \"faultName\": \"CertMCertificateToExpire\",\n            \"vendor\": 193,\n            \"code\": 9699329,\n            \"defaultDescription\": \"The certificate will expire in [x] days and should be renewed to prevent service failure\",\n            \"defaultExpiration\": 1800,\n            \"defaultSeverity\": \"Warning\",\n            \"probableCause\": 351,\n            \"category\": \"ProcessingErrorAlarm\",\n            \"specificProblem\": \"Certificate Management, Certificate is about to Expire\"\n        },\n        {\n            \"faultName\": \"CertMTrustedCertificateToExpire\",\n            \"vendor\": 193,\n            \"code\": 9699330,\n            \"defaultDescription\": \"The trusted certificate will expire in [x] days and should be renewed to prevent service failure\",\n            \"defaultExpiration\": 1800,\n            \"defaultSeverity\": \"Warning\",\n            \"probableCause\": 351,\n            \"category\": \"ProcessingErrorAlarm\",\n            \"specificProblem\": \"Certificate Management, Trusted Certificate is about to Expire\"\n        },\n        {\n            \"faultName\": \"CertMAutomaticEnrollmentFailed\",\n            \"vendor\": 193,\n            \"code\": 9699331,\n            \"defaultDescription\": \"Automatic certificate renewal failed due to local misconfiguration or remote enrollment service denial\",\n            \"defaultExpiration\": 1800,\n            \"defaultSeverity\": \"Warning\",\n            \"probableCause\": 307,\n            \"category\": \"ProcessingErrorAlarm\",\n            \"specificProblem\": \"Certificate Management, Automatic Enrollment Failed\"\n        }\n    ]\n- name: eric-sec-sip-tls.json\n  data: |-\n    [\n     {\n          \"faultName\": \"InternalCAInternalCertificateCreationFailure\",\n          \"vendor\": 193,\n          \"code\": 10223618,\n          \"defaultSeverity\": \"Major\",\n          \"probableCause\": 302,\n          \"defaultDescription\": \"\",\n          \"specificProblem\": \"Internal CA Internal Certificate Creation Failure\",\n          \"category\": \"ProcessingErrorAlarm\"\n      }\n    ]\n- name: eric-lm-combined-server.json\n  data: |-\n    [\n      {\n        \"faultName\": \"LicenseManagerAutonomousModeActivated\",\n        \"vendor\": 193,\n        \"code\": 17301506,\n        \"defaultExpiration\": 3600,\n        \"defaultSeverity\": \"Major\",\n        \"probableCause\": 306,\n        \"category\": \"QualityOfServiceAlarm\",\n        \"specificProblem\": \"License Manager Autonomous Mode Activated\",\n        \"createAlarm\": true\n      },\n      {\n        \"faultName\": \"LicenseManagerLicenseGracePeriodActivated\",\n        \"vendor\": 193,\n        \"code\": 17301511,\n        \"defaultDescription\": \"License Key [LICENSE_KEY] belonging to License Domain [LICENSE_DOMAIN] will be deleted\",\n        \"defaultSeverity\": \"Major\",\n        \"probableCause\": 1,\n        \"category\": \"CommunicationsAlarm\",\n        \"specificProblem\": \"License Manager License Grace Period Activated\",\n        \"createAlarm\": true\n      }\n    ]",
+          "description": "",
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "ahSnmpTrapsConfigMap": {
+      "default": "{\"trapTargets\": [{\"address\":\"10.100.110.10\",\"community\":\"public\"}]}\n",
+      "description": "",
+      "type": [
+        "string",
+        "integer",
+        "number"
+      ]
+    },
+    "alarms": {
+      "properties": {
+        "enabled": {
+          "default": "true",
+          "description": "",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "enum": [
+                "true",
+                "false"
+              ],
+              "type": "string"
+            }
+          ]
+        },
+        "kafka": {
+          "properties": {
+            "host": {
+              "default": "eric-bss-kafka-proxy-http:80",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "annotations": {
+      "default": "{}",
+      "description": "",
+      "type": "object"
+    },
+    "appArmorProfile": {
+      "properties": {
+        "fc-delete-resourceloader": {
+          "properties": {
+            "localhostProfile": {
+              "default": "",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "fc-install-resourceloader": {
+          "properties": {
+            "localhostProfile": {
+              "default": "",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "fc-rollback-resourceloader": {
+          "properties": {
+            "localhostProfile": {
+              "default": "",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "fc-upgrade-resourceloader": {
+          "properties": {
+            "localhostProfile": {
+              "default": "",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "config": {
+      "properties": {
+        "iam": {
+          "properties": {
+            "claimName": {
+              "default": "groups",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "currentLocation": {
+      "properties": {
+        "name": {
+          "default": "",
+          "description": "",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "eric-pm-server": {
+      "properties": {
+        "config": {
+          "properties": {
+            "cil_recording_rules": {
+              "properties": {
+                "groups": {
+                  "default": "- name: cil\n  rules:\n    - record: cil_data_disk_low_sliding_window_ratio\n      expr: (cassandra_storage_filesystem_bytes_total - max_over_time(cassandra_storage_filesystem_usable_bytes[30m])) / cassandra_storage_filesystem_bytes_total\n    - record: cil_gc_pause_percentage\n      expr: sum by(cassandra_datacenter, cassandra_node) (rate(cassandra_jvm_gc_estimated_collection_duration_seconds_total[30s]))*100",
+                  "description": "",
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            },
+            "recording_rules": {
+              "default": "{}",
+              "description": "",
+              "type": "object"
+            },
+            "remote_write": {
+              "default": "[]",
+              "description": "",
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "deprecatedLabels": {
+          "properties": {
+            "enabled": {
+              "default": "false",
+              "description": "",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "replaceLabels": {
+          "properties": {
+            "enabled": {
+              "default": "false",
+              "description": "",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "service": {
+          "properties": {
+            "endpoints": {
+              "properties": {
+                "scrapeTargets": {
+                  "properties": {
+                    "tls": {
+                      "properties": {
+                        "enforced": {
+                          "default": "required",
+                          "description": "",
+                          "type": [
+                            "string",
+                            "integer",
+                            "number"
+                          ]
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "fullnameOverride": {
+      "default": "",
+      "description": "",
+      "type": [
+        "string",
+        "integer",
+        "number"
+      ]
+    },
+    "imageCredentials": {
+      "properties": {
+        "fcresourceloader": {
+          "properties": {
+            "registry": {
+              "properties": {
+                "imagePullPolicy": {
+                  "default": "\u003cnil\u003e",
+                  "description": "",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number",
+                    "null"
+                  ]
+                },
+                "url": {
+                  "default": "\u003cnil\u003e",
+                  "description": "",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "repoPath": {
+              "default": "\u003cnil\u003e",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "pullSecret": {
+          "default": "\u003cnil\u003e",
+          "description": "",
+          "type": [
+            "string",
+            "integer",
+            "number",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "imagePullSecrets": {
+      "default": "[]",
+      "description": "",
+      "type": "array"
+    },
+    "images": {
+      "properties": {
+        "fcresourceloader": {
+          "default": "\u003cnil\u003e",
+          "description": "",
+          "type": [
+            "string",
+            "integer",
+            "number",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "labels": {
+      "default": "{}",
+      "description": "",
+      "type": "object"
+    },
+    "logConnectionTtlMinutes": {
+      "default": "120",
+      "description": "",
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?\\d+$",
+          "type": "string"
+        }
+      ]
+    },
+    "logLevel": {
+      "default": "info",
+      "description": "",
+      "type": [
+        "string",
+        "integer",
+        "number"
+      ]
+    },
+    "log": {
+      "properties": {
+        "streamingMethod": {
+          "default": "indirect",
+          "description": "The local parameter for specifying the streaming method of service logs. It can be 'indirect', 'direct', 'dual', or null. If set to null, global.log.streamingMethod will be used to determine the streaming method",
+          "type": "string",
+          "enum": [ "indirect", "direct", "dual", "" ]
+        }
+      }
+    },
+    "logQueueSize": {
+      "default": "1000",
+      "description": "",
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?\\d+$",
+          "type": "string"
+        }
+      ]
+    },
+    "logTimeoutSeconds": {
+      "default": "5",
+      "description": "",
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?\\d+$",
+          "type": "string"
+        }
+      ]
+    },
+    "logTransformerHost": {
+      "default": "eric-log-transformer:5024",
+      "description": "",
+      "type": [
+        "string",
+        "integer",
+        "number"
+      ]
+    },
+    "logTransformerNoTlsHost": {
+      "default": "eric-log-transformer:5025",
+      "description": "",
+      "type": [
+        "string",
+        "integer",
+        "number"
+      ]
+    },
+    "nameOverride": {
+      "default": "",
+      "description": "",
+      "type": [
+        "string",
+        "integer",
+        "number"
+      ]
+    },
+    "networkPolicy": {
+      "properties": {
+        "egress": {
+          "properties": {
+            "accessLabels": {
+              "properties": {
+                "sfcPostinstall": {
+                  "default": "{}",
+                  "description": "",
+                  "type": "object"
+                },
+                "sfcPostrollback": {
+                  "default": "{}",
+                  "description": "",
+                  "type": "object"
+                },
+                "sfcPostupgrade": {
+                  "default": "{}",
+                  "description": "",
+                  "type": "object"
+                },
+                "sfcPredelete": {
+                  "default": "{}",
+                  "description": "",
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "nodeSelector": {
+      "default": "{}",
+      "description": "",
+      "type": "object"
+    },
+    "pmConfigMap": {
+      "properties": {
+        "pod_scrape_config": {
+          "default": "- scrape_interval: 10 # scrape interval in seconds\n  scrape_regex: interval1 # this regex to be present in Pod's label for custom scrapping. Example : bss.ericsson.com/scrape: \"interval1\"\n- scrape_interval: 60\n  scrape_regex: interval2",
+          "description": "",
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "podSecurityContext": {
+      "properties": {
+        "supplementalGroups": {
+          "default": "\u003cnil\u003e",
+          "description": "",
+          "type": [
+            "array",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "resources": {
+      "properties": {
+        "fc-delete-resourceloader": {
+          "properties": {
+            "limits": {
+              "properties": {
+                "cpu": {
+                  "default": "400m",
+                  "description": "",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "128Mi",
+                  "description": "",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "requests": {
+              "properties": {
+                "cpu": {
+                  "default": "40m",
+                  "description": "",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "32Mi",
+                  "description": "",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "fc-install-resourceloader": {
+          "properties": {
+            "limits": {
+              "properties": {
+                "cpu": {
+                  "default": "400m",
+                  "description": "",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "128Mi",
+                  "description": "",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "requests": {
+              "properties": {
+                "cpu": {
+                  "default": "40m",
+                  "description": "",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "32Mi",
+                  "description": "",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "fc-rollback-resourceloader": {
+          "properties": {
+            "limits": {
+              "properties": {
+                "cpu": {
+                  "default": "400m",
+                  "description": "",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "128Mi",
+                  "description": "",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "requests": {
+              "properties": {
+                "cpu": {
+                  "default": "40m",
+                  "description": "",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "32Mi",
+                  "description": "",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "fc-upgrade-resourceloader": {
+          "properties": {
+            "limits": {
+              "properties": {
+                "cpu": {
+                  "default": "400m",
+                  "description": "",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "128Mi",
+                  "description": "",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "requests": {
+              "properties": {
+                "cpu": {
+                  "default": "40m",
+                  "description": "",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "32Mi",
+                  "description": "",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "seccompProfile": {
+      "properties": {
+        "fc-delete-resourceloader": {
+          "properties": {
+            "localhostProfile": {
+              "default": "",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "fc-install-resourceloader": {
+          "properties": {
+            "localhostProfile": {
+              "default": "",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "fc-rollback-resourceloader": {
+          "properties": {
+            "localhostProfile": {
+              "default": "",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "fc-upgrade-resourceloader": {
+          "properties": {
+            "localhostProfile": {
+              "default": "",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "",
+              "description": "",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "securityPolicy": {
+      "properties": {
+        "rolename": {
+          "default": "",
+          "description": "",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "serviceAccount": {
+      "properties": {
+        "create": {
+          "default": "true",
+          "description": "",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "enum": [
+                "true",
+                "false"
+              ],
+              "type": "string"
+            }
+          ]
+        },
+        "name": {
+          "default": "\u003cnil\u003e",
+          "description": "",
+          "type": [
+            "string",
+            "integer",
+            "number",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "terminationGracePeriodSeconds": {
+      "default": "30",
+      "description": "",
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?\\d+$",
+          "type": "string"
+        }
+      ]
+    },
+    "tolerations": {
+      "default": "[]",
+      "description": "",
+      "type": "array"
+    }
+  },
+  "type": "object"
+}

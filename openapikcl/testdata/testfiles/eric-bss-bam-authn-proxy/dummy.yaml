@@ -1,0 +1,163 @@
+{
+  "annotations": {
+    "nostrud_3": -64075879.64587491
+  },
+  "appArmorProfile": {
+    "deserunt__": "sit occaecat officia esse proident",
+    "authnproxy": {
+      "localhostProfile": "aliquip nisi velit deserunt est",
+      "type": "ullamco dolor pariatur cupidatat est"
+    }
+  },
+  "authnProxy": {
+    "clientCredentialSecret": -52205014.11259981,
+    "cookieDomain": 24777749.72840309,
+    "idleSessionTimeout": -10722353
+  },
+  "config": {
+    "minimeb": true,
+    "ea_eb": false,
+    "pariatur_f": 58864947,
+    "dolor1": false
+  },
+  "global": {
+    "labore_b84": -4627431.910795599,
+    "mollitd3": "ad laborum exercitation in",
+    "consectetur_2_2": -16856027.45629491,
+    "occaecat_71": -54885405,
+    "occaecat4e": false,
+    "non_1f_": true,
+    "ea_9ef": 79757905,
+    "annotations": {
+      "nulla_5": -89959251,
+      "minim4": "aliqua magna aliquip sint laboris"
+    },
+    "fsGroup": {
+      "eu_b9": -13744992,
+      "proident_7a": "id sed laboris laborum",
+      "manual": "sit",
+      "namespace": true
+    },
+    "labels": {
+      "aliquip_964": -36134614,
+      "velit4b": true
+    },
+    "log": {
+      "quis_10b": true,
+      "ea_1": "reprehenderit consectetur",
+      "streamingMethod": "direct"
+    },
+    "nodeSelector": {
+      "laborum8b": 29983485.837924466,
+      "cupidatat_a3e": true
+    },
+    "pullSecret": null,
+    "registry": {
+      "Duis22": -16789092.706831083,
+      "culpabe1": 70225180,
+      "quisd71": "magna Ut labore"
+    },
+    "timezone": 50581939.654571354
+  },
+  "images": {
+    "tempor__6e": 83329617,
+    "qui_eae": 54225922,
+    "culpaa": "amet aute quis Lorem proident",
+    "ad3": "Excepteur incididunt"
+  },
+  "ingress": {
+    "enabled": true,
+    "fqdn": "dolor",
+    "ingressClass": 14464724,
+    "path": -200837,
+    "port": 66498941,
+    "tls": {
+      "veniam2e": 27574677.99737902,
+      "sint_a": false
+    }
+  },
+  "labels": {
+    "in1f2": 94058940.74724475,
+    "ullamco_abd": "veniam laborum id",
+    "quis370": "cupidatat"
+  },
+  "nameOverride": -57836136.560908936,
+  "networkPolicy": {
+    "sint_15": "consequat reprehenderit ut magna",
+    "cupidatat8_": "culpa laborum non",
+    "sunt_e_": "incididunt",
+    "egress": {
+      "ea__b": "ullamco tempor incididunt",
+      "nisi_bf": 8113500,
+      "Duisd": 94653609.80198753,
+      "accessLabels": {
+        "ad_59": true,
+        "dolorc1": "dolor"
+      }
+    },
+    "enabled": true
+  },
+  "nodeSelector": {
+    "sed_66": 78885948,
+    "ad773": -52871304,
+    "amet257": "ipsum Duis",
+    "auteb0": false
+  },
+  "podDisruptionBudget": {
+    "velit22": -96380905.95069943
+  },
+  "probes": {
+    "laboris_100": false,
+    "authnproxy": {
+      "livenessProbe": {
+        "ullamco7": 39680236.24723321,
+        "utd": "in sint do exercitation laborum",
+        "dolor_0": 10990021,
+        "failureThreshold": "8497",
+        "initialDelaySeconds": -86673172,
+        "periodSeconds": "30300515"
+      },
+      "startupProbe": {
+        "adipisicing5": -35867597.56694593
+      }
+    }
+  },
+  "replicaCount": 50121303,
+  "resources": {
+    "et68": true,
+    "occaecatfa3": -92313746,
+    "authnproxy": {
+      "voluptate_a9": false,
+      "velit91": 51843569.705536306,
+      "dolord4": -91142111,
+      "officiad7f": 63620250.72682628
+    }
+  },
+  "seccompProfile": {
+    "doloreb": 58835999.40427548,
+    "cupidatat0": true,
+    "in_a1": 4020718.524193302,
+    "utd": "laborum"
+  },
+  "securityPolicy": {
+    "labore_4ac": "elit ad aute pariatur consequat",
+    "inb94": 26003551,
+    "in0b": -17630873.183324873,
+    "rolename": "dolore exercitation ipsum"
+  },
+  "service": {
+    "app": {
+      "labelName": "Duis"
+    },
+    "port": 69638476,
+    "tls": {
+      "ea9a3": 66443442.71974215,
+      "estb7e": -90203125,
+      "in_0": 27799196.531865984,
+      "velit1": -87729270,
+      "Excepteur50e": true
+    }
+  },
+  "terminationGracePeriodSeconds": -22251,
+  "tolerations": []
+}

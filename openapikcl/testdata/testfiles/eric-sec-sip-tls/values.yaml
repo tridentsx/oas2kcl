@@ -1,0 +1,474 @@
+## Default values for eric-sec-sip-tls.
+## This is a YAML-formatted file.
+## Declare variables to be passed into your templates.
+
+# global:
+#  annotations: {}
+#  labels: {}
+#  security:
+#    policyBinding:
+#      create: false
+#    policyReferenceMap:
+#      default-restricted-security-policy: default-restricted-security-policy
+#    tls:
+#      enabled: true
+#      trustedInternalRootCa:
+#        secret: eric-sec-sip-tls-trusted-root-cert
+#  # DR-D1123-134 - Role kind for security policy
+#  securityPolicy:
+#    rolekind: ""  # possible values: "ClusterRole", "Role", ""
+#  # pullSecret, the secret resource name used for authenticating towards docker registry where images are pulled
+#  pullSecret:
+#  # DR-D1125-029
+#  # sets the ".spec.ipFamilies" field K8s service to one of the following values
+#  # Note: this parameter also sets .spec.ipFamilyPolicy to "SingleStack" if either IPv4 or IPv6 is set
+#  #   or to "PreferDualStack" if default empty is used.
+#  # - default empty: Cluster IP service is allocated based on the default cluster address family
+#  #   (single-stack on either address family or from both IPv4 and IPv6 service IP ranges).
+#  # - IPv4: ClusterIP is allocated from an IPv4 service IP range.
+#  # - IPv6: ClusterIP is allocated from an IPv6 service IP range.
+#  internalIPFamily:
+#  registry:
+#    # Docker registry url
+#    url: armdocker.rnd.ericsson.se
+#    # imagePullPolicy, desired policy under which condition the images are pulled from registry
+#    imagePullPolicy: IfNotPresent
+#    # repoPath, image repository path
+#    repoPath:
+#  # nodeSelector, to influence the Pod placement decision and instruct Kubernetes to schedule a Pod on certain node(s)
+#  nodeSelector: {}
+#  # DR-D1123-136 - fsGroup, to set up the proper gid value for accessing mounted persistent data (default is 10000 if not defined)
+#  fsGroup:
+#    # 'manual' Sets a fsGroup ID for all services. Enforce a specific value (this has the highest precedence)
+#    manual: 15000 {range='0..max', null} (default=null)
+#    # 'namespace' The value defined is utilized according to the settings established by the cluster administrator.
+#    # This is not evaluated when global.fsGroup.manual is set (second highest precedence)
+#    namespace: true {values='true', 'false', null} (default=null)
+#  # DR-D1123-135 - When the global ID for supplementalGroups is set, and both global and local values are provided,
+#  # the global values are combined with the local values. If no local settings are given, the global values will be used as-is.
+#  podSecurityContext:
+#    supplementalGroups:  # {value='0..max'} (default=null)
+#  timezone: UTC
+#  networkPolicy:
+#    enabled: false
+#  featureGates:
+#    # turn on or off schema validation of Helm parameter values
+#    helmSchemaValidation: false
+#  log:
+#    # Supported values direct, indirect or dual
+#    streamingMethod: direct
+#  tolerations: []
+
+# # Name of the kubernetes objects deployed from this Helm chart
+# nameOverride:
+# # Database backend configurations
+# persistence:
+#  type:
+
+imageCredentials:
+  ## pullSecret, the secret resource name used for authenticating towards docker registry where images are pulled
+  ## overrides the global value when set
+  pullSecret:
+  repoPath:
+  registry:
+    ## url, service specific Docker registry url, overrides the global value when set
+    url:
+    ## imagePullPolicy, service specific policy under which condition the images are pulled from registry,
+    ## overrides the global value when set
+    imagePullPolicy:
+  sip:
+    # see default in eric-product-info.yaml
+    repoPath:
+    registry:
+      ## url, service specific Docker registry url, overrides imageCredentials.registry.url
+      ## and the global value when set
+      url:
+      ## imagePullPolicy, service specific policy, overrides imageCredentials.registry.imagePullPolicy
+      ## and the global value when set
+      imagePullPolicy:
+  supervisor:
+    # see default in eric-product-info.yaml
+    repoPath:
+    registry:
+      url:
+      imagePullPolicy:
+  hooklauncher:
+    # see default in eric-product-info.yaml
+    registry:
+      url:
+      imagePullPolicy:
+    repoPath:
+
+updateStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 50%
+    maxSurge: 25%
+
+images:
+  sip:
+    name: eric-sec-sip-tls-main
+    tag: 12.1.0-28
+  supervisor:
+    name: eric-sec-sip-tls-supervisor
+    tag: 12.1.0-28
+
+## replicas, number of SIP-TLS pod instances. Only one of them is processing and watching CRs.
+replicaCount: 2
+
+affinity:
+  podAntiAffinity: "soft"
+  topologyKey: "kubernetes.io/hostname"
+
+## podDisruptionBudget, enables workload to be able to properly deal with voluntary disruptions
+## applicable when replicas greater than 1, parameters are mutually exclusive
+podDisruptionBudget:
+  minAvailable: 1
+  maxUnavailable:
+
+resources:
+  sip-tls:
+    requests:
+      memory: "200Mi"
+      cpu: "100m"
+      ephemeral-storage:
+    limits:
+      memory: "400Mi"
+      cpu: "1000m"
+      ephemeral-storage:
+  sip-tls-supervisor:
+    requests:
+      memory: "200Mi"
+      cpu: "100m"
+      ephemeral-storage:
+    limits:
+      memory: "400Mi"
+      cpu: "300m"
+      ephemeral-storage:
+  # Logshipper resource values are based on a measurement.
+  # Please check SIP-TLS User Guide, section Configuration Parameters, for more information.
+  logshipper:
+    requests:
+      memory: "20Mi"
+      cpu: "14m"
+      ephemeral-storage:
+    limits:
+      memory: "30Mi"
+      cpu: "20m"
+      ephemeral-storage:
+  hooklauncher:
+    requests:
+      memory: "50Mi"
+      cpu: "100m"  # higher than hard coded defaults in hooklauncher templates
+      ephemeral-storage: "100Mi"
+    limits:
+      memory: "100Mi"
+      cpu: "300m"  # higher than hard coded defaults in hooklauncher templates
+      ephemeral-storage: "100Mi"
+
+## Probes configuration
+probes:
+  sip-tls:
+    livenessProbe:
+      initialDelaySeconds: 0
+      timeoutSeconds: 5
+      periodSeconds: 10
+      failureThreshold: 3
+    readinessProbe:
+      initialDelaySeconds: 0
+      timeoutSeconds: 5
+      periodSeconds: 10
+      successThreshold: 1
+      failureThreshold: 3
+    startupProbe:
+      initialDelaySeconds: 0
+      timeoutSeconds: 5
+      periodSeconds: 10
+      failureThreshold: 3
+  sip-tls-supervisor:
+    livenessProbe:
+      initialDelaySeconds: 0
+      timeoutSeconds: 5
+      periodSeconds: 10
+      failureThreshold: 5
+    readinessProbe:
+      initialDelaySeconds: 0
+      timeoutSeconds: 5
+      periodSeconds: 10
+      successThreshold: 1
+      failureThreshold: 3
+    startupProbe:
+      initialDelaySeconds: 0
+      timeoutSeconds: 5
+      periodSeconds: 10
+      failureThreshold: 3
+  logshipper:
+    livenessProbe:
+      initialDelaySeconds: 180
+      timeoutSeconds: 10
+      periodSeconds: 10
+      failureThreshold: 3
+
+## Tolerations to influence scheduling decisions made by Kubernetes scheduler
+## NOTE: This is the service level tolerations that will be merged
+## with the global tolerations. The merge semantics can be found in DR-D1120-061-AD.
+tolerations:
+  sip-tls:
+  ## If SIP-TLS is deployed as a single replica, it is mandatory to use the following tolerations,
+  ## with a suitable tolerationSeconds value (recommended: 0)
+  #  - key: node.kubernetes.io/not-ready
+  #    operator: Exists
+  #    effect: NoExecute
+  #    tolerationSeconds: 0
+  #  - key: node.kubernetes.io/unreachable
+  #    operator: Exists
+  #    effect: NoExecute
+  #    tolerationSeconds: 0
+  hooklauncher:
+
+internalCertificate:
+  ## The time in seconds that certificates are valid
+  ## The value must be in quotes as a string to prevent reflection in Helm templating.
+  ## For instance, a large integer value could appear in E notation,
+  ## which is not valid for SIP-TLS code.
+  validLifetimeSeconds: "604800"
+
+  ## The certificate renewal threshold as a ratio relative to validLifetimeSeconds
+  ## The renewal time is calculated by multiplying validLifetimeSeconds by renewalThresholdRatio
+  ## E.g. with default values the certificate would be renewed after 544320s (604800s*0.9) at the latest
+  renewalThresholdRatio: 0.9
+
+  ## The Kubernetes cluster domain that gets populated to Subject Alternative Name
+  clusterDomain: cluster.local
+
+  # Applying changes to these configuration values do not trigger immediate certificate renewal
+  privatekey:
+    # Supported values: ECDSA, Ed25519, RSA
+    # Only applicable if cert-manager is enabled
+    algorithm: ECDSA
+    # If algorithm is set to RSA, valid values are 2048, 4096 or 8192, and will default to 2048 if not specified.
+    # If algorithm is set to ECDSA, valid values are 256, 384 or 512, and will default to 256 if not specified.
+    # If algorithm is set to Ed25519, Size is ignored. No other values are allowed.
+    # Only applicable if cert-manager is enabled
+    size: 256
+    # Supported values: pkcs1, pkcs8
+    encoding: pkcs8
+
+## Possible values: debug, info, error
+logLevel: info
+
+service:
+  endpoints:
+    metrics:
+      tls:
+        # - If 'optional': HTTP only
+        # - If 'required': HTTPS only
+        # For metrics we won't have both HTTP and HTTPS at same time
+        # options: 'optional' or 'required'
+        enforced: required
+        verifyClientCertificate: required
+    yang:
+      tls:
+        # - If 'optional': HTTP and HTTPS
+        # - If 'required': HTTPS only
+        ## If 'global.security.tls.enabled' is false, then both these options are ignored.
+        ## In this case, the server will only accept HTTP requests.
+        enforced: required
+        verifyClientCertificate: required
+
+## If false, metrics will not be scraped
+metrics:
+  enabled: true
+
+pm:
+  serviceName: eric-pm-server
+
+keyManagement:
+  serviceAccountNameForCredentials: eric-sec-key-management-admin
+  hostname: eric-sec-key-management
+  port: 8200
+  ## Configuration parameters for use with the KMS Operator
+  customObject:
+    enabled: true
+    replicaCount: 3
+    resources:
+      ## The flavor that represents the required resource requests and limits for each KMS Instance replica
+      flavor: "default"
+      ## The requested volume size for the KMS Configuration data and client data for each KMS instance
+      persistentVolumeClaim:
+        size: 1G
+
+tracemalloc:
+  enabled: false
+
+supervisor:
+  ## How much time later supervisor should check for status of watchdog certificate and KMS after startup
+  ## (i.e. when to start to send alarm and deploy the emergency certificates upon failure)
+  startupDelaySeconds: 600
+  ## How much longer (in seconds) are the emergency certificates valid than their original counterpart.
+  ## The minimum recommended value is 15778800 (half year).
+  ## The value must be in quotes as a string to prevent reflection in Helm templating.
+  ## For instance, a large integer value could appear in E notation,
+  ## which is not valid for SIP-TLS code.
+  emergencyTtl: "15778800"
+  ## Sets the threshold (in seconds) for recovering the certificates after the emergency certificates were deployed
+  ## and the faulty situation was fixed. Only those certificates will be recovered which are scheduled for renewal to
+  ## later than defined by this threshold value. For the others, the emergency certificates will stay in place
+  ## as they will be renewed automatically in less time than this threshold
+  recoveryThreshold: 3600
+  ## The time-to-live of the watchdog certificate in seconds. This certificate is used internally by SIP-TLS
+  ## to verify that the certificate issuance/renewal is working properly
+  ## If cert-manager is used, this value should be at least 3600s
+  wdcTtl: 1800
+
+## Alarm Handler for fault indication
+alarmHandler:
+  hostname: eric-fh-alarm-handler
+  ## Use 6006 when enabling tls. Use 6005 when disabling tls
+  port: 6006
+  tls:
+    enabled: true
+
+## log has precedence over global.log
+log:
+  ## Supported values: direct, indirect, dual
+  streamingMethod: null
+
+## Log Shipper (as a sidecar) configuration
+## Only in effect when:
+##    global.log.streamingMethod is set to dual or direct
+##    log.streamingMethod is set to dual or direct
+## Local configurations has precedence over global.
+## Log Shipper also requires Log Transformer
+logShipper:
+  logLevel: "info"
+  storage:
+    path: "/logs"
+    size: "500Mi"
+    medium: "Ephemeral"
+  input:
+    files:
+      - enabled: true
+        paths:
+          - "sip-tls.log"
+          - "sip-tls-supervisor.log"
+        parsers:
+          - "json"
+  output:
+    logTransformer:
+      enabled: true
+      host: eric-log-transformer
+
+## Additional labels to be attached by an Application Design Engineer or an Application Deployment Engineer
+labels: {}
+
+## Additional annotations to be attached by an Application Design Engineer or an Application Deployment Engineer
+annotations: {}
+
+## Additional nodeSelector values to be attached by an Application Design Engineer or an Application Deployment Engineer
+nodeSelector:
+  sip-tls: {}
+  hooklauncher: {}
+
+## Additional Pod Topology Spread Constraints values to be attached by an Application Design Engineer or an Application Deployment Engineer
+topologySpreadConstraints: []
+
+## terminationGracePeriodSeconds, time duration after process termination before they are forcibly killed
+terminationGracePeriodSeconds: 5
+
+# Pod priority configuration for deployment
+podPriority:
+  # No priority set by default
+  sip-tls:
+    priorityClassName: ""
+  hooklauncher:
+    priorityClassName: ""
+
+networkPolicy:
+  enabled: true
+
+bandwidth:
+  maxEgressRate: 10M
+
+# DR-D1123-127 The AppArmor profile will be present as annotations on a pod level
+appArmorProfile:
+  # The setting applies to every container when the container name is omitted
+  type: ""  # { choice='unconfined, runtime/default, localhost, "" ' } [ default="" ]
+  # localhostProfile:  # profiles/apparmorprofile.json # @conditional: apparmorProfile.type= 'localhost'
+  # The setting can be applied to specific containers below
+  sip-tls:
+    type: ""  # { choice='unconfined, runtime/default, localhost, "" ' } [ default="" ]
+    # localhostProfile:  # profiles/apparmorprofile.json # @conditional: apparmorProfile.sip-tls.type= 'localhost'
+  sip-tls-supervisor:
+    type: ""  # { choice='unconfined, runtime/default, localhost, "" ' } [ default="" ]
+    # localhostProfile:  # profiles/apparmorprofile.json # @conditional: apparmorProfile.sip-tls-supervisor.type= 'localhost'
+  logshipper:
+    type: ""  # { choice='unconfined, runtime/default, localhost, "" ' } [ default="" ]
+    # localhostProfile:  # profiles/apparmorprofile.json # @conditional: apparmorProfile.logshipper.type= 'localhost'
+  hooklauncher:
+    type: ""  # { choice='unconfined, runtime/default, localhost, "" ' } [ default="" ]
+    # localhostProfile:  # profiles/apparmorprofile.json # @conditional: apparmorProfile.hooklauncher.type= 'localhost'
+
+# DR-D1123-128 The Seccomp profile will be present in security context on a container level
+seccompProfile:
+  # The setting applies to every container when the container name is omitted
+  type: ""  # { choice='Unconfined, RuntimeDefault, Localhost, "" ' } [ default="" ]
+  # localhostProfile:  # profiles/seccompprofile.json # @conditional: seccompProfile.type= 'Localhost'
+  # The setting can be applied to specific containers below
+  sip-tls:
+    type: ""  # { choice='Unconfined, RuntimeDefault, Localhost, "" ' } [ default="" ]
+    # localhostProfile:  # profiles/seccompprofile.json # @conditional: seccompProfile.sip-tls.type= 'Localhost'
+  sip-tls-supervisor:
+    type: ""  # { choice='Unconfined, RuntimeDefault, Localhost, "" ' } [ default="" ]
+    # localhostProfile:  # profiles/seccompprofile.json # @conditional: seccompProfile.sip-tls-supervisor.type= 'Localhost'
+  logshipper:
+    type: ""  # { choice='Unconfined, RuntimeDefault, Localhost, "" ' } [ default="" ]
+    # localhostProfile:  # profiles/seccompprofile.json # @conditional: seccompProfile.logshipper.type= 'Localhost'
+  hooklauncher:
+    type: ""  # { choice='Unconfined, RuntimeDefault, Localhost, "" ' } [ default="" ]
+    # localhostProfile:  # profiles/seccompprofile.json # @conditional: seccompProfile.hooklauncher.type= 'Localhost'
+
+# DR-D1123-135 - A set of local supplementalGroups values
+# podSecurityContext:
+#  supplementalGroups:  # {value='0..max'} (default=null)
+
+# DR-D1123-134 - Role name for security policy
+securityPolicy:
+  sip-tls:
+    rolename: eric-sec-sip-tls
+  hooklauncher:
+    rolename: eric-lcm-smart-helm-hooks
+
+certmanager:
+  # Issuer name of trusted root CA
+  issuer: ""
+  # Kind of trusted root CA. Supported values: Issuer, GoogleCASIssuer, AWSPCAIssuer, KMSIssuer
+  kind: "Issuer"
+  # Group of trusted root CA. Supported values: cert-manager.io, cas-issuer.jetstack.io, awspca.cert-manager.io, cert-manager.skyscanner.net
+  group: "cert-manager.io"
+
+# It should not be changed unless application explicitly set it to false if not compliant with DR-D1123-133
+multipleKeysInSecrets:
+  enabled: true
+
+# Collection of SIP-TLS features
+# Added based on the consideration to keep in-line with CERTM Helm chart parameters
+# CERTM uses features.yang.enabled too to enable its Yang-based Northbound Interface
+features:
+  # Yang-based Northbound Interface feature configuration
+  yang:
+    # Enable Yang-based Northbound Interface feature, false by default
+    enabled: false
+    # Parameters for the current CM Yang Provider in the cluster
+    # These two are needed only because CM Yang Provider CA secret used by the Yang server is assembled from these values.
+    cmyp:
+      hostname: eric-cm-yang-provider
+      caSecretSuffix: -ca-secret
+    # CM Mediator related configuration
+    cmm:
+      hostname: eric-cm-mediator
+      caSecretSuffix: -tls-client-ca-secret
+      # Use 5004 when enabling tls. Use 5003 when disabling tls
+      port: 5004
+      tls:
+        enabled: true

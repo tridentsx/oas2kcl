@@ -1,0 +1,866 @@
+# Default values for eric-message-bus-kf
+
+# If specified, allows the overriding of the name of all Kubernetes resources in the Message Bus KF service
+#fullnameOverride:
+
+# The number of brokers
+replicaCount: 3
+
+# Additional labels allow a list of key/values to be appended to the list of labels of the resource object.
+labels: {}
+
+# The available Message Bus KF pods required during voluntary disruption.
+podDisruptionBudget: {}
+  # Select either one of below parameters with your expected values.
+# maxUnavailable: 1
+# minAvailable: 2
+# Whether Multi-AG Functionality is enabled or not
+enableMultiAppGroup: false
+# List of Kafka Application Groupss managed by this deployment. Multiple AGs can be configured.
+appGroups:
+# Name of the AG. This name must be unique within a Kafka cluster.
+#- name: "AG1"
+# Override StatefulSet name. Never set this for new deployments.
+# It should only be set when enabling multiDC as part of an upgrade.
+#  statefulsetNameOverride: "eric-data-message-bus-kf"
+# Number of Pods in the AG. This setting overrides replicaCount.
+#  replicaCount: 2
+updateStrategy:
+  # Update Strategy
+  type: "RollingUpdate"
+
+#global:
+#   # Global configuration parameter to enable/disable Network Policy
+#   networkPolicy:
+#     enabled: false
+#   log:
+#     streamingMethod: null # Supported values: direct, indirect, dual
+#   logShipper: # mandatory to set global.logShipper.deployment.type as sidecar
+#     deployment:
+#       type: "sidecar"
+#       model:  # Supported values ["static", ""]
+#   hooklauncher:
+#     executor: service
+#     executorCharts: []
+#   Possible values are: IPv4, IPv6
+#   internalIPFamily:
+#   # The Secret resource name to use for authenticating towards docker registry when pulling the image
+#   pullSecret: armdocker_secret_name
+#   registry:
+#      # Global image registry
+#      url: armdocker.rnd.ericsson.se
+#   # timezone setting.
+#   timezone: UTC
+#   security:
+#     tls:
+#       enabled: true
+#     sasl:
+#       enabled: false
+#   securityPolicy:
+#     rolekind: ""  # possible values: "ClusterRole", "Role", ""
+#   fsGroup:
+#     manual: 10000
+#     namespace: true
+#   nodeSelector:
+## DR1120-061 Tolerations to influence scheduling decisions made by Kubernetes scheduler
+#   tolerations: []
+
+
+productInfo:
+  # R-State of the product. R State should match helm chart version (3.1.0 -> R2A)
+  # To automate it when packaging the helm chart rstate can be generated
+  # and below value replaced with correct R-State
+  rstate: "RSTATE"
+
+# A list of key/values to be appended to the list of user defined annotations
+annotations: {}
+
+## Tolerations to influence scheduling decisions made by Kubernetes scheduler
+tolerations:
+  messagebuskf: []
+  hooklauncher: []
+terminationGracePeriodSeconds: 30
+
+imageCredentials:
+  repoPath:
+  messagebuskf:
+    registry:
+      # Docker registry url. Overrides global.registry.url
+      url:
+      # Message Bus KF container images pull Policy
+      imagePullPolicy:
+    # Docker repository path
+    repoPath:
+  # The Secret resource name to use for authenticating towards docker registry when pulling the image
+  # pullSecret: armdocker_secret_name
+  metricsexporter:
+    registry:
+      # Docker registry url. Overrides global.registry.url
+      url:
+      # container images pull Policy
+      imagePullPolicy:
+    # Docker repository path
+    repoPath:
+  jmxexporter:
+    registry:
+      url:
+      imagePullPolicy:
+    repoPath:
+  hooklauncher:
+    registry:
+      url:
+      imagePullPolicy:
+    repoPath:
+  kafkaOperator:
+    registry:
+      # Docker registry url. Overrides global.registry.url
+      url:
+      # Message Bus KF Strimzi Operator container images pull Policy
+      imagePullPolicy:
+    # Docker repository path
+    repoPath: "proj-adp-message-bus-kf-drop"
+# images:
+#   messagebuskf:
+#     # Docker image name of the Message Bus KF image
+#     name: eric-data-message-bus-kf
+#     # Docker image tag
+#     tag: "3.2.0-35"
+#   jmxexporter:
+#     # Docker image name of the JMX exporter image
+#     name: eric-data-message-bus-kf-jmx-exporter
+#     # The image tag of the jmx exporter
+#     tag: 1.14.9
+#   logshipper:
+#     name: "eric-log-shipper"
+#     tag: "6.0.0-17"
+
+#Probes:
+#  failureThreshold: Minimum consecutive failures for the probe to be considered failed after having succeeded.
+#  initialDelaySeconds: Number of seconds after the container has started before liveness or readiness probes are initiated.
+#  periodSeconds: How often (in seconds) to perform the probe.
+#  successThreshold: Minimum consecutive successes for the probe to be considered successful after having failed.
+#  timeoutSeconds: Number of seconds after which the probe times out.
+
+probes:
+  messagebuskf:
+    readinessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 60
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 15
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 60
+      periodSeconds: 30
+      successThreshold: 1
+      timeoutSeconds: 15
+  jmxexporter:
+    readinessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 20
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 15
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 60
+      periodSeconds: 30
+      successThreshold: 1
+      timeoutSeconds: 15
+  logshipper:
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 300
+      periodSeconds: 30
+      successThreshold: 1
+      timeoutSeconds: 15
+  metricsexporter:
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 15
+      periodSeconds: 15
+      successThreshold: 1
+      timeoutSeconds: 15
+    readinessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 5
+      periodSeconds: 15
+      successThreshold: 1
+      timeoutSeconds: 15
+
+# MBKF uses Logshipper 10.3.0 which is aligned with DR-1120-012AD, DR-1120-014AD - Readiness probe is no longer supported in LS side car since 5.5.0
+# livenessProbe:
+#   logshipper:
+#     initialDelaySeconds: 300
+#     timeoutSeconds: 15
+#     periodSeconds: 30
+#     successThreshold: 1
+#     failureThreshold: 3
+
+
+resources:
+  checkzkready:
+    requests:
+      cpu: "500m"
+      memory: "512Mi"
+      # Support ephemeral-storage parameter, no default value.
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions.
+      ephemeral-storage:
+    limits:
+      cpu: "1"
+      memory: "3Gi"
+      # Support ephemeral-storage parameter, no default value.
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions.
+      ephemeral-storage:
+  messagebuskf:
+    requests:
+      # This is the min CPU setting at startup
+      cpu: "1"
+      # This is the min Memory setting at startup
+      memory: "1Gi"
+      # Support ephemeral-storage parameter, no default value.
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions.
+      ephemeral-storage:
+    limits:
+      # This the maximum cpu setting that can be requested
+      cpu: "2"
+      # This is the max memory setting that can be requested
+      memory: "6Gi"
+      # Support ephemeral-storage parameter, no default value.
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions.
+      ephemeral-storage:
+    jvm:
+      initialMemoryAllocationPercentage: 50
+      smallMemoryAllocationMaxPercentage: 70
+      largeMemoryAllocationMaxPercentage: 50
+  jmxexporter:
+    requests:
+      # CPU resources
+      cpu: "500m"
+      # Memory resources. This should be twice as big as the heap
+      memory: "512Mi"
+      # Support ephemeral-storage parameter, no default value.
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions.
+      ephemeral-storage:
+    limits:
+      # CPU resources limit
+      cpu: "1"
+      # Memory resources limit. This should be twice as big as the heap
+      memory: "1Gi"
+      # Support ephemeral-storage parameter, no default value.
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions.
+      ephemeral-storage:
+    jvm:
+      initialMemoryAllocationPercentage: 50
+      smallMemoryAllocationMaxPercentage: 70
+      largeMemoryAllocationMaxPercentage: 50
+  logshipper:
+    requests:
+      memory: "50Mi"
+      cpu: "50m"
+      # Support ephemeral-storage parameter, no default value.
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions.
+      ephemeral-storage:
+    limits:
+      memory: "100Mi"
+      cpu: "100m"
+      # Support ephemeral-storage parameter, no default value.
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions.
+      ephemeral-storage:
+  metricsexporter:
+    requests:
+      cpu: "100m"
+      memory: "8Mi"
+      # Support ephemeral-storage parameter, no default value.
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions.
+      ephemeral-storage:
+    limits:
+      cpu: "200m"
+      memory: "32Mi"
+      # Support ephemeral-storage parameter, no default value.
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions.
+      ephemeral-storage:
+  hooklauncher:
+    requests:
+      memory: "50Mi"
+      cpu: "500m"
+      ephemeral-storage: "100Mi"
+    limits:
+      memory: "100Mi"
+      cpu: "700m"
+      ephemeral-storage: "100Mi"
+  kafkaOperator:
+    limits:
+      memory: 384Mi
+      cpu: 1
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions.
+      ephemeral-storage: "100Mi"
+    requests:
+      memory: 384Mi
+      cpu: 200m
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions.
+      ephemeral-storage: "100Mi"
+  flavors:
+    - name: micro
+      kafka:
+        cpu:
+          request: "200m"
+          limit: "500m"
+        memory:
+          request: "256Mi"
+          limit: "512Mi"
+      topicOperator:
+        cpu:
+          request: "200m"
+          limit: "500m"
+        memory:
+          request: "256Mi"
+          limit: "512Mi"
+      userOperator:
+        cpu:
+          request: "200m"
+          limit: "500m"
+        memory:
+          request: "256Mi"
+          limit: "512Mi"
+      tlsSidecar:
+        cpu:
+          request: "200m"
+          limit: "500m"
+        memory:
+          request: "256Mi"
+          limit: "512Mi"
+      cruiseControl:
+        cpu:
+          request: "200m"
+          limit: "500m"
+        memory:
+          request: "256Mi"
+          limit: "512Mi"
+      zookeeper:
+        cpu:
+          request: "200m"
+          limit: "500m"
+        memory:
+          request: "256Mi"
+          limit: "512Mi"
+      mirrormaker2:
+        cpu:
+          request: "200m"
+          limit: "500m"
+        memory:
+          request: "256Mi"
+          limit: "512Mi"
+      zkBRAgent:
+        cpu:
+          request: "200m"
+          limit: "500m"
+        memory:
+          request: "256Mi"
+          limit: "512Mi"
+    - name: small
+      kafka:
+        cpu:
+          request: "1"
+          limit: "2"
+        memory:
+          request: "512Mi"
+          limit: "1Gi"
+      topicOperator:
+        cpu:
+          request: "1"
+          limit: "2"
+        memory:
+          request: "512Mi"
+          limit: "1Gi"
+      userOperator:
+        cpu:
+          request: "1"
+          limit: "2"
+        memory:
+          request: "512Mi"
+          limit: "1Gi"
+      tlsSidecar:
+        cpu:
+          request: "1"
+          limit: "2"
+        memory:
+          request: "512Mi"
+          limit: "1Gi"
+      cruiseControl:
+        cpu:
+          request: "1"
+          limit: "2"
+        memory:
+          request: "512Mi"
+          limit: "1Gi"
+      zookeeper:
+        cpu:
+          request: "1"
+          limit: "2"
+        memory:
+          request: "512Mi"
+          limit: "1Gi"
+      mirrormaker2:
+        cpu:
+          request: "1"
+          limit: "2"
+        memory:
+          request: "512Mi"
+          limit: "1Gi"
+      zkBRAgent:
+        cpu:
+          request: "1"
+          limit: "2"
+        memory:
+          request: "512Mi"
+          limit: "1Gi"
+    - name: medium
+      kafka:
+        cpu:
+          request: "2"
+          limit: "3"
+        memory:
+          request: "1Gi"
+          limit: "2Gi"
+      topicOperator:
+        cpu:
+          request: "2"
+          limit: "3"
+        memory:
+          request: "1Gi"
+          limit: "2Gi"
+      userOperator:
+        cpu:
+          request: "2"
+          limit: "3"
+        memory:
+          request: "1Gi"
+          limit: "2Gi"
+      tlsSidecar:
+        cpu:
+          request: "2"
+          limit: "3"
+        memory:
+          request: "1Gi"
+          limit: "2Gi"
+      cruiseControl:
+        cpu:
+          request: "2"
+          limit: "3"
+        memory:
+          request: "1Gi"
+          limit: "2Gi"
+      zookeeper:
+        cpu:
+          request: "2"
+          limit: "3"
+        memory:
+          request: "1Gi"
+          limit: "2Gi"
+      mirrormaker2:
+        cpu:
+          request: "2"
+          limit: "3"
+        memory:
+          request: "1Gi"
+          limit: "2Gi"
+      zkBRAgent:
+        cpu:
+          request: "2"
+          limit: "3"
+        memory:
+          request: "1Gi"
+          limit: "2Gi"
+
+logShipper:
+  storage:
+    path: "/logs"
+    size: "500Mi"
+    medium: "Ephemeral"
+  input:
+    files:
+      - enabled: true
+        buffer:
+          maxSize: "64k"
+        paths:
+          - "check-zk-ready.log"
+          - "eric-data-message-bus-kf.log"
+          - "metricsexporter.log"
+          - "jmxexporter.log"
+        parsers:
+          - "json"
+  output:
+    logTransformer:
+      host: eric-log-transformer
+
+jmx:
+  # If set to true, enables the monitoring of Java Management Extensions (JMX) using the PM Server Microservice. To ensure the monitoring metrics can be viewed, deploy the PM Server service
+  enabled: false
+  # Message Bus KF provides JMX metrics on this port
+  kafkaPort: 7072
+  # JMX exporter scrapes the metrics and makes them available in text format, exposed on this port
+  servicePort: 9072
+  # Uses default rule set in JMX container which allows scraping of all metrics in a default format
+  rules: "default"
+  # Toggle to keep open or close localPort. Default to true to keep previous behavior.
+  enableRemote: true
+  # JMX Exporter Local Port
+  localPort: 7071
+  # JVM OPTs for JMX exporter
+  # It is not recommended for JVM heap size setting (i.e. -Xmx256m) use resources.jmxexporter.jvm instead.
+  # support for -Xmx and -Xms will be deprecated soon.
+  # Use resources.jmxexporter.jvm for setting -Xmx and -Xms instaed.
+  # If -Xmx or/and -Xms is set then resources.jmxexporter.jvm would not take effect.
+  jvmOpt: ""
+
+metricsexporter:
+  ## If false, metricsexporter will not be installed
+  ## It will only be enabled if metricsexporter.enabled is also true.
+  enabled: false
+  port: 9087
+
+# The directory where Message Bus KF log data is kept
+dataDirectory: "/opt/kafka/data"
+logSubPath: "logs"
+# Can specify labels for directing node assignment. Format - label: value
+nodeSelector: {}
+
+## DR-D1123-135 - When the global ID for supplementalGroups is set, and both global and local values are provided,
+## the global values are combined with the local values. If no local settings are given, the global values will be used as-is.
+#  podSecurityContext:
+## supplementalGroups: null # {value='0..max'} (default=null)
+# DR-D1123-135 - A set of local supplementalGroups values
+podSecurityContext:
+  supplementalGroups: null  # {value='0..max'} (default=null)
+
+# sets inter-pod anti-affinity , values supported 'Soft/Hard'.
+affinity:
+  podAntiAffinity: "soft"
+  topologyKey: "kubernetes.io/hostname"
+
+# Service level parameter to enable/disable Network Policy.
+networkPolicy:
+  enabled: true
+
+dataCoordinator:
+  # The name of the Data Coordinator ZK service
+  clientServiceName: "eric-data-coordinator-zk"
+  # The port that the Data Coordinator ZK service listens on
+  tlsClientPort: "2281"
+  clientPort: "2181"
+
+
+# The Kubernetes cluster domain that gets populated to Subject Alternative Name
+clusterDomain: "cluster.local"
+
+persistence:
+  persistentVolumeClaim:
+    # The storage class to use for the persistent volume. Supported storage classes are: network-block
+    storageClassName: "network-block"
+    # Size of the persistent volume
+    size: "15Gi"
+    # The persistent volume access mode
+    # A Boolean variable indicating whether the Helm chart uses a persistent volume (true) or whether it uses storage from the node (false)
+    enabled: true
+  temporaryVolume:
+    # Default value for medium is Disk.
+    medium: "Disk"
+    sizeLimit: "25Gi"
+    enabled: false
+
+security:
+  tls:
+    messagebuskf:
+      # The port that Message Bus KF listens and accepts tls connections on
+      port: 9093
+      # provider for tls solution, supported values: none, edaTls, sip-tls
+      provider: "sip-tls"
+      #edaTls:
+      # name of the secret that hold the keystore/truststore and their credentials
+      # secretName: eric-data-message-bus-kf-store-secret
+  sasl:
+    credentials:
+      kubernetesSecretName: eric-data-message-bus-kf
+    zookeeperclient:
+      # If set to true, enables the SASL/DIGEST-MD5 authentication with Zookeeper
+      enabled: false
+      credentials:
+        kubernetesSecretName: eric-data-coordinator-zk
+
+  plaintext:
+    messagebuskf:
+      # The port that Message Bus KF listens and accepts plaintext connections on
+      port: 9092
+
+  saslplaintext:
+    messagebuskf:
+      # The port that Message Bus KF listens and accepts sasl_plaintext connections on
+      port: 9091
+
+securityPolicy:
+  rolename: eric-data-message-bus-kf
+
+service:
+  endpoints:
+    messagebuskf:
+      sasl:
+        enforced: "required"
+      tls:
+        enforced: "required"
+        verifyClientCertificate: "required"
+        servcertTimeToLive: 604800
+        servcertRenewalLeadTime: 4800
+    dataCoordinator:
+      tls:
+        enforced: "required"
+        clientTimeToLive: 604800
+        clientRenewalLeadTime: 4800
+
+# Configuration Overrides. Specify any Kafka settings you would like set on the StatefulSet
+# here in map format, as defined in the official Apache Kafka docs.
+
+configurationOverrides:
+  # Specify which version of the inter-broker protocol will be used. It allows to run brokers with different versions in the same MBKF cluster. This avoids downtime during upgrade. Set this to '1.0' for full backwards compatibility to MBKF releases before 1.6.0.
+  "inter.broker.protocol.version": '1.0'
+
+  # The max time that the client waits to establish a connection to zookeeper.
+  "zookeeper.connection.timeout.ms": 30000
+
+  # Zookeeper session timeout.
+  "zookeeper.session.timeout.ms": 30000
+
+  # The default replication factor for automatically created topics. Topic creation will fail if the cluster size is lower than this replication factor
+  "default.replication.factor": 3
+
+  # The replication factor for the offsets topic (set higher to ensure availability)
+  "offsets.topic.replication.factor": 3
+
+  # The number of partitions for the offset commit topic (should not change after deployment)
+  "offsets.topic.num.partitions": 24
+
+  # The offsets topic segment bytes should be kept relatively small in order to facilitate faster log compaction and cache loads
+  "offsets.topic.segment.bytes": "1048576"
+
+  # The number of hours to keep a log file before deleting it
+  "log.retention.hours": 168
+
+  # The default cleanup policy for segments beyond the retention window. Valid policies are: delete and compact
+  "log.cleanup.policy": "delete"
+
+  # Enable the log cleaner process to run on the server
+  "log.cleaner.enable": "true"
+
+  # The minimum time a message will remain uncompacted in the log
+  "log.cleaner.min.compaction.lag.ms": 0
+
+  # The maximum size of a single log file in bytes
+  "log.segment.bytes": "10485760"
+
+  # A string of extra JVM options to pass to the broker. For instance, garbage collector or heap settings
+  "jvm.performance.opts" : "-server -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:+ExplicitGCInvokesConcurrent -Djava.awt.headless=true"
+
+  # JVM heap size for the broker. (It will be deprecated soon.)
+  # It is not recommended. Use resources.messagebuskf.jvm instaed.
+  # If this parameter is set then resources.messagebuskf.jvm would not take effect.
+  #"heap.opts" : "-Xmx1G -Xms1G"
+
+  # Specifies the minimum number of replicas that must acknowledge a write for the write to be considered successful.
+  # If this minimum cannot be met, then the producer will raise an exception
+  "min.insync.replicas": 2
+
+  # The transaction topic segment bytes should be kept relatively small in order to facilitate faster log compaction and cache loads.
+  "transaction.state.log.segment.bytes": "1048576"
+
+  # The number of partitions for the transaction topic (should not change after deployment).
+  "transaction.state.log.num.partitions": 24
+
+  # Replication factor for the transaction topic (set higher to ensure availability).
+  # Internal Topic creation will fail if the cluster size is lower than this replication factor.
+  "transaction.state.log.replication.factor": 3
+
+  # Overridden min.insync.replicas for the transaction topic that must acknowledge a write for the write to be considered successful.
+  # If this minimum cannot be met, then the producer will raise an exception.
+  "transaction.state.log.min.isr": 2
+
+  # Specify the root log level.Sets verbose if root log level set as DEBUG
+  "log4j.root.loglevel": "INFO"
+
+  # Specifiy additional root loggers.
+  "log4j.loggers": ""
+
+  # Add additional appenders for log4j.
+  "log4j.appenders": ""
+
+  # Enable auto creation of topic on the server by consumers must be disabled.
+  # Totally not acceptable for production usage due to possible data loss and limited scalability.
+  "auto.create.topics.enable": "false"
+
+  # name of the keystore file
+  ssl.keystore.filename: "server.keystore.jks"
+
+  # file containing the password of the private key
+  ssl.key.credentials: "keypw"
+
+  # file containing the password for the Keystore
+  ssl.keystore.credentials: "keystorepw"
+
+  #name of the truststore file
+  ssl.truststore.filename: "server.truststore.jks"
+
+  # file containing the password for the Truststore
+  ssl.truststore.credentials: "truststorepw"
+
+  # custom property to enable inter-broker SSL channel
+  inter.broker.ssl.enabled: true
+
+  # The endpoint identification algorithm to validate server hostname using server certificate. Set to "" to disable hostname verification
+  ssl.endpoint.identification.algorithm: ""
+
+topologySpreadConstraints: []
+
+## log has precedence over global.log
+log:
+  ## streamingMethod has precedence over 'outputs'
+  ## Supported values: direct, indirect, dual
+  streamingMethod: null
+
+pmServer:
+  pmServiceName: eric-pm-server
+
+defaultAccessLabels:
+  eric-sec-sip-tls-access: "true"
+  eric-data-distributed-coordinator-ed-access: "true"
+  eric-sec-key-management-access: "true"
+
+
+bandwidth:
+  maxEgressRate: # maximum outgoing traffic rate from MBKF
+# Pod priority configuration for deployments DR-1126-030
+podPriority:
+  eric-data-message-bus-kf:
+    priorityClassName: "" # No priority set to eric-data-message-bus-kf
+  hooklauncher:
+    priorityClassName: "" # No priority set to hooklauncher
+  kafkaOperator:
+    priorityClassName: ""
+# Configuration of seccomp profile types, it would be Unconfined, RuntimeDefault, Localhost or ""
+# seccomp is not set by default
+seccompProfile:
+  type:
+  checkzkready:
+  messagebuskf:
+  jmxexporter:
+  metricsexporter:
+
+securityContext:
+  allowPrivilegeEscalation: false
+  privileged: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  capabilities:
+    drop:
+      - ALL
+
+# Configuration of appArmor profile types, it would be unconfined, runtime/default, localhost or ""
+# appArmor is not set by default
+appArmorProfile:
+  type:
+  localhostProfile:
+  jmxexporter:
+    type:
+    localhostProfile:
+  messagebuskf:
+    type:
+    localhostProfile:
+  logshipper:
+    type:
+    localhostProfile:
+  checkzkready:
+    type:
+    localhostProfile:
+  metricsexporter:
+    type:
+    localhostProfile:
+  hooklauncher:
+    type:
+    localhostProfile:
+
+# Configuration of Server certs max retries times in renewcertKF.sh reload() function.
+# If set empty then default value is 5. Recommand higher value when data flow is heavy
+reloadServerCertsMaxRetries: 5
+
+# STRIMZI OPERATER : DEFAULT VALUES
+# IMPORTANT! : MBKF Operator based deployment is limited to use only by applications that have an agreement with the ADP program.
+#There are multiple reasons for that, including the current solutions for external exposure and mirroring that are not aligned with the ADP architecture, and the current lack of support for migration between the legacy (Helm-based) deployments and operator-based deployments.
+kafkaOperator:
+  #If set to true, it will deploy strimzi operator and required CRDs along with it. It won't deploy native kafka cluster from chart.
+  #default: false
+  enabled: false  #set to true for dev purpose
+
+  tolerations: []
+
+  #Optional, default is 120000 ms. The interval between periodic reconciliations, in milliseconds.
+  fullReconciliationIntervalMs: 120000
+
+  #Optional, default 300000 ms. The timeout for internal operations, in milliseconds.
+  #This value should be increased when using Strimzi on clusters where regular Kubernetes operations take longer than usual (because of slow downloading of Docker images, for example)
+  operationTimeoutMs: 300000
+
+  #Optional. Enables or disables features and functionality controlled by feature gates.
+  # https://strimzi.io/docs/operators/0.29.0/configuring.html#ref-operator-cluster-feature-gates-str
+  featureGates: ""
+
+  #Optional, default true. Controls whether Strimzi generates network policy resources.
+  #Network policies allow connections between Kafka components.
+  generateNetworkPolicy: true
+
+  # Override the value for Connect build timeout
+  connectBuildTimeoutMs: 300000
+
+  # Optional: Rack Awareness
+  # To enable rack awareness and deploy cluster role and cluster role binding required for it, set following value to true
+  # default: false
+  rackAwareness:
+    enabled: false
+
+  log:
+    stream:
+      logTransformer:
+        host: eric-log-transformer
+    fe:
+      level: INFO
+    be:
+      level: INFO
+
+  # Configuration of appArmor profile types, it would be unconfined, runtime/default, localhost or ""
+  # appArmor is not set by default
+  appArmorProfile:
+    type:
+    localhostProfile:
+  # Configuration of seccomp profile types, it would be Unconfined, RuntimeDefault, Localhost or ""
+  # seccomp is not set by default
+  seccompProfile:
+    type:
+    localhostProfile:
+  # Sets cluster operator ZK client certificate configuration
+  clusterOperator:
+    tls:
+      clientTimeToLive: 13140000
+      clientRenewalLeadTime: 432000
+
+zkBRAgent:
+  restoreType: default
+  includedPath:
+  excludedPath: /cluster
+  logLevel: "INFO"
+  grpc:
+    backup:
+      # Time, in seconds, to wait for the data channel to be ready before aborting the backup
+      dataChannelTimeoutSecs: 30
+      # Maximum Size, in KiB, of fragment chunk to send with each backup data message
+      fragmentChunkSize: 512
+
+# enable new scraping pattern
+enableNewScrapePattern: false

@@ -1,0 +1,78 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "BasicTypes",
+  "type": "object",
+  "description": "A schema demonstrating all basic JSON Schema types",
+  "properties": {
+    "stringValue": {
+      "type": "string",
+      "description": "A simple string value"
+    },
+    "integerValue": {
+      "type": "integer",
+      "description": "A simple integer value"
+    },
+    "numberValue": {
+      "type": "number",
+      "description": "A simple number value (can be integer or float)"
+    },
+    "booleanValue": {
+      "type": "boolean",
+      "description": "A boolean value (true or false)"
+    },
+    "nullValue": {
+      "type": "null",
+      "description": "A null value"
+    },
+    "arrayOfStrings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "An array of strings"
+    },
+    "arrayOfIntegers": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      },
+      "description": "An array of integers"
+    },
+    "arrayOfNumbers": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "description": "An array of numbers"
+    },
+    "arrayOfBooleans": {
+      "type": "array",
+      "items": {
+        "type": "boolean"
+      },
+      "description": "An array of booleans"
+    },
+    "objectValue": {
+      "type": "object",
+      "properties": {
+        "nestedString": {
+          "type": "string",
+          "description": "A string nested in an object"
+        },
+        "nestedInteger": {
+          "type": "integer",
+          "description": "An integer nested in an object"
+        }
+      },
+      "description": "A nested object"
+    },
+    "multiTypeArray": {
+      "type": "array",
+      "items": {
+        "type": ["string", "number", "boolean"]
+      },
+      "description": "An array that can contain multiple types"
+    }
+  },
+  "required": ["stringValue", "integerValue", "numberValue", "booleanValue"]
+} 

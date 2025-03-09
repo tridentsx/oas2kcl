@@ -1,0 +1,259 @@
+#global:
+#  labels: {}
+#  annotations: {}
+#  timezone: UTC
+#  pullSecret:
+#  nodeSelector: {}
+#  security:
+#    tls:
+#      enabled: true
+#  registry:
+#    url: armdocker.rnd.ericsson.se
+#    imagePullPolicy: IfNotPresent
+#    repoPath:
+#  securityPolicy:
+#    rolekind: ""
+#  tolerations: []
+#  podSecurityContext:
+#    supplementalGroups:
+#  fsGroup:
+#    manual:
+#    namespace:
+#  internalIPFamily:
+#  networkPolicy:
+#    enabled: false
+#  log:
+#    streamingMethod: "indirect"
+
+replicaCount: 1
+
+imageCredentials:
+  oam-dashboards:
+    registry:
+      imagePullPolicy:
+      url:
+    repoPath:
+  proxy:
+    registry:
+      imagePullPolicy:
+      url:
+    repoPath:
+  pullSecret:
+
+images:
+  oam-dashboards:
+    name:
+    tag:
+  proxy:
+    name:
+    tag:
+
+nameOverride: ""
+fullnameOverride: ""
+
+config:
+  dashboards:
+    optionalPlugins:
+      disabled: true
+    assetConfiguration:
+      opensearch_dashboards.yml: |
+        opensearchDashboards.index: ".bam-oam-dashboards"
+        opensearchDashboards.branding:
+          applicationTitle: "Ericsson OAM Dashboards"
+        logging:
+          json: false
+          loggers:
+            - context: root
+              appenders:
+                - console
+              level: info
+          appenders:
+            console:
+              kind: console
+              layout:
+                kind: pattern
+                highlight: true
+                pattern: '[%logger] %meta %message'
+    opensearchHosts: "http://localhost:8080"
+    basePath: "/oam-dashboards"
+    rewriteBasePath: true
+    serverHost: "0.0.0.0"
+  service:
+    port: 9443
+  faultIndications:
+    enabled: true
+    host: eric-bss-bam-ah-proxy:5000
+  oidcAuth:
+    enabled: true
+    clientId: AuthorizationClient
+    groupsClaim: groups
+    usernameClaim: email
+    caSecret: eric-bss-bam-oam-oidc-ca-bundle
+    issuerUrl:
+    authnProxyLoginURL:
+  searchEngine:
+    url: https://eric-data-search-engine-tls:9200
+    noTlsUrl: http://eric-data-search-engine:9200
+  log:
+    level: info
+    streamingMethod: ""
+    transformerHost: "eric-log-transformer:5024"
+    transformerNoTlsHost: "eric-log-transformer:5025"
+    timeoutSeconds: 5
+    queueSize: 1000
+    connectionTtlMinutes: 120
+  licenseControl:
+    interval: 600
+    secondsPerSeverity: 43200
+    functionControlHost: eric-bss-bam-function-controller-evaluation-service:8443
+    functionControlNoTlsHost: eric-bss-bam-function-controller-evaluation-service:8080
+
+probes:
+  front-proxy:
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 1
+      periodSeconds: 10
+      timeoutSeconds: 2
+    startupProbe:
+      failureThreshold: 60
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 2
+  oam-dashboards:
+    livenessProbe:
+      failureThreshold: 10
+      initialDelaySeconds: 10
+      periodSeconds: 20
+      successThreshold: 1
+      timeoutSeconds: 5
+    startupProbe:
+      failureThreshold: 80
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 2
+  back-proxy:
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 1
+      periodSeconds: 10
+      timeoutSeconds: 2
+    startupProbe:
+      failureThreshold: 60
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 2
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  name: ""
+
+rbac:
+  create: true
+
+appArmorProfile:
+  oam-dashboards:
+    type: ""
+    localhostProfile: ""
+  front-proxy:
+    type: ""
+    localhostProfile: ""
+  back-proxy:
+    type: ""
+    localhostProfile: ""
+
+seccompProfile:
+  oam-dashboards:
+    type: ""
+    localhostProfile: ""
+  front-proxy:
+    type: ""
+    localhostProfile: ""
+  back-proxy:
+    type: ""
+    localhostProfile: ""
+
+podPriority:
+  eric-bss-bam-oam-dashboards:
+    priorityClassName:
+
+labels: {}
+
+annotations: {}
+
+service:
+  port: 5601
+  app:
+    labelName: bss-oam-gui
+    discoveryServices: eric-bss-gui-aggregator
+
+terminationGracePeriodSeconds: 30
+
+topologySpreadConstraints: []
+
+ingress:
+  enabled: true
+  ingressClass:
+  tls:
+    ca: eric-tm-ingress-controller-cr-oam-client-ca
+  frontProxy:
+    caSecret: eric-sec-sip-tls-trusted-root-cert
+    subjectName: eric-bss-bam-oam-dashboards
+
+resources:
+  oam-dashboards:
+    requests:
+      cpu: 100m
+      memory: 512M
+    limits:
+      cpu: 100m
+      memory: 512M
+  front-proxy:
+    limits:
+      cpu: 100m
+      memory: 64Mi
+    requests:
+      cpu: 50m
+      memory: 32Mi
+  back-proxy:
+    limits:
+      cpu: 100m
+      memory: 64Mi
+    requests:
+      cpu: 50m
+      memory: 32Mi
+
+updateStrategy:
+  oam-dashboards:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 50%
+      maxSurge: 50%
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity:
+  podAntiAffinity: "soft"
+  nodeAffinity: {}
+  # topologyKey value to use when setting podAntiAffinity
+  # Default: "kubernetes.io/hostname"
+  # Example: "kubernetes.io/zone" - specify kubernetes.io/zone as antiAffinity key
+  topologyKey: "kubernetes.io/hostname"
+
+networkPolicy:
+  enabled: true
+  egress:
+    accessLabels:
+      oam-dashboards: {}
+
+securityPolicy:
+  rolename: ""
+
+podSecurityContext:
+  supplementalGroups:

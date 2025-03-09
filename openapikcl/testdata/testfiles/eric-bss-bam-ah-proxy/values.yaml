@@ -1,0 +1,163 @@
+# global:
+#  labels: {}
+#  annotations: {}
+#  timezone: UTC
+#  pullSecret:
+#  nodeSelector: {}
+#  tolerations: []
+#  security:
+#    tls:
+#      enabled: true
+#  registry:
+#    url: armdocker.rnd.ericsson.se
+#    imagePullPolicy: IfNotPresent
+#    repoPath:
+#  networkPolicy:
+#    enabled: false
+#  securityPolicy:
+#    rolekind: ""
+#  podSecurityContext:
+#    supplementalGroups:
+#  fsGroup:
+#    manual:
+#    namespace:
+#  internalIPFamily:
+#  log:
+#    streamingMethod: "indirect"
+replicaCount: 2
+
+imageCredentials:
+  ahproxy:
+    repoPath:
+    registry:
+      url:
+      imagePullPolicy:
+  pullSecret:
+
+images:
+  ahproxy:
+    name:
+    tag:
+
+nameOverride: ""
+
+fullnameOverride: ""
+
+updateStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 50%
+    maxSurge: 50%
+
+serviceAccount:
+  create: true
+  name:
+
+service:
+  port: 5000
+
+annotations: {}
+
+labels: {}
+
+resources:
+  ahproxy:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+topologySpreadConstraints: []
+
+affinity:
+  podAntiAffinity: "soft"
+  nodeAffinity: {}
+  # topologyKey value to use when setting podAntiAffinity
+  # Default: "kubernetes.io/hostname"
+  # Example: "kubernetes.io/zone" - specify kubernetes.io/zone as antiAffinity key
+  topologyKey: "kubernetes.io/hostname"
+
+podPriority:
+  eric-bss-bam-ah-proxy:
+    priorityClassName:
+
+podDisruptionBudget:
+  minAvailable: 1
+  maxUnavailable:
+
+networkPolicy:
+  enabled: true
+  egress:
+    accessLabels:
+      ahproxy: {}
+
+seccompProfile:
+  ahproxy:
+    type: ""
+    localhostProfile: ""
+
+appArmorProfile:
+  ahproxy:
+    type: ""
+    localhostProfile: ""
+
+securityPolicy:
+  rolename: ""
+
+podSecurityContext:
+  supplementalGroups:
+
+config:
+  upstream:
+    host: "eric-fh-alarm-handler:6006"
+    hostNoTls: "eric-fh-alarm-handler:6005"
+  kproxy:
+    enabled: true
+    port: 19092
+  server:
+    port: 4141
+  alarms:
+    enabled: true
+  metrics:
+    enabled: true
+    host: eric-pm-server
+    serviceName: ah_proxy
+  log:
+    level: info
+    streamingMethod: ""
+    transformerHost: "eric-log-transformer:5024"
+    transformerNoTlsHost: "eric-log-transformer:5025"
+    timeoutSeconds: 5
+    queueSize: 1000
+    connectionTtlMinutes: 120
+
+probes:
+  ahproxy:
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 1
+      periodSeconds: 10
+      timeoutSeconds: 2
+    startupProbe:
+      failureThreshold: 60
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 2
+
+terminationGracePeriodSeconds: 30
+
+autoScaling:
+  ahproxy:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 20
+    averageUtilization:
+      cpu: 800
+      memory: 320

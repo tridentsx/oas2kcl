@@ -1,0 +1,83 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "UserProfile",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier"
+        },
+        "type": {
+            "type": "string",
+            "enum": ["personal", "business"],
+            "description": "Type of profile"
+        },
+        "region": {
+            "type": "string",
+            "enum": ["US", "EU", "APAC"],
+            "description": "Region of operation"
+        }
+    },
+    "required": ["id", "type"],
+    "allOf": [
+        {
+            "if": {
+                "properties": {
+                    "type": { "const": "business" }
+                }
+            },
+            "then": {
+                "properties": {
+                    "companyName": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "vatNumber": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{2}[0-9]{9}$"
+                    }
+                },
+                "required": ["companyName"]
+            }
+        },
+        {
+            "if": {
+                "properties": {
+                    "region": { "const": "EU" }
+                }
+            },
+            "then": {
+                "properties": {
+                    "gdprConsent": {
+                        "type": "boolean",
+                        "const": true
+                    }
+                },
+                "required": ["gdprConsent"]
+            }
+        }
+    ],
+    "oneOf": [
+        {
+            "properties": {
+                "contactMethod": { "const": "email" },
+                "email": {
+                    "type": "string",
+                    "format": "email"
+                }
+            },
+            "required": ["contactMethod", "email"]
+        },
+        {
+            "properties": {
+                "contactMethod": { "const": "phone" },
+                "phone": {
+                    "type": "string",
+                    "pattern": "^\\+[0-9]{10,15}$"
+                }
+            },
+            "required": ["contactMethod", "phone"]
+        }
+    ]
+} 

@@ -1,0 +1,23 @@
+{
+  "configName": "Development Environment",
+  "logging": {
+    "level": "debug",
+    "output": "console"
+  },
+  "database": {
+    "host": "dev.example.com",
+    "port": 5432,
+    "credentials": {
+      "username": "devuser",
+      "password": "devpass"
+    }
+  },
+  "security": {
+    "authentication": {
+      "enabled": true,
+      "method": "oauth",
+      "timeout": 1800
+    },
+    "ssl": false
+  }
+} 

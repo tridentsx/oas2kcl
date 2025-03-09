@@ -1,0 +1,1973 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "properties": {
+     "affinity": {
+      "properties": {
+        "nodeAffinity": {
+          "default": "{}",
+          "description": "nodeAffinity rules",
+          "type": "object"
+        },
+        "podAntiAffinity": {
+          "default": "soft",
+          "description": "podAntiAffinity with two possible values: soft and hard",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        },
+        "topologyKey": {
+          "default": "kubernetes.io/hostname",
+          "description": "topologyKey to use",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "annotations": {
+      "default": "{}",
+      "description": "The key-prefix is optional and cannot exceed 253 characters with following character set: [a-z0-9A-Z\\.] The key cannot exceed 63 characters with following character set: [a-z0-9A-Z\\_\\.\\-]",
+      "type": "object"
+    },
+    "appArmorProfile": {
+      "properties": {
+        "fc-admin-server": {
+          "properties": {
+            "localhostProfile": {
+              "default": "\"\"",
+              "description": "Localhost path to the AppArmor profile for the fc-admin-server container. Should only be set if appArmorProfile.fc-admin-server.type is set to localhost.",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "\"\"",
+              "description": "The AppArmor type for the fc-admin-server container. Available options are \"unconfined\", \"runtime/default\", \"localhost\" and \"\" [default=\"\"].",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "fc-eval-api-server": {
+          "properties": {
+            "localhostProfile": {
+              "default": "\"\"",
+              "description": "Localhost path to the AppArmor profile for the fc-eval-api-server container. Should only be set if appArmorProfile.fc-eval-api-server.type is set to localhost.",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "\"\"",
+              "description": "The AppArmor type for the fc-eval-api-server container. Available options are \"unconfined\", \"runtime/default\", \"localhost\" and \"\" [default=\"\"].",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "status-cm-cleanup": {
+          "properties": {
+            "localhostProfile": {
+              "default": "\"\"",
+              "description": "Localhost path to the AppArmor profile for the status-cm-cleanup container. Should only be set if appArmorProfile.status-cm-cleanup.type is set to localhost.",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "\"\"",
+              "description": "The AppArmor type for the status-cm-cleanup container. Available options are \"unconfined\", \"runtime/default\", \"localhost\" and \"\" [default=\"\"].",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "autoScaling": {
+      "properties": {
+        "fcEvaluationService": {
+          "properties": {
+            "averageUtilization": {
+              "properties": {
+                "cpu": {
+                  "default": 800,
+                  "description": "The average percentage of requested CPU utilization used by the Horizontal Pod Autoscaler (HPA) for scaling decisions. Default is 80% of fc-eval-api-server container's default CPU limit, but in case the container's CPU request- or limit is changed this value must also be changed accordingly.",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": 160,
+                  "description": "The average percentage of requested memory utilization used by the Horizontal Pod Autoscaler (HPA) for scaling decisions. Default is ~80% of fc-eval-api-server container's default Memory limit, but in case the container's memory request- or limit is changed this value must also be changed accordingly.",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "enabled": {
+              "default": "true",
+              "description": "Enable/disable auto-scaling for fcEvaluationService workload. Note! Enabling auto-scaling in existing deployments which currently has a statically configured replica count will lead to Kubernetes first scaling down the replica count to 1 before the Horizontal Pod Autoscaler (HPA) adjusts the count using its defined replicas and scaling decisions.",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            },
+            "maxReplicas": {
+              "default": "20",
+              "description": "The maximum replicas the Horizontal Pod Autoscaler (HPA) may scale up to.",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            },
+            "minReplicas": {
+              "default": "2",
+              "description": "The minimum replicas the Horizontal Pod Autoscaler (HPA) may scale down to.",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "backend": {
+      "properties": {
+        "fcAdminService": {
+          "properties": {
+            "cmAgent": {
+              "properties": {
+                "enabled": {
+                  "default": "true",
+                  "description": "CM Agent enabled",
+                  "oneOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "enum": [
+                        "true",
+                        "false"
+                      ],
+                      "type": "string"
+                    }
+                  ]
+                },
+                "hostName": {
+                  "default": "eric-bss-bam-cm-agent",
+                  "description": "CM Agent host",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "port": {
+                  "default": "5000",
+                  "description": "CM Agent port",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "licenseManager": {
+              "properties": {
+                "hostName": {
+                  "default": "eric-lm-combined-server",
+                  "description": "License manager host",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "port": {
+                  "default": "8080",
+                  "description": "License manager https port",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "tlsport": {
+                  "default": "18326",
+                  "description": "The tls port for license manager",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "fcAdminService": {
+      "properties": {
+        "config": {
+          "properties": {
+            "kafkaHost": {
+              "default": "eric-bss-kafka-proxy-http:80",
+              "description": "FQDN of the local kafka proxy including port",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "logConnectionTtlMinutes": {
+              "default": "120",
+              "description": "Log connection TTL (minutes) towards log transformer service. Connection will reset after configured number of minutes. Required when streamingMethod is set to direct or dual",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            },
+            "logLevel": {
+              "default": "info",
+              "description": "Log level for admin service",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "log": {
+              "properties": {
+                "streamingMethod": {
+                  "default": "indirect",
+                  "description": "The local parameter for specifying the streaming method of service logs. It can be 'indirect', 'direct', 'dual', or null. If set to null, global.log.streamingMethod will be used to determine the streaming method",
+                  "type": "string",
+                  "enum": [ "indirect", "direct", "dual", "" ]
+                }
+              }
+            },
+            "logQueueSize": {
+              "default": "1000",
+              "description": "Size of the log queue for streaming. Required when streamingMethod is set to direct or dual",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            },
+            "logTimeoutSeconds": {
+              "default": "5",
+              "description": "Timeout waiting for logs to be streamed (in seconds) before terminating. Required when streamingMethod is set to direct or dual",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            },
+            "logTransformerHost": {
+              "default": "eric-log-transformer:5024",
+              "description": "FQDN including port number of the log transformer service, don't include protocol. Required when streamingMethod is set to direct or dual",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "logTransformerNoTlsHost": {
+              "default": "eric-log-transformer:5025",
+              "description": "FQDN including port number of the log transformer non tls service, don't include protocol. Required when streamingMethod is set to direct or dual",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "metrics": {
+          "properties": {
+            "enabled": {
+              "default": "true",
+              "description": "This allows the service to increment counters.",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            },
+            "host": {
+              "default": "eric-pm-server",
+              "description": "Host name of the pm server. this is used for pm metrics access if network policies are in use",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "serviceName": {
+              "default": "fc_admin_server",
+              "description": "The subsystem name for all the metrics generated by the service to be prefixed",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "reconciliation": {
+          "properties": {
+            "licenseEvaluationInterval": {
+              "default": "1440",
+              "description": "License evaluation interval (in minutes).License keys are evaluated at this interval",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            },
+            "queueEvictionInterval": {
+              "default": "60",
+              "description": "Queue Eviction interval (in minutes).Failed FC resources will not be requeued after this interval",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            },
+            "stateSyncRetryInterval": {
+              "default": "600",
+              "description": "Retry interval (in seconds) to sync resources state in secondary sites.",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "replicaCount": {
+          "default": "2",
+          "description": "Replica count for admin service",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        },
+        "service": {
+          "properties": {
+            "port": {
+              "default": "8090",
+              "description": "Service HTTP port",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            },
+            "tlsport": {
+              "default": "8443",
+              "description": "Service TLS port",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "fcEvaluationService": {
+      "properties": {
+        "config": {
+          "properties": {
+            "kafkaHost": {
+              "default": "eric-bss-kafka-proxy-http:80",
+              "description": "FQDN of the local kafka proxy including port",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "logConnectionTtlMinutes": {
+              "default": "120",
+              "description": "Log connection TTL (minutes) towards log transformer service. Connection will reset after configured number of minutes. Required when streamingMethod is set to direct or dual",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            },
+            "logLevel": {
+              "default": "info",
+              "description": "Log level for evaluation service",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "log": {
+              "properties": {
+                "streamingMethod": {
+                  "default": "indirect",
+                  "description": "The local parameter for specifying the streaming method of service logs. It can be 'indirect', 'direct', 'dual', or null. If set to null, global.log.streamingMethod will be used to determine the streaming method",
+                  "type": "string",
+                  "enum": [ "indirect", "direct", "dual", "" ]
+                }
+              }
+            },
+            "logQueueSize": {
+              "default": "1000",
+              "description": "Size of the log queue for streaming. Required when streamingMethod is set to direct or dual",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            },
+            "logTimeoutSeconds": {
+              "default": "5",
+              "description": "Timeout waiting for logs to be streamed (in seconds) be terminating. Required when streamingMethod is set to direct or dual",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            },
+            "logTransformerHost": {
+              "default": "eric-log-transformer:5024",
+              "description": "FQDN including port number of the log transformer service, don't include protocol. Required when streamingMethod is set to direct or dual",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "logTransformerNoTlsHost": {
+              "default": "eric-log-transformer:5025",
+              "description": "FQDN including port number of the log transformer non tls service, don't include protocol. Required when streamingMethod is set to direct or dual",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "metrics": {
+          "properties": {
+            "enabled": {
+              "default": "true",
+              "description": "This allows the service to increment counters.",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            },
+            "host": {
+              "default": "eric-pm-server",
+              "description": "Host name of the pm server. this is used for pm metrics access if network policies are in use",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "serviceName": {
+              "default": "fc_eval_server",
+              "description": "The subsystem name for all the metrics generated by the service to be prefixed",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "replicaCount": {
+          "default": "2",
+          "description": "Replica count for evaluation service",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        },
+        "service": {
+          "properties": {
+            "port": {
+              "default": "8080",
+              "description": "Service HTTP port",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            },
+            "tlsport": {
+              "default": "8443",
+              "description": "Service TLS port",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "fullnameOverride": {
+      "default": "\u003cempty\u003e",
+      "description": "Overriding the full name",
+      "type": [
+        "string",
+        "integer",
+        "number",
+        "null"
+      ]
+    },
+    "global": {
+      "properties": {
+        "annotations": {
+          "default": "nil",
+          "description": "Global annotations. Global, service level, and resource-specific annotations are merged, no conflicts are allowed.",
+          "type": "object"
+        },
+        "fsGroup": {
+          "properties": {
+            "manual": {
+              "default": "\u003cempty\u003e",
+              "description": "Sets a fsGroup ID for all services. If manual set to empty namespace default configuration is used.",
+              "type": [
+                "null",
+                "integer"
+              ]
+            },
+            "namespace": {
+              "default": "\u003cempty\u003e",
+              "description": "Sets a fsGroup to use namespace default. The following values are possible: true, false and \"\". If global.fsGroup.namespace set to \"\" or false, namespace default configuration is used.",
+              "type": [
+                "null",
+                "boolean"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "internalIPFamily": {
+          "default": "\u003cempty\u003e",
+          "description": "InternalIPFamily configures the IP address family used for cluster-internal IP address. Available values are: IPv4, IPv6, and empty.",
+          "enum": [
+            "IPv6",
+            "IPv4",
+            ""
+          ],
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "labels": {
+          "default": "nil",
+          "description": "Global labels. Global, service level, and resource-specific labels are merged, no conflicts are allowed.",
+          "type": "object"
+        },
+        "log": {
+          "properties": {
+            "streamingMethod": {
+              "default": "indirect",
+              "description": "The global parameter for specifying the streaming method of service logs. It can be 'indirect', 'direct', 'dual', or null. If both global.log.streamingMethod and log.streamingMethod are set to null, it will choose 'indirect' by default",
+              "type": "string",
+              "enum": ["indirect", "direct", "dual", ""]
+            }
+          }
+        },
+        "networkPolicy": {
+          "properties": {
+            "enabled": {
+              "default": "false",
+              "description": "Global network policy parameter",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "nodeSelector": {
+          "default": "{}",
+          "description": "Global Node Selectors",
+          "type": "object"
+        },
+        "tolerations": {
+          "default": "[]",
+          "description": "Tolerations for pod assignment, this supports the fullAPI",
+          "type": "array"
+        },
+        "podSecurityContext": {
+          "properties": {
+            "supplementalGroups": {
+              "default": "\u003cempty\u003e",
+              "description": "SupplementalGroups is used for setting the GID value(s) for volume data that is used by the services. The value will be merged if both global and local value are set. supplementalGroup will not be set in helmchart if both global and local value are not set.",
+              "type": [
+                "null",
+                "array"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "pullSecret": {
+          "default": "\u003cempty\u003e",
+          "description": "PullSecret used when fetching the image",
+          "type": [
+            "string",
+            "integer",
+            "number",
+            "null"
+          ]
+        },
+        "registry": {
+          "properties": {
+            "imagePullPolicy": {
+              "default": "IfNotPresent",
+              "description": "Pull policy for the image",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "repoPath": {
+              "default": "\u003cempty\u003e",
+              "description": "Repo where the image is located",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "url": {
+              "default": "armdocker.rnd.ericsson.se",
+              "description": "Registry url to fetch image from",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "security": {
+          "properties": {
+            "tls": {
+              "properties": {
+                "enabled": {
+                  "default": "true",
+                  "description": "Configuration option to enable/disable TLS support",
+                  "oneOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "enum": [
+                        "true",
+                        "false"
+                      ],
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "securityPolicy": {
+          "properties": {
+            "rolekind": {
+              "default": "\"\"",
+              "description": "Configuration of the security policy role kind. The following values are possible: ClusterRole, Role and \"\". Rolebinding will not be created with value \"\".",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "timezone": {
+          "default": "UTC",
+          "description": "Timezone",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "imageCredentials": {
+      "properties": {
+        "fcAdminService": {
+          "properties": {
+            "registry": {
+              "properties": {
+                "imagePullPolicy": {
+                  "description": "The image pull policy",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number",
+                    "null"
+                  ]
+                },
+                "url": {
+                  "default": "\u003cempty\u003e",
+                  "description": "Registry url to fetch image from",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "repoPath": {
+              "default": "proj-bam-released",
+              "description": "Repo where the image is located",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "fcCleanup": {
+          "properties": {
+            "registry": {
+              "properties": {
+                "imagePullPolicy": {
+                  "description": "The image pull policy",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number",
+                    "null"
+                  ]
+                },
+                "url": {
+                  "default": "\u003cempty\u003e",
+                  "description": "Registry url to fetch image from",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "repoPath": {
+              "default": "proj-bam-released",
+              "description": "Repo where the image is located",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "fcEvaluationService": {
+          "properties": {
+            "registry": {
+              "properties": {
+                "imagePullPolicy": {
+                  "default": "\u003cnil\u003e",
+                  "description": "Image pull policy",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number",
+                    "null"
+                  ]
+                },
+                "url": {
+                  "default": "\u003cempty\u003e",
+                  "description": "Registry url to fetch image from",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "repoPath": {
+              "default": "proj-bam-released",
+              "description": "Repo where the image is located",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "pullSecret": {
+          "default": "\u003cempty\u003e",
+          "description": "PullSecret used when fetching the image",
+          "type": [
+            "string",
+            "integer",
+            "number",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "images": {
+      "properties": {
+        "fcAdminService": {
+          "properties": {
+            "name": {
+              "default": "\u003cempty\u003e",
+              "description": "The name for the fcAdminService",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "tag": {
+              "default": "\u003cempty\u003e",
+              "description": "The tag for the fcAdminService",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "fcCleanup": {
+          "properties": {
+            "name": {
+              "default": "\u003cempty\u003e",
+              "description": "The name for fcCleanup",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "tag": {
+              "default": "\u003cempty\u003e",
+              "description": "The tag for fcCleanup",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "fcEvaluationService": {
+          "properties": {
+            "name": {
+              "default": "\u003cempty\u003e",
+              "description": "The name for fcEvaluationService",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "tag": {
+              "default": "\u003cempty\u003e",
+              "description": "The tag for fcEvaluationService",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "labels": {
+      "default": "{}",
+      "description": "List of key/value pairs of labels appended to every helm resource created by Function Controller helm chart",
+      "type": "object"
+    },
+    "nameOverride": {
+      "default": "\u003cempty\u003e",
+      "description": "Name override of the chart",
+      "type": [
+        "string",
+        "integer",
+        "number",
+        "null"
+      ]
+    },
+    "networkPolicy": {
+      "properties": {
+        "egress": {
+          "properties": {
+            "accessLabels": {
+              "properties": {
+                "fcAdminService": {
+                  "default": "{}",
+                  "description": "This parameter is a placeholder for adding a list of egress traffic network policy labels of admin service. If this service wants to send traffic then it should add all its outgoing traffic network policy access labels using this parameter.",
+                  "type": "object"
+                },
+                "fcEvaluationService": {
+                  "default": "{}",
+                  "description": "This parameter is a placeholder for adding a list of egress traffic network policy labels of evaluation service. If this service wants to send traffic then it should add all its outgoing traffic network policy access labels using this parameter.",
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "enabled": {
+          "default": "true",
+          "description": "Network policy. The network policy will be enabled if both networkPolicy.enabled and global.networkPolicy.enabled are set to true.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "enum": [
+                "true",
+                "false"
+              ],
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "nodeSelector": {
+      "default": "{}",
+      "description": "Node selectors",
+      "type": "object"
+    },
+    "podPriority": {
+      "properties": {
+        "eric-bss-bam-function-controller": {
+          "properties": {
+            "priorityClassName": {
+              "default": "",
+              "description": "The pod priority for the service",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "podSecurityContext": {
+      "properties": {
+        "supplementalGroups": {
+          "default": "\u003cempty\u003e",
+          "description": "SupplementalGroups is used for setting the GID value(s) for volume data that is used by the services. The value will be merged if both global and local value are set. supplementalGroup will not be set in helmchart if both global and local value are not set.",
+          "items": {
+            "type": "integer"
+          },
+          "type": [
+            "null",
+            "array"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "probes": {
+      "properties": {
+        "fcAdminService": {
+          "properties": {
+            "livenessProbe": {
+              "properties": {
+                "failureThreshold": {
+                  "default": "3",
+                  "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "initialDelaySeconds": {
+                  "default": "1",
+                  "description": "Number of seconds after the container has started before probe is initiated",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "periodSeconds": {
+                  "default": "30",
+                  "description": "How often (in seconds) to perform the probe",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "timeoutSeconds": {
+                  "default": "1",
+                  "description": "Number of seconds after which the probe times out",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "readinessProbe": {
+              "properties": {
+                "failureThreshold": {
+                  "default": "3",
+                  "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "initialDelaySeconds": {
+                  "default": "1",
+                  "description": "Number of seconds after the container has started before probe is initiated",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "periodSeconds": {
+                  "default": "30",
+                  "description": "How often (in seconds) to perform the probe",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "successThreshold": {
+                  "default": "1",
+                  "description": "Minimum consecutive successes for the probe to be considered successful after having failed",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "timeoutSeconds": {
+                  "default": "1",
+                  "description": "Number of seconds after which the probe times out",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "startupProbe": {
+              "properties": {
+                "failureThreshold": {
+                  "default": "60",
+                  "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "initialDelaySeconds": {
+                  "default": "5",
+                  "description": "Number of seconds after the container has started before probe is initiated",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "periodSeconds": {
+                  "default": "5",
+                  "description": "How often (in seconds) to perform the probe",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "successThreshold": {
+                  "default": "1",
+                  "description": "Minimum consecutive successes for the probe to be considered successful after having failed",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "timeoutSeconds": {
+                  "default": "1",
+                  "description": "Number of seconds after which the probe times out",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "fcEvaluationService": {
+          "properties": {
+            "livenessProbe": {
+              "properties": {
+                "failureThreshold": {
+                  "default": "3",
+                  "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "initialDelaySeconds": {
+                  "default": "1",
+                  "description": "Number of seconds after the container has started before probe is initiated",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "periodSeconds": {
+                  "default": "10",
+                  "description": "How often (in seconds) to perform the probe",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "timeoutSeconds": {
+                  "default": "2",
+                  "description": "Number of seconds after which the probe times out",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "startupProbe": {
+              "properties": {
+                "failureThreshold": {
+                  "default": "60",
+                  "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "initialDelaySeconds": {
+                  "default": "5",
+                  "description": "Number of seconds after the container has started before probe is initiated",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "periodSeconds": {
+                  "default": "5",
+                  "description": "How often (in seconds) to perform the probe",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "successThreshold": {
+                  "default": "1",
+                  "description": "Minimum consecutive successes for the probe to be considered successful after having failed",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "timeoutSeconds": {
+                  "default": "2",
+                  "description": "Number of seconds after which the probe times out",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "resources": {
+      "properties": {
+        "fc-admin-server": {
+          "properties": {
+            "limits": {
+              "properties": {
+                "cpu": {
+                  "default": "500m",
+                  "description": "Limits cpu",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "128Mi",
+                  "description": "Limits memory",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "requests": {
+              "properties": {
+                "cpu": {
+                  "default": "100m",
+                  "description": "Request cpu",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "32Mi",
+                  "description": "Request memory",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "fc-eval-api-server": {
+          "properties": {
+            "limits": {
+              "properties": {
+                "cpu": {
+                  "default": "100m",
+                  "description": "Limits cpu",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "64Mi",
+                  "description": "Limits memory",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "requests": {
+              "properties": {
+                "cpu": {
+                  "default": "10m",
+                  "description": "Request cpu",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "32Mi",
+                  "description": "Request memory",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "status-cm-cleanup": {
+          "properties": {
+            "limits": {
+              "properties": {
+                "cpu": {
+                  "default": "100m",
+                  "description": "Limits cpu",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "64Mi",
+                  "description": "Limits memory",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "requests": {
+              "properties": {
+                "cpu": {
+                  "default": "10m",
+                  "description": "Request cpu",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "32Mi",
+                  "description": "Request memory",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "seccompProfile": {
+      "properties": {
+        "fc-admin-server": {
+          "properties": {
+            "localhostProfile": {
+              "default": "\"\"",
+              "description": "Localhost path to the seccomp profile for the fc-admin-server container. Should only be set if seccompProfile.fc-admin-server.type is set to Localhost",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "\"\"",
+              "description": "Feature of the Linux kernel for secure computing mode for fc-admin-server container. Available options are `Unconfined`, `RuntimeDefault`, `Localhost` and \"\" [default=\"\"]",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "fc-eval-api-server": {
+          "properties": {
+            "localhostProfile": {
+              "default": "\"\"",
+              "description": "Localhost path to the seccomp profile for the fc-eval-api-server container. Should only be set if seccompProfile.fc-eval-api-server.type is set to Localhost",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "\"\"",
+              "description": "Feature of the Linux kernel for secure computing mode for fc-eval-api-server container. Available options are `Unconfined`, `RuntimeDefault`, `Localhost` and \"\" [default=\"\"]",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "status-cm-cleanup": {
+          "properties": {
+            "localhostProfile": {
+              "default": "\"\"",
+              "description": "Localhost path to the seccomp profile for the status-cm-cleanup container. Should only be set if seccompProfile.status-cm-cleanup.type is set to Localhost",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "\"\"",
+              "description": "Feature of the Linux kernel for secure computing mode for status-cm-cleanup container. Available options are `Unconfined`, `RuntimeDefault`, `Localhost` and \"\" [default=\"\"]",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "securityPolicy": {
+      "properties": {
+        "rolename": {
+          "default": "eric-bss-bam-function-controller",
+          "description": "Rolename sets the name of the security policy role that is bound to the service account.",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "serviceAccount": {
+      "properties": {
+        "create": {
+          "default": "true",
+          "description": "Create service account",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "enum": [
+                "true",
+                "false"
+              ],
+              "type": "string"
+            }
+          ]
+        },
+        "name": {
+          "default": "Template name",
+          "description": "Name of the service account to be used",
+          "type": [
+            "string",
+            "integer",
+            "number",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "terminationGracePeriodSeconds": {
+      "default": "30",
+      "description": "Number of seconds after SIGTERM caught before shutting down",
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?\\d+$",
+          "type": "string"
+        }
+      ]
+    },
+    "tolerations": {
+      "default": "[]",
+      "description": "Toleration rules",
+      "type": "array"
+    },
+    "topologySpreadConstraints": {
+      "properties": {
+        "fcAdminService": {
+          "default": "[]",
+          "description": "The topology spread constant for fcAdminService",
+          "type": "array"
+        },
+        "fcEvaluationService": {
+          "default": "[]",
+          "description": "The topology spread constant for fcEvaluationService",
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "updateStrategy": {
+      "properties": {
+        "fcAdminService": {
+          "properties": {
+            "rollingUpdate": {
+              "properties": {
+                "maxSurge": {
+                  "default": "50%",
+                  "description": "The maximum number of pods that can be created over the desired number of pods",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "maxUnavailable": {
+                  "default": "50%",
+                  "description": "The maximum number of pods that can be unavailable during the update process",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "type": {
+              "default": "RollingUpdate",
+              "description": "The update strategy type",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "fcEvaluationService": {
+          "properties": {
+            "rollingUpdate": {
+              "properties": {
+                "maxSurge": {
+                  "default": "50%",
+                  "description": "The maximum number of pods that can be created over the desired number of pods",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "maxUnavailable": {
+                  "default": "50%",
+                  "description": "The maximum number of pods that can be unavailable during the update process",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "type": {
+              "default": "RollingUpdate",
+              "description": "The update strategy type",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "podDisruptionBudget": {
+      "properties": {
+        "fcEvaluationService": {
+          "properties": {
+            "maxUnavailable": {
+              "default": "\u003cempty\u003e",
+              "description": "The maximum allowed number of unavailable pods of fc evaluation service during a planned disruption. This parameter is mutually exclusive with podDisruptionBudget.fcEvaluationService.minAvailable.",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "minAvailable": {
+              "default": "1",
+              "description": "Minimum number of pods of fc evaluation service that must remain available during a planned disruption. This parameter is mutually exclusive with podDisruptionBudget.fcEvaluationService.maxUnavailable.",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "fcAdminService": {
+          "properties": {
+            "maxUnavailable": {
+              "default": "\u003cempty\u003e",
+              "description": "The maximum allowed number of unavailable pods of fc evaluation service during a planned disruption. This parameter is mutually exclusive with podDisruptionBudget.fcAdminService.minAvailable.",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "minAvailable": {
+              "default": "1",
+              "description": "Minimum number of pods of fc evaluation service that must remain available during a planned disruption. This parameter is mutually exclusive with podDisruptionBudget.fcAdminService.maxUnavailable.",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      }
+    }
+  }
+}

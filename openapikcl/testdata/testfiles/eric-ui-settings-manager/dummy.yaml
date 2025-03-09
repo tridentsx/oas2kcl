@@ -1,0 +1,68 @@
+{
+  "enabled": false,
+  "persistence": {
+    "dbHost": "adipisicing Duis",
+    "housekeepingDays": -90595613,
+    "provider": "tempor",
+    "host": "cillum"
+  },
+  "nameOverride": "Excepteur mollit deserunt sunt cupidatat",
+  "fullnameOverride": "esse",
+  "seccompProfile": {
+    "usm": {
+      "type": "Unconfined",
+      "localhostProfile": null
+    }
+  },
+  "replicaCount": 13336760,
+  "service": {
+    "app": {
+      "labelName": "mollit"
+    }
+  },
+  "prometheus": {
+    "scrape": false
+  },
+  "nodeSelector": {
+    "usm": {
+      "tempor72": "Ut",
+      "laborum1dd": true,
+      "irure_6e": "do Excepteur ullamco esse",
+      "in_5": false
+    },
+    "usm-hk": {
+      "ipsum_360": true
+    }
+  },
+  "log": {
+    "streamingMethod": "dual",
+    "transformerHost": "dolor in",
+    "transformerNoTlsPort": -8874058,
+    "timeoutSeconds": -94075573,
+    "queueSize": -87768620,
+    "connectionTtlSeconds": 97644565
+  },
+  "ingress": {
+    "proxy": {
+      "service": "in dolor id tempor",
+      "port": 77086861
+    }
+  },
+  "tolerations": [],
+  "terminationGracePeriodSeconds": {
+    "usm": -26461184,
+    "usm-hk": -82834253
+  },
+  "labels": {
+    "irure_dea": 42471939.63643533,
+    "ad_951": -45883614.517930396
+  },
+  "annotations": {
+    "commodo__": -20414882.63296625,
+    "in18": 23617026
+  },
+  "affinity": {
+    "podAntiAffinity": "soft",
+    "topologyKey": "dolor"
+  }
+}

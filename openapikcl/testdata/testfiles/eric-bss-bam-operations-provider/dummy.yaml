@@ -1,0 +1,172 @@
+{
+  "affinity": {
+    "sint2": true,
+    "podAntiAffinity": -75483769.02955814
+  },
+  "annotations": {
+    "dolorf": true,
+    "enimd12": true,
+    "et3": false,
+    "sedb": -83680357.64291628
+  },
+  "appArmorProfile": {
+    "dolorf28": 82621004,
+    "nulla_052": false,
+    "anim_8": "est reprehenderit",
+    "operationsprovider": {
+      "localhostProfile": "esse",
+      "type": "mollit ipsum velit"
+    }
+  },
+  "config": {
+    "est_e7d": "ex",
+    "alarms": {
+      "enabled": true,
+      "kafka": {
+        "consectetur508": 28055077,
+        "deserunt_c": 94822218.29977998,
+        "proident_4a": -75689316,
+        "eiusmod9": -11366693,
+        "host": 63834263.25585723
+      }
+    },
+    "cmAgent": {
+      "aute_9_": true,
+      "nostrud0": 12039026.132864177,
+      "mollit_9": 52468947.048906356,
+      "host": -17831032.29632181
+    },
+    "iam": {
+      "admin": {
+        "passwordKey": -92304859,
+        "secret": -73497685.89075749,
+        "userKey": 41533420
+      },
+      "enabled": "false"
+    },
+    "log": {
+      "aliquip__c9": true,
+      "connectionTtlMinutes": -84118224,
+      "streamingMethod": "esse",
+      "transformerHost": "commodo eiusmod do esse et"
+    },
+    "operationsprovider": {
+      "velit_76": -41981984,
+      "sintc01": false,
+      "sit_f1": false,
+      "trace": {
+        "cillum3f0": -18739708,
+        "in207": 68541996,
+        "in688": false,
+        "inactiveJobsRetentionPeriodInMinute": -95726512,
+        "traceLogsSize": -49037431
+      }
+    },
+    "searchEngine": {
+      "Lorem_": "ipsum irure ut do",
+      "ametbf": 33454038
+    },
+    "server": {
+      "mollit_5db": "ipsum ad",
+      "eiusmod4db": 82702489.97647524
+    }
+  },
+  "fullnameOverride": 30223869.98966229,
+  "global": {
+    "et_4": -96521745,
+    "fsGroup": {
+      "esse_ce0": -71267385.898375,
+      "manual": "027",
+      "namespace": null
+    },
+    "internalIPFamily": "IPv4",
+    "podSecurityContext": {
+      "eiusmod_9": "consequat laboris",
+      "in_bca": 63764140.555268586,
+      "ut_2e": 76214391.22727239,
+      "adipisicing_1": "officia irure dolore",
+      "cupidatat_9d_": "nisi ipsum",
+      "supplementalGroups": null
+    }
+  },
+  "imageCredentials": {
+    "operationsprovider": {
+      "anim_1": -16412504.256035596,
+      "aute_2e4": -92625397,
+      "nostrudb": 43147705.98676959,
+      "est5": 98577978.57066411
+    },
+    "pullSecret": "consequat nulla aliquip"
+  },
+  "images": 74242202.45394877,
+  "labels": {
+    "tempor_e4_": "Lorem"
+  },
+  "nameOverride": -97026454,
+  "nodeSelector": {
+    "et_f6d": -6177949,
+    "cillum8e6": 6952301,
+    "esse_73": "eu velit",
+    "adipisicinge": -12586368.19033052
+  },
+  "podDisruptionBudget": {
+    "do_0": -83387539,
+    "amet199": "minim sed ad",
+    "elite": "qui dolor",
+    "incididunt_d": 79709500.07779297,
+    "amet39a": "irure",
+    "incididunt_c_": -84677368
+  },
+  "podPriority": {
+    "cupidatat7": true,
+    "eric-bss-bam-operations-provider": {
+      "labore_7": true
+    }
+  },
+  "podSecurityContext": {
+    "pariatur2ff": 19222370.017390937,
+    "nulla3e": -12715418.712495819,
+    "supplementalGroups": null
+  },
+  "replicaCount": "-8917922",
+  "resources": {
+    "Lorem_4c": -68438330.51846385,
+    "inf4c": 28112071
+  },
+  "seccompProfile": {
+    "voluptate_e6": 49108853.96890333,
+    "occaecat0": "eu anim nisi",
+    "operationsprovider": {
+      "adipisicing_a": 50380386.776946485,
+      "localhostProfile": "enim pariatur anim",
+      "type": -70093174.10187279
+    }
+  },
+  "securityPolicy": {
+    "enimd97": -83154371.78413321,
+    "irure955": 81486172,
+    "rolename": 40829004.52721453
+  },
+  "service": {
+    "aliqua_4": -38955261,
+    "port": -46882002
+  },
+  "serviceAccount": {
+    "Duis2": true,
+    "dolor6c2": "dolore",
+    "create": true,
+    "name": null
+  },
+  "terminationGracePeriodSeconds": "215",
+  "tolerations": [],
+  "updateStrategy": {
+    "veniamd8": false,
+    "tempor_9": "officia elit Ut veniam",
+    "nostrud_c": 98304288,
+    "operationsprovider": {
+      "eu_63": 16026773.668122992,
+      "iruref": "pariatur aliqua",
+      "type": 99604733
+    }
+  }
+}

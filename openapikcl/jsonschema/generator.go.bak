@@ -1,0 +1,575 @@
+// Package jsonschema provides functionality for converting JSON Schema to KCL.
+package jsonschema
+
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"os"
+	"path/filepath"
+	"strings"
+	"unicode"
+
+	jsonschemalib "github.com/santhosh-tekuri/jsonschema/v5"
+)
+
+// GenerateSchemas converts a JSON Schema to KCL schemas and writes them to the specified output directory
+func GenerateSchemas(schemaData []byte, outputDir string, packageName string) error {
+	// Parse the JSON schema
+	var schema map[string]interface{}
+	if err := json.Unmarshal(schemaData, &schema); err != nil {
+		return fmt.Errorf("failed to parse JSON Schema: %w", err)
+	}
+
+	// Create the output directory if it doesn't exist
+	if err := os.MkdirAll(outputDir, 0755); err != nil {
+		return fmt.Errorf("failed to create output directory: %w", err)
+	}
+
+	// Determine schema name from title or use default
+	schemaName := "Schema"
+	if title, ok := schema["title"].(string); ok && title != "" {
+		schemaName = formatSchemaName(title)
+	}
+
+	// Parse the schema
+	parsedSchema, err := parseJsonSchema(schemaData)
+	if err != nil {
+		return fmt.Errorf("failed to parse schema: %w", err)
+	}
+
+	// Generate the KCL schema
+	kclSchema, err := generateSchemaToKCLWithDefaults(schemaName, parsedSchema, schema)
+	if err != nil {
+		return fmt.Errorf("failed to generate KCL schema: %w", err)
+	}
+
+	// Write the KCL schema to a file
+	if err := writeKCLSchemaFile(outputDir, schemaName, kclSchema); err != nil {
+		return fmt.Errorf("failed to write KCL schema file: %w", err)
+	}
+
+	// Generate a main.k file that imports all schemas
+	schemas := []string{schemaName}
+	if err := generateMainFile(outputDir, packageName, schemas); err != nil {
+		return fmt.Errorf("failed to generate main.k file: %w", err)
+	}
+
+	log.Printf("successfully generated KCL schema in %s", outputDir)
+	return nil
+}
+
+// formatSchemaName formats a schema name to be valid in KCL.
+func formatSchemaName(name string) string {
+	if name == "" {
+		return "Schema"
+	}
+
+	// Convert to PascalCase
+	var result strings.Builder
+	nextUpper := true
+
+	for _, ch := range name {
+		if ch == '_' || ch == '-' || ch == ' ' {
+			nextUpper = true
+		} else if nextUpper {
+			result.WriteRune(unicode.ToUpper(ch))
+			nextUpper = false
+		} else {
+			result.WriteRune(ch)
+		}
+	}
+
+	formatted := result.String()
+	if formatted == "" {
+		return "Schema"
+	}
+
+	return formatted
+}
+
+// extractSchemaName extracts the schema name from a reference string.
+func extractSchemaName(ref string) string {
+	parts := strings.Split(ref, "/")
+	return parts[len(parts)-1]
+}
+
+// writeKCLSchemaFile writes a KCL schema to a file.
+func writeKCLSchemaFile(outputDir, name, content string) error {
+	outputFile := filepath.Join(outputDir, name+".k")
+	err := os.WriteFile(outputFile, []byte(content), 0644)
+	if err != nil {
+		return err
+	}
+	log.Printf("Schema %s written to %s", name, outputFile)
+	return nil
+}
+
+// generateSchemaToKCLWithDefaults generates a KCL schema from a JSON Schema with default values.
+func generateSchemaToKCLWithDefaults(schemaName string, schema *jsonschemalib.Schema, rawSchema map[string]interface{}) (string, error) {
+	// Track if we need to import the regex module
+	needsRegexImport := checkIfNeedsRegexImport(schema, rawSchema)
+
+	// Start building the KCL schema
+	var sb strings.Builder
+
+	// Add regex import if needed
+	if needsRegexImport {
+		sb.WriteString("import regex\n\n")
+	}
+
+	// Start schema definition
+	sb.WriteString(fmt.Sprintf("schema %s:\n", schemaName))
+
+	// Add schema documentation if available
+	description := schema.Description
+	if description != "" {
+		lines := strings.Split(description, "\n")
+		for _, line := range lines {
+			sb.WriteString(fmt.Sprintf("    # %s\n", line))
+		}
+	}
+
+	// Extract properties
+	properties, err := extractProperties(schema, rawSchema)
+	if err != nil {
+		return "", err
+	}
+
+	// Add properties to the schema
+	for propName, propType := range properties {
+		sb.WriteString(fmt.Sprintf("    %s: %s\n", propName, propType))
+	}
+
+	// Add validation constraints
+	constraints := generateConstraints(schema, rawSchema)
+	if len(constraints) > 0 {
+		sb.WriteString("\n    check:\n")
+		for _, constraint := range constraints {
+			sb.WriteString(fmt.Sprintf("        %s\n", constraint))
+		}
+	}
+
+	return sb.String(), nil
+}
+
+// generateConstraints generates KCL constraints for a JSON Schema.
+func generateConstraints(schema *jsonschemalib.Schema, rawSchema map[string]interface{}) []string {
+	constraints := []string{}
+
+	// Get type from raw schema since the compiled schema doesn't store it directly
+	schemaType := getSchemaType(rawSchema)
+
+	if schemaType == "string" {
+		// MinLength constraint
+		if schema.MinLength != -1 {
+			constraints = append(constraints, fmt.Sprintf("len(self) >= %d", schema.MinLength))
+		}
+
+		// MaxLength constraint
+		if schema.MaxLength != -1 {
+			constraints = append(constraints, fmt.Sprintf("len(self) <= %d", schema.MaxLength))
+		}
+
+		// Pattern constraint
+		if schema.Pattern != nil {
+			// Get pattern as string
+			pattern := schema.Pattern.String()
+			// Remove leading and trailing slashes for compatibility with KCL
+			if len(pattern) > 2 && pattern[0] == '^' && pattern[len(pattern)-1] == '$' {
+				pattern = pattern[1 : len(pattern)-1]
+			}
+			constraints = append(constraints, fmt.Sprintf(`regex.match(self, r"%s")`, pattern))
+		}
+
+		// Format constraint
+		if schema.Format != "" {
+			switch schema.Format {
+			case "email":
+				constraints = append(constraints, `regex.match(self, r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")`)
+			case "date-time":
+				constraints = append(constraints, `regex.match(self, r"^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(\.(\d+))?(Z|([+-])(\d{2}):(\d{2}))$")`)
+			case "date":
+				constraints = append(constraints, `regex.match(self, r"^(\d{4})-(\d{2})-(\d{2})$")`)
+			case "time":
+				constraints = append(constraints, `regex.match(self, r"^(\d{2}):(\d{2}):(\d{2})$")`)
+			case "uuid":
+				constraints = append(constraints, `regex.match(self, r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")`)
+			}
+		}
+
+		// Enum constraint
+		if schema.Enum != nil && len(schema.Enum) > 0 {
+			values := make([]string, 0, len(schema.Enum))
+			for _, e := range schema.Enum {
+				if s, ok := e.(string); ok {
+					values = append(values, fmt.Sprintf(`"%s"`, s))
+				}
+			}
+			if len(values) > 0 {
+				constraints = append(constraints, fmt.Sprintf("self in [%s]", strings.Join(values, ", ")))
+			}
+		}
+	}
+
+	if schemaType == "integer" || schemaType == "number" {
+		// Minimum constraint
+		if schema.Minimum != nil {
+			exclusiveMin := false
+			if exMin, ok := rawSchema["exclusiveMinimum"].(bool); ok {
+				exclusiveMin = exMin
+			}
+
+			if exclusiveMin {
+				constraints = append(constraints, fmt.Sprintf("self > %v", schema.Minimum))
+			} else {
+				constraints = append(constraints, fmt.Sprintf("self >= %v", schema.Minimum))
+			}
+		}
+
+		// Maximum constraint
+		if schema.Maximum != nil {
+			exclusiveMax := false
+			if exMax, ok := rawSchema["exclusiveMaximum"].(bool); ok {
+				exclusiveMax = exMax
+			}
+
+			if exclusiveMax {
+				constraints = append(constraints, fmt.Sprintf("self < %v", schema.Maximum))
+			} else {
+				constraints = append(constraints, fmt.Sprintf("self <= %v", schema.Maximum))
+			}
+		}
+
+		// MultipleOf constraint
+		if schema.MultipleOf != nil {
+			constraints = append(constraints, fmt.Sprintf("self %% %v == 0", schema.MultipleOf))
+		}
+	}
+
+	if schemaType == "array" {
+		// MinItems constraint
+		if schema.MinItems != -1 {
+			constraints = append(constraints, fmt.Sprintf("len(self) >= %d", schema.MinItems))
+		}
+
+		// MaxItems constraint
+		if schema.MaxItems != -1 {
+			constraints = append(constraints, fmt.Sprintf("len(self) <= %d", schema.MaxItems))
+		}
+
+		// UniqueItems constraint
+		if schema.UniqueItems {
+			constraints = append(constraints, "len(self) == len(unique(self))")
+		}
+	}
+
+	return constraints
+}
+
+// checkIfNeedsRegexImport checks if the schema requires the regex import.
+func checkIfNeedsRegexImport(schema *jsonschemalib.Schema, rawSchema map[string]interface{}) bool {
+	if schema == nil {
+		return false
+	}
+
+	// Check if this schema has a pattern
+	if schema.Pattern != nil {
+		return true
+	}
+
+	// Check if this schema has a format that requires regex
+	if schema.Format != "" {
+		switch schema.Format {
+		case "email", "date-time", "date", "time", "uuid", "uri", "hostname", "ipv4", "ipv6":
+			return true
+		}
+	}
+
+	// Check for string type with patterns
+	schemaType := getSchemaType(rawSchema)
+	if schemaType == "string" {
+		return true
+	}
+
+	// Recursively check properties
+	for _, propSchema := range schema.Properties {
+		if propRaw, ok := rawSchema["properties"].(map[string]interface{}); ok {
+			for _, propValue := range propRaw {
+				if propMap, ok := propValue.(map[string]interface{}); ok {
+					if checkIfNeedsRegexImport(propSchema, propMap) {
+						return true
+					}
+				}
+			}
+		}
+	}
+
+	// Check items in arrays
+	if schema.Items != nil {
+		if itemSchema, ok := schema.Items.(*jsonschemalib.Schema); ok {
+			if itemsRaw, ok := rawSchema["items"].(map[string]interface{}); ok {
+				if checkIfNeedsRegexImport(itemSchema, itemsRaw) {
+					return true
+				}
+			}
+		}
+	}
+
+	// Check schema compositions
+	for _, s := range schema.OneOf {
+		if oneOfRaw, ok := rawSchema["oneOf"].([]interface{}); ok {
+			for _, oneOfItem := range oneOfRaw {
+				if oneOfMap, ok := oneOfItem.(map[string]interface{}); ok {
+					if checkIfNeedsRegexImport(s, oneOfMap) {
+						return true
+					}
+				}
+			}
+		}
+	}
+
+	for _, s := range schema.AnyOf {
+		if anyOfRaw, ok := rawSchema["anyOf"].([]interface{}); ok {
+			for _, anyOfItem := range anyOfRaw {
+				if anyOfMap, ok := anyOfItem.(map[string]interface{}); ok {
+					if checkIfNeedsRegexImport(s, anyOfMap) {
+						return true
+					}
+				}
+			}
+		}
+	}
+
+	for _, s := range schema.AllOf {
+		if allOfRaw, ok := rawSchema["allOf"].([]interface{}); ok {
+			for _, allOfItem := range allOfRaw {
+				if allOfMap, ok := allOfItem.(map[string]interface{}); ok {
+					if checkIfNeedsRegexImport(s, allOfMap) {
+						return true
+					}
+				}
+			}
+		}
+	}
+
+	return false
+}
+
+// extractProperties extracts properties from a JSON Schema.
+func extractProperties(schema *jsonschemalib.Schema, rawSchema map[string]interface{}) (map[string]string, error) {
+	properties := make(map[string]string)
+
+	// If schema has properties
+	for propName, propSchema := range schema.Properties {
+		sanitizedName := sanitizePropertyName(propName)
+		propType := getKCLType(propSchema, getPropRawSchema(rawSchema, propName))
+		required := isPropertyRequired(propName, schema)
+
+		// If the property is required or we're defaulting to required
+		if required {
+			properties[sanitizedName] = propType
+		} else {
+			properties[sanitizedName] = propType + "?"
+		}
+	}
+
+	return properties, nil
+}
+
+// isPropertyRequired checks if a property is required in a JSON Schema.
+func isPropertyRequired(propertyName string, schema *jsonschemalib.Schema) bool {
+	for _, req := range schema.Required {
+		if req == propertyName {
+			return true
+		}
+	}
+	return false
+}
+
+// getKCLType returns the KCL type for a JSON Schema type.
+func getKCLType(schema *jsonschemalib.Schema, rawSchema map[string]interface{}) string {
+	if schema == nil {
+		return "any"
+	}
+
+	// Handle reference to another schema
+	if schema.Ref != nil {
+		refLocation := schema.Ref.Location
+		if refLocation != "" {
+			refName := extractSchemaName(refLocation)
+			return formatSchemaName(refName)
+		}
+	}
+
+	// Get type from raw schema
+	schemaType := getSchemaType(rawSchema)
+
+	// Handle array type
+	if schemaType == "array" && rawSchema != nil {
+		if items, ok := rawSchema["items"].(map[string]interface{}); ok {
+			if itemSchema, ok := schema.Items.(*jsonschemalib.Schema); ok {
+				itemType := getKCLType(itemSchema, items)
+				return fmt.Sprintf("[%s]", itemType)
+			}
+		}
+		return "[any]"
+	}
+
+	// Handle object type
+	if schemaType == "object" {
+		if len(schema.Properties) > 0 {
+			return "{str:any}" // Simplified for now
+		}
+		return "{str:any}"
+	}
+
+	// Handle primitive types based on schema type
+	switch schemaType {
+	case "string":
+		return "str"
+	case "integer":
+		return "int"
+	case "number":
+		return "float"
+	case "boolean":
+		return "bool"
+	case "null":
+		return "None"
+	default:
+		return "any"
+	}
+}
+
+// sanitizePropertyName sanitizes a property name to be a valid KCL identifier.
+func sanitizePropertyName(name string) string {
+	// Check if the property name is a Go keyword
+	keywords := map[string]bool{
+		"break": true, "default": true, "func": true, "interface": true,
+		"select": true, "case": true, "defer": true, "go": true, "map": true,
+		"struct": true, "chan": true, "else": true, "goto": true, "package": true,
+		"switch": true, "const": true, "fallthrough": true, "if": true,
+		"range": true, "type": true, "continue": true, "for": true, "import": true,
+		"return": true, "var": true,
+	}
+
+	// KCL keywords
+	kclKeywords := map[string]bool{
+		"import": true, "as": true, "assert": true, "check": true, "schema": true,
+		"mixin": true, "protocol": true, "rule": true, "for": true, "in": true,
+		"if": true, "elif": true, "else": true, "or": true, "and": true, "not": true,
+		"all": true, "any": true, "filter": true, "map": true, "lambda": true,
+	}
+
+	if keywords[name] || kclKeywords[name] {
+		return name + "_"
+	}
+
+	// Remove special characters and ensure the name is valid
+	var result strings.Builder
+	for i, ch := range name {
+		if (i == 0 && !unicode.IsLetter(ch) && ch != '_') || (!unicode.IsLetter(ch) && !unicode.IsDigit(ch) && ch != '_') {
+			result.WriteRune('_')
+		} else {
+			result.WriteRune(ch)
+		}
+	}
+
+	return result.String()
+}
+
+// parseJsonSchema parses a JSON Schema from bytes.
+func parseJsonSchema(schemaBytes []byte) (*jsonschemalib.Schema, error) {
+	compiler := jsonschemalib.NewCompiler()
+
+	// Register the schema
+	if err := compiler.AddResource("schema.json", strings.NewReader(string(schemaBytes))); err != nil {
+		return nil, fmt.Errorf("failed to add schema resource: %w", err)
+	}
+
+	// Compile the schema
+	schema, err := compiler.Compile("schema.json")
+	if err != nil {
+		return nil, fmt.Errorf("failed to compile schema: %w", err)
+	}
+
+	return schema, nil
+}
+
+// getSchemaType extracts the type from a raw schema
+func getSchemaType(rawSchema map[string]interface{}) string {
+	if rawSchema == nil {
+		return ""
+	}
+
+	// Check for type field
+	if typeValue, ok := rawSchema["type"]; ok {
+		if typeStr, ok := typeValue.(string); ok {
+			return typeStr
+		} else if typeArr, ok := typeValue.([]interface{}); ok && len(typeArr) > 0 {
+			// Some schemas specify multiple types - use the first non-null type
+			for _, t := range typeArr {
+				if tStr, ok := t.(string); ok && tStr != "null" {
+					return tStr
+				}
+			}
+			// If we only have null or couldn't find a non-null type, return the first one
+			if tStr, ok := typeArr[0].(string); ok {
+				return tStr
+			}
+		}
+	}
+
+	// Infer type from schema structure
+	if _, ok := rawSchema["properties"]; ok {
+		return "object"
+	}
+	if _, ok := rawSchema["items"]; ok {
+		return "array"
+	}
+
+	return "any"
+}
+
+// getPropRawSchema retrieves the raw schema for a property
+func getPropRawSchema(rawSchema map[string]interface{}, propName string) map[string]interface{} {
+	if rawSchema == nil {
+		return nil
+	}
+
+	properties, ok := rawSchema["properties"].(map[string]interface{})
+	if !ok {
+		return nil
+	}
+
+	propSchema, ok := properties[propName].(map[string]interface{})
+	if !ok {
+		return nil
+	}
+
+	return propSchema
+}
+
+// generateMainFile creates a main.k file that imports all schemas.
+func generateMainFile(outputDir string, packageName string, schemas []string) error {
+	var sb strings.Builder
+
+	// Add package header if specified
+	if packageName != "" {
+		sb.WriteString(fmt.Sprintf("package %s\n\n", packageName))
+	}
+
+	// Import each schema
+	for _, schema := range schemas {
+		sb.WriteString(fmt.Sprintf("import %s\n", schema))
+	}
+
+	// Write the main.k file
+	mainFilePath := filepath.Join(outputDir, "main.k")
+	if err := os.WriteFile(mainFilePath, []byte(sb.String()), 0644); err != nil {
+		return err
+	}
+
+	log.Printf("generated main.k file with %d schema imports", len(schemas))
+	return nil
+}

@@ -1,0 +1,173 @@
+{
+  "doloree": true,
+  "occaecatfea": "sed nostrud laborum ut",
+  "Excepteurd5_": true,
+  "in5": "Ut sed aute",
+  "laboris_13": "laboris voluptate dolore aliqua",
+  "affinity": {
+    "Excepteur_6bc": "elit",
+    "Duis_0": true,
+    "ex__43": "anim amet",
+    "nodeAffinity": {
+      "incididunt6b4": -45726830,
+      "nullaf6": -80602616.24765368
+    }
+  },
+  "alarms": {
+    "enabled": false,
+    "kafka": {
+      "do_6": 59934013.660848826,
+      "do_62e": -7210517.194853812,
+      "Duis_3b": "et",
+      "host": -65772559
+    }
+  },
+  "annotations": {
+    "iruree6": 40905931.89386836
+  },
+  "appArmorProfile": {
+    "ut_5": 26556976
+  },
+  "brAgent": {
+    "backupTypeList": [],
+    "brLabelValue": 6743088.788433835,
+    "enabled": true,
+    "productionDate": "cupidatat ad Ut sed"
+  },
+  "imageCredentials": {
+    "bamcmstore": {
+      "proident6": -52556687,
+      "registry": {
+        "velit6": -34010266.29489845,
+        "in23": false,
+        "sit1": "aute aliquip eiusmod velit",
+        "est_5_": true,
+        "Excepteur49b": "enim voluptate nulla labore",
+        "imagePullPolicy": 33193701.568639293
+      }
+    },
+    "bamcmstorebra": {
+      "aliqua_2d": 48424811,
+      "registry": {
+        "aliquab": 1422608,
+        "Excepteura": "aliqua proident",
+        "imagePullPolicy": "anim"
+      }
+    },
+    "repoPath": null
+  },
+  "images": {
+    "Ut_87": 27311978,
+    "bamcmstore": {
+      "name": "in adipisicing nisi veniam Lorem",
+      "tag": -77384746.7498998
+    },
+    "bamcmstorebra": {
+      "name": -36224800.791356504,
+      "tag": "id proident"
+    }
+  },
+  "logLevel": "ad minim incididunt dolor",
+  "logQueueSize": 38793051,
+  "logTimeoutSeconds": "-6848859917",
+  "logTransformerNoTlsHost": -28187867.995345205,
+  "metrics": {
+    "culpa70c": true,
+    "sint_f53": 56151281,
+    "adipisicing_4": 37159875.240549624,
+    "doloreb4": -25448921,
+    "qui_1": true
+  },
+  "nameOverride": null,
+  "networkPolicy": {
+    "elitb": false,
+    "anim_3": true,
+    "animcc": 95003798.17712483,
+    "ea_0dc": -10439590.584252968,
+    "occaecate84": false,
+    "aliqua_f": -15666003
+  },
+  "nodeSelector": {
+    "officia_8": false,
+    "labore_8f": "nisi irure",
+    "ullamco__3": false
+  },
+  "persistence": {
+    "consectetur20e": 67119832.75495577
+  },
+  "podPriority": {
+    "Duis47e": "in culpa magna",
+    "do8": true,
+    "Excepteur664": -88782339.7751597,
+    "Ut_3c": 80376047,
+    "eiusmod_2d9": "reprehenderit nulla eiusmod officia",
+    "eric-bss-bam-cm-store": {
+      "pariatur30a": "nisi Excepteur proident ea",
+      "priorityClassName": -64163206
+    }
+  },
+  "podSecurityContext": {
+    "laboris69e": -11595957,
+    "commodo_b": true
+  },
+  "replicaCount": 94682012,
+  "resources": {
+    "bamcmstore": {
+      "limits": {
+        "eu_b": "dolore in",
+        "cpu": "irure sit",
+        "memory": -34107197.87080905
+      },
+      "requests": {
+        "dolor_da": false,
+        "sint_ad": -22064794,
+        "fugiat4": 20083797.472673208
+      }
+    },
+    "bra": {
+      "non_5": "aliqua",
+      "eu_9": "non ipsum et adipisicing reprehenderit",
+      "incididuntc32": -24870927.317708924,
+      "limits": {
+        "irure_3a2": 25968718,
+        "cpu": 74542751.15714148
+      },
+      "requests": {
+        "cpu": 22998898,
+        "memory": "culpa exercitation dolore tempor ut"
+      }
+    }
+  },
+  "securityPolicy": {
+    "do_4": -72590067.64085653,
+    "rolename": 53373588
+  },
+  "service": {
+    "Duis47": true,
+    "eiusmod65": "quis non commodo tempor eu",
+    "qui17": 68239264.68365964,
+    "port": "-254",
+    "type": -95999103
+  },
+  "serviceAccount": {
+    "sed_976": -24868281,
+    "create": false
+  },
+  "topologySpreadConstraints": [],
+  "updateStrategy": {
+    "tempor_11": true,
+    "consectetur_b": "ullamco Ut incididunt laborum",
+    "bamcmstore": {
+      "exercitation_a": 70520544,
+      "ut_16": 4590589,
+      "rollingUpdate": {
+        "quis74": -90317984.36272718,
+        "nulla_38a": -10955856.174940243,
+        "laborume9c": false,
+        "sint_6d": -19014015.71254389,
+        "maxUnavailable": "elit consectetur dolore consequat"
+      },
+      "type": "sunt cillum commodo"
+    }
+  }
+}

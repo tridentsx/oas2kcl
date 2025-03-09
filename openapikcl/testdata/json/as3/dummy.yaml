@@ -1,0 +1,89 @@
+- class: ADC
+  schemaVersion: "3.28"
+  target:
+    ut_095: 4.745733295161083e+06
+  label: ""
+  remark: '{y}'
+  constants:
+    minim_b: []
+  Common:
+    class: Tenant
+    label: '|{}z'
+    remark: zzzz
+    verifiers:
+      aliqua_de: true
+    enable: true
+    Shared:
+      class: Application
+      template: shared
+      serviceMain:
+        description: Primary service of the application
+    constants:
+      class: Constants
+  controls:
+    archiveId: sint tempor proident Lorem
+    class: Controls
+    dryRun: false
+    fortune: true
+    logLevel: emergency
+    trace: true
+    userAgent: sint proident
+  scratch: ad
+- class: ADC
+  schemaVersion: 3.7.76249
+- class: ADC
+  $schema: http://QSgHiuBelpVkCeTFXfDAuLIoxOsUo.exbpK6-z4LoYNtQtYw9RnGk64shP+EwlsLIsJkoIARbQC,H6MX
+  updateMode: complete
+  schemaVersion: "3.19"
+  id: ""
+  target:
+    hostname: deserunt anim
+  label: '}zz}z|}z~'
+  remark: z|
+  constants:
+    eu61: -317929.6375963539
+    in_1f5: ut minim mollit
+    in_a: 62798862
+    class: Constants
+    version: eiusmod tempor enim dolore
+    timestamp: "1918-03-17T04:03:51.0Z"
+  Common:
+    class: Tenant
+    label: ~{{~~y
+    remark: y{{yz}{y~
+    verifiers:
+      Lorem019: anim non
+    enable: true
+    Shared:
+      class: Application
+      template: shared
+      enable: true
+      label: '|||y|{|z}|'
+      remark: y}zy}y
+      schemaOverlay: nostrud non elit
+      constants:
+        class: Constants
+      serviceMain:
+        description: Primary service of the application
+    constants:
+      class: Constants
+    optimisticLockKey: id non qui culpa velit
+  controls:
+    archiveTimestamp: "1924-06-15T20:43:39.0Z"
+    class: Controls
+  scratch: sunt
+- class: ADC
+  $schema: http://fKaCSinVc.qjuPhe1mcZricNOxUaRRJm5,fslHV4
+  updateMode: selective
+  schemaVersion: 3.50.0
+  id: ;(_~0
+  target:
+    fugiat47a: false
+  constants:
+    class: Constants
+    version: quis in dolore ut sit
+    timestamp: "1959-03-15T11:43:15.0Z"
+  Common:
+    class: Tenant
+    label: '||~~zzy'
+  scratch: velit

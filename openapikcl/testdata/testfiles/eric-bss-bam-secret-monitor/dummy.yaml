@@ -1,0 +1,129 @@
+{
+  "affinity": {
+    "officia7": false,
+    "exercitation97": 32689780,
+    "aute5": "ex culpa Lorem nisi quis"
+  },
+  "annotations": {
+    "eiusmod_16": true,
+    "esse00": -61378506.37255662
+  },
+  "appArmorProfile": {
+    "nulla2ce": "deserunt labore",
+    "deserunt_96": "sint commodo qui officia",
+    "bamsecretmonitor": {
+      "tempor_0_": 75201116,
+      "ada1": "laboris",
+      "voluptate_3": 13274654.05905363,
+      "localhostProfile": 17625802.878084913,
+      "type": -54659169.074728854
+    }
+  },
+  "faultMapping": {
+    "doloreed9": -33461472,
+    "nisia7e": 23155796.699977532
+  },
+  "fullnameOverride": -93201922,
+  "images": {
+    "dolorf": -67662847,
+    "veniam_1": true,
+    "bamsecretmonitor": {
+      "name": "do eiusmod dolore dolor",
+      "tag": null
+    }
+  },
+  "kafkaProxy": {
+    "ut5": "commodo nulla veniam ut id",
+    "elit__a0": 37706464,
+    "port": 7239515,
+    "serviceName": -54638556
+  },
+  "labels": {
+    "voluptate8": false,
+    "consectetur2a": true,
+    "ipsum_f": -21031933.432259858,
+    "culpa_5": -67602981
+  },
+  "logConnectionTtlMinutes": 53119658,
+  "logLevel": 47084130.65047675,
+  "log": {
+    "Lorem_9": true,
+    "streamingMethod": "dual"
+  },
+  "logQueueSize": "309735005",
+  "logTransformerNoTlsHost": -54438786,
+  "networkPolicy": {
+    "consectetur_34": false,
+    "sed_f4b": "sit in dolore",
+    "minimf": -85322514,
+    "egress": {
+      "laborume8e": -62153702,
+      "nulla_c6": -22619438.13704677,
+      "nulla_585": "sint enim occaecat eu",
+      "Excepteur_285": -76413012,
+      "accessLabels": {
+        "proidentcc": false,
+        "tempor_e": false,
+        "secretmonitor": {
+          "dolor_0d": -90398577,
+          "occaecatc0b": -67669785.67064017,
+          "consectetur_a6": true,
+          "culpa8": -827152
+        }
+      }
+    },
+    "enabled": false
+  },
+  "probes": {
+    "euf2_": -57319396,
+    "adipisicing_9": -23982324,
+    "ullamco_4": 62404073,
+    "consequat__c": 63353644.98515323,
+    "culpa_1d": true
+  },
+  "resources": {
+    "Lorem9cc": 39222617.6845817
+  },
+  "security": {
+    "aliquip30": -75072485,
+    "enimc2": -33485551.30691766,
+    "anim63": "labore nostrud culpa",
+    "Lorem_92e": "laboris",
+    "cillum__49": "Excepteur anim Ut do",
+    "tls": {
+      "in76": false,
+      "Ut5": -1229324,
+      "sit1": false,
+      "qui_0a": false,
+      "kafkaProxy": {
+        "enabled": true,
+        "issuer": -9873054.129977271
+      },
+      "mutual": false
+    }
+  },
+  "securityPolicy": {
+    "sed15": "enim cillum Lorem eu",
+    "nulla_4a4": -79339096
+  },
+  "service": {
+    "consequatb90": -68956057.88842842,
+    "adipisicing_904": 36849969.858590096,
+    "aliquip_1b": "Lorem quis cillum sed",
+    "tlsport": "841735611"
+  },
+  "serviceAccount": {
+    "Excepteur_7_": 50114275.30302912,
+    "dolorb": true,
+    "proident__16": "adipisicing sunt nulla ipsum",
+    "proident24": -17819111,
+    "dolore__3": 41093584,
+    "create": true,
+    "name": "consequat"
+  },
+  "tolerations": [],
+  "updateStrategy": {
+    "sit_16": -84036206.29222672,
+    "amet_d0": 31732128.400728986
+  }
+}

@@ -1,0 +1,204 @@
+replicaCount: 1
+
+#global:
+#  labels: {}
+#  annotations: {}
+#  timezone: UTC
+#  nodeSelector: {}
+#  tolerations: []
+#  security:
+#    tls:
+#      enabled: true
+#  pullSecret:
+#  registry:
+#    url: armdocker.rnd.ericsson.se
+#    repoPath:
+#  networkPolicy:
+#    enabled: false
+#  securityPolicy:
+#    rolekind: ""
+#  podSecurityContext:
+#    supplementalGroups:
+#  fsGroup:
+#    manual:
+#    namespace:
+#  internalIPFamily:
+#  log:
+#    streamingMethod: "indirect"
+
+imageCredentials:
+  topologyManager:
+    repoPath: # see default in eric-product-info.yaml
+    registry: # overrides global registry url
+      url:
+      imagePullPolicy:
+
+images:
+  topologyManager:
+    name:
+    tag:
+
+serviceAccount:
+  create: true
+  name:
+
+security:
+  kafkaProxy:
+    tls:
+      enabled: true
+      mutual: true
+  watcher:
+    tls:
+      enabled: true
+      mutual: true
+      syncCertSecretName: eric-bss-bam-topology-manager-sync-client-cert
+      syncCaSecretName: eric-bss-bam-topology-manager-sync-ca
+
+alarms:
+  kafkaProxy:
+    host: eric-bss-kafka-proxy-http
+    port: 80
+
+resources:
+  # Below commented out resource config is also supported but
+  # deprecated in BAM 3.3. If boths ways are configured the
+  # deprecated values has precedence.
+  #
+  #requests:
+  #  cpu:
+  #  memory:
+  #limits:
+  #  cpu:
+  #  memory:
+  topologymanager:
+    requests:
+      cpu: 150m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 700Mi
+
+updateStrategy:
+  topologymanager:
+    type: Recreate
+
+#DR-D1123-113
+service:
+  endpoints:
+    rest:
+      tls:
+        enforced: required
+        verifyClientCertificate: required
+
+#TODO set correct default values
+topologymanager:
+  scanInterval: 60
+  podDownAlarmRaiseGrace: 300
+  logLevel: info
+  log:
+    streamingMethod: ""
+  logTransformerHost: "eric-log-transformer:5024"
+  logTransformerNoTlsHost: "eric-log-transformer:5025"
+  logTimeoutSeconds: 5
+  logQueueSize: 1000
+  logConnectionTtlMinutes: 120
+  port: 8080
+  tlsPort: 8443
+  enrichmentLabel:
+    name:
+    value:
+  currentLocation:
+    name:
+    clusterName:
+    siteId:
+    siteName:
+    dc:
+    region:
+    address:
+      fqdn: eric-bss-bam-topology-manager-query-rbac-proxy
+      port: 443
+      protocol: https
+  minUnreachableCounter: 5
+  # Fetch active alarms from alarm handler and store in disk
+  alarmHandler:
+    enabled: true
+    host: eric-fh-alarm-handler:5006
+    noTlsHost: eric-fh-alarm-handler:5005
+  # Fetch alarm histories from search engine and store in disk
+  searchEngine:
+    enabled: true
+    alarmHistorySizePerLocation: 1000
+    host: eric-data-search-engine-tls:9200
+    noTlsHost: eric-data-search-engine:9200
+  metrics:
+    enabled: true
+    host: eric-pm-server
+    serviceName: topology_manager
+  remoteMirror:
+    enabled: true
+    localArgs: {}
+  locationEnrollment:
+    serverCATrustSecret: eric-bss-bam-topology-manager-sync-ca
+    clientCATrustSecret: eric-bss-bam-topology-manager-sync-ca
+
+persistence:
+  persistentVolumeClaim:
+    size: 256Mi
+    #storageClassName:
+
+#Below is migration code should be removed after deprecation period for BSS_BAM-4268
+#persistentVolumeClaim:
+#  size: 256Mi
+#  storageClassName:
+
+annotations: {}
+labels: {}
+nodeSelector: {}
+affinity:
+  nodeAffinity: {}
+
+tolerations: []
+
+probes:
+  topologyManager:
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 1
+      periodSeconds: 10
+      timeoutSeconds: 2
+    startupProbe:
+      failureThreshold: 60
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 2
+
+terminationGracePeriodSeconds: 30
+
+podPriority:
+  eric-bss-bam-topology-manager:
+    priorityClassName:
+
+networkPolicy:
+  enabled: true
+  egress:
+    accessLabels:
+      topologyManager: {}
+
+topologySpreadConstraints: [] # Configuration for topology-spread constraints.
+
+seccompProfile:
+  topologymanager:
+    type: ""
+    localhostProfile: ""
+
+appArmorProfile:
+  topologymanager:
+    type: ""
+    localhostProfile: ""
+
+securityPolicy:
+  rolename: ""
+
+podSecurityContext:
+  supplementalGroups:

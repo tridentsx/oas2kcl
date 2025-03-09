@@ -1,0 +1,1123 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "properties": {
+    "affinity": {
+      "properties": {
+        "nodeAffinity": {
+          "default": "{}",
+          "description": "nodeAffinity rules",
+          "type": "object"
+        },
+        "podAntiAffinity": {
+          "default": "soft",
+          "description": "podAntiAffinity with two possible values: soft and hard",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        },
+        "topologyKey": {
+          "default": "kubernetes.io/hostname",
+          "description": "topologyKey to use",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "alarms": {
+      "properties": {
+        "enabled": {
+          "default": "true",
+          "description": "If enabled, CM Agent will produce alarms if errors occurs",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "enum": [
+                "true",
+                "false"
+              ],
+              "type": "string"
+            }
+          ]
+        },
+        "kafka": {
+          "properties": {
+            "host": {
+              "default": "eric-bss-kafka-proxy-http:80",
+              "description": "FQDN of the local kafka proxy including port",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "annotations": {
+      "default": "{}",
+      "description": "The key-prefix is optional and cannot exceed 253 characters with following character set: [a-z0-9A-Z\\.] The key cannot exceed 63 characters with following character set: [a-z0-9A-Z\\_\\.\\-]",
+      "type": "object"
+    },
+    "appArmorProfile": {
+      "properties": {
+        "cmagent": {
+          "properties": {
+            "localhostProfile": {
+              "default": "\"\"",
+              "description": "Localhost path to the AppArmor profile for the cmagent container. Should only be set if appArmorProfile.cmagent.type is set to localhost.",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "\"\"",
+              "description": "The AppArmor type for the cmagent container. Available options are \"unconfined\", \"runtime/default\", \"localhost\" , \"\" [default=\"\"]",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "cmmsync": {
+      "properties": {
+        "enabled": {
+          "default": "true",
+          "description": "If enabled, CM Mediator configurations will be synced by CM Agent",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "enum": [
+                "true",
+                "false"
+              ],
+              "type": "string"
+            }
+          ]
+        },
+        "host": {
+          "default": "eric-cm-mediator:5004",
+          "description": "FQDN of the local CM Mediator service including port",
+          "type": "string"
+        },
+        "noTlsHost": {
+          "default": "eric-cm-mediator:5003",
+          "description": "FQDN of the local CM Mediator non tls service including port",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "config": {
+      "properties": {
+        "forceCreateConfig": {
+          "default": "false",
+          "description": "If config should be overriden during Helm operations if already existing, should be true if changing any of these: config.localStorage, config.primaryStorage, config.isPrimary. If true then any Helm operation will overwrite the existing config.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "enum": [
+                "true",
+                "false"
+              ],
+              "type": "string"
+            }
+          ]
+        },
+        "gitClient": {
+          "properties": {
+            "caKey": {
+              "default": "ca.crt",
+              "description": "Secret key in config.gitClient.caSecret pointing to the CA in PEM format.",
+              "type": "string"
+            },
+            "caSecret": {
+              "default": "eric-bss-bam-cm-agent-rbac-client-ca",
+              "description": "Secret name containing CA for the remote git connection.",
+              "type": "string"
+            },
+            "tlsEnabled": {
+              "default": "true",
+              "description": "Providing either secure, encrypted communication (true) or unencrypted communication (false)",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "isPrimary": {
+          "default": "true",
+          "description": "Whether this CMA Service should consider itself as a primary",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "enum": [
+                "true",
+                "false"
+              ],
+              "type": "string"
+            }
+          ]
+        },
+        "localStorage": {
+          "default": "eric-bss-bam-cm-store-rbac-proxy:9443",
+          "description": "FQDN of the local CMA storage including port",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        },
+        "logConnectionTtlMinutes": {
+          "default": "120",
+          "description": "Log connection TTL (minutes) towards log transformer service. Connection will reset after configured number of minutes. Required when streamingMethod is set to direct or dual",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        },
+        "logLevel": {
+          "default": "info",
+          "description": "Log level, possible values are: debug, info, error",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        },
+        "log": {
+          "properties": {
+            "streamingMethod": {
+              "default": "indirect",
+              "description": "The local parameter for specifying the streaming method of service logs. It can be 'indirect', 'direct', 'dual', or null. If set to null, global.log.streamingMethod will be used to determine the streaming method",
+              "type": "string",
+              "enum": [ "indirect", "direct", "dual", "" ]
+            }
+          }
+        },
+        "logQueueSize": {
+          "default": "1000",
+          "description": "Size of the log queue for streaming. Required when streamingMethod is set to direct or dual",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        },
+        "logTimeoutSeconds": {
+          "default": "5",
+          "description": "Timeout waiting for logs to be streamed (in seconds) before terminating. Required when streamingMethod is set to direct or dual",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        },
+        "logTransformerHost": {
+          "default": "eric-log-transformer:5024",
+          "description": "FQDN including port number of the log transformer service, don't include protocol. Required when streamingMethod is set to direct or dual",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        },
+        "logTransformerNoTlsHost": {
+          "default": "eric-log-transformer:5025",
+          "description": "FQDN including port number of the log transformer non tls service, don't include protocol. Required when streamingMethod is set to direct or dual",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        },
+        "primaryStorage": {
+          "default": "eric-bss-bam-cm-store-rbac-proxy:9443",
+          "description": "FQDN including port number of the primary CMA service, don't include protocol.",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        },
+        "recloneThreshold": {
+          "default": "90",
+          "description": "Marks a threshold in percentage for the local Git respository. When exeeded, the repository will be deleted and cloned anew to prevent ‘no space left on device' error. This mechanism can be disabled by setting this parameter to value 0.",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        },
+        "syncInterval": {
+          "default": "5",
+          "description": "Interval between sync (in seconds)",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "fullnameOverride": {
+      "default": "\u003cempty\u003e",
+      "description": "Overriding the full name",
+      "type": [
+        "string",
+        "integer",
+        "number",
+        "null"
+      ]
+    },
+    "gitRepo": {
+      "properties": {
+        "size": {
+          "default": "32Mi",
+          "description": "Size of the ephemeral storage used to store the configuration data to be replicated.\nFor an absolute minimum calculate:\ngitrepo size = configuration data size * 4.\nNote: The size of 'gitrepo' contributes to the memory of cm-agent.",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "global": {
+      "properties": {
+        "annotations": {
+          "default": "nil",
+          "description": "Global annotations. Global, service level, and resource-specific annotations are merged, no conflicts are allowed.",
+          "type": "object"
+        },
+        "fsGroup": {
+          "properties": {
+            "manual": {
+              "default": "\u003cempty\u003e",
+              "description": "Sets a fsGroup ID for all services. If manual set to empty namespace default configuration is used.",
+              "type": [
+                "null",
+                "integer"
+              ]
+            },
+            "namespace": {
+              "default": "\u003cempty\u003e",
+              "description": "Sets a fsGroup to use namespace default. The following values are possible: true, false and \"\". If global.fsGroup.namespace set to \"\" or false, namespace default configuration is used.",
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "internalIPFamily": {
+          "default": "\u003cempty\u003e",
+          "description": "InternalIPFamily configures the IP address family used for cluster-internal IP address. Available values are: IPv4, IPv6, and empty.",
+          "enum": [
+            "IPv6",
+            "IPv4",
+            ""
+          ],
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "labels": {
+          "default": "nil",
+          "description": "Global labels. Global, service level, and resource-specific labels are merged, no conflicts are allowed.",
+          "type": "object"
+        },
+        "log": {
+          "properties": {
+            "streamingMethod": {
+              "default": "indirect",
+              "description": "The global parameter for specifying the streaming method of service logs. It can be 'indirect', 'direct', 'dual', or null. If both global.log.streamingMethod and log.streamingMethod are set to null, it will choose 'indirect' by default",
+              "type": "string",
+              "enum": ["indirect", "direct", "dual", ""]
+            }
+          }
+        },
+        "networkPolicy": {
+          "properties": {
+            "enabled": {
+              "default": "false",
+              "description": "Network policy",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "nodeSelector": {
+          "default": "{}",
+          "description": "Global node selectors",
+          "type": "object"
+        },
+        "tolerations": {
+          "default": "[]",
+          "description": "Tolerations for pod assignment, this supports the fullAPI",
+          "type": "array"
+        },
+        "podSecurityContext": {
+          "properties": {
+            "supplementalGroups": {
+              "default": "\u003cempty\u003e",
+              "description": "SupplementalGroups is used for setting the GID value(s) for volume data that is used by the services. The value will be merged if both global and local value are set. supplementalGroup will not be set in helmchart if both global and local value are not set.",
+              "type": [
+                "array",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "pullSecret": {
+          "default": "\u003cempty\u003e",
+          "description": "PullSecret used when fetching the image",
+          "type": [
+            "string",
+            "integer",
+            "number",
+            "null"
+          ]
+        },
+        "registry": {
+          "properties": {
+            "imagePullPolicy": {
+              "default": "IfNotPresent",
+              "description": "Pull policy for the image",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "repoPath": {
+              "default": "\u003cempty\u003e",
+              "description": "Repo where the image is located",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "url": {
+              "default": "armdocker.rnd.ericsson.se",
+              "description": "Registry url to fetch image from",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "security": {
+          "properties": {
+            "tls": {
+              "properties": {
+                "enabled": {
+                  "default": "true",
+                  "description": "Configuration option to enable/disable TLS support",
+                  "oneOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "enum": [
+                        "true",
+                        "false"
+                      ],
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "securityPolicy": {
+          "properties": {
+            "rolekind": {
+              "default": "\"\"",
+              "description": "Configuration of the security policy role kind. The following values are possible: ClusterRole, Role and \"\". Rolebinding will not be created with value \"\".",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "timezone": {
+          "default": "UTC",
+          "description": "Timezone",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "imageCredentials": {
+      "properties": {
+        "cmagent": {
+          "properties": {
+            "registry": {
+              "properties": {
+                "imagePullPolicy": {
+                  "default": "IfNotPresent",
+                  "description": "Pull policy for the image",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "pullSecret": {
+          "default": "\u003cempty\u003e",
+          "description": "PullSecret used when fetching the image",
+          "type": [
+            "string",
+            "integer",
+            "number",
+            "null"
+          ]
+        },
+        "registry": {
+          "properties": {
+            "url": {
+              "default": "\u003cempty\u003e",
+              "description": "Registry url to fetch image from",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "repoPath": {
+          "default": "proj-bam-drop",
+          "description": "Repo where the image is located",
+          "type": [
+            "string",
+            "integer",
+            "number",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "images": {
+      "properties": {
+        "cmagent": {
+          "properties": {
+            "name": {
+              "default": "eric-bss-bam-cm-agent",
+              "description": "Docker image name for CMA",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "tag": {
+              "default": "Same as Chart version",
+              "description": "Docker image tag for CMA",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "labels": {
+      "default": "{}",
+      "description": "List of key/value pairs of labels appended to every helm resource created by Function Controller helm chart",
+      "type": "object"
+    },
+    "metrics": {
+      "properties": {
+        "enabled": {
+          "default": "true",
+          "description": "This allows the service to increment counters.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "enum": [
+                "true",
+                "false"
+              ],
+              "type": "string"
+            }
+          ]
+        },
+        "host": {
+          "default": "eric-pm-server",
+          "description": "Host name of the pm server. this is used for pm metrics access if network policies are in use",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        },
+        "serviceName": {
+          "default": "cm_agent",
+          "description": "The subsystem name for all the metrics generated by the service to be prefixed",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "nameOverride": {
+      "default": "\u003cempty\u003e",
+      "description": "Name override of the chart",
+      "type": [
+        "string",
+        "integer",
+        "number",
+        "null"
+      ]
+    },
+    "networkPolicy": {
+      "properties": {
+        "egress": {
+          "properties": {
+            "accessLabels": {
+              "properties": {
+                "cmagent": {
+                  "default": "{}",
+                  "description": "This parameter is a placeholder for adding a list of egress traffic network policy labels. If this service wants to send traffic then it should add all its outgoing traffic network policy access labels using this parameter.",
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "enabled": {
+          "default": "true",
+          "description": "Network policy. The network policy will be enabled if both networkPolicy.enabled and global.networkPolicy.enabled are set to true.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "enum": [
+                "true",
+                "false"
+              ],
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "nodeSelector": {
+      "default": "{}",
+      "description": "Node selectors",
+      "type": "object"
+    },
+    "podPriority": {
+      "properties": {
+        "eric-bss-bam-cm-agent": {
+          "properties": {
+            "priorityClassName": {
+              "default": "",
+              "description": "The pod priority for the service",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "podSecurityContext": {
+      "properties": {
+        "supplementalGroups": {
+          "default": "\u003cempty\u003e",
+          "description": "SupplementalGroups is used for setting the GID value(s) for volume data that is used by the services. The value will be merged if both global and local value are set. supplementalGroup will not be set in helmchart if both global and local value are not set.",
+          "type": [
+            "array",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "probes": {
+      "properties": {
+        "cmagent": {
+          "properties": {
+            "livenessProbe": {
+              "properties": {
+                "failureThreshold": {
+                  "default": "3",
+                  "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "initialDelaySeconds": {
+                  "default": "1",
+                  "description": "Number of seconds after the container has started before probe is initiated",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "periodSeconds": {
+                  "default": "10",
+                  "description": "How often (in seconds) to perform the probe",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "timeoutSeconds": {
+                  "default": "2",
+                  "description": "Number of seconds after which the probe times out",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "startupProbe": {
+              "properties": {
+                "failureThreshold": {
+                  "default": "60",
+                  "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "initialDelaySeconds": {
+                  "default": "5",
+                  "description": "Number of seconds after the container has started before probe is initiated",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "periodSeconds": {
+                  "default": "5",
+                  "description": "How often (in seconds) to perform the probe",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "successThreshold": {
+                  "default": "1",
+                  "description": "Minimum consecutive successes for the probe to be considered successful after having failed",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "timeoutSeconds": {
+                  "default": "2",
+                  "description": "Number of seconds after which the probe times out",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "replicaCount": {
+      "default": "1",
+      "description": "Replica count for service",
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?\\d+$",
+          "type": "string"
+        }
+      ]
+    },
+    "resources": {
+      "properties": {
+        "cmagent": {
+          "properties": {
+            "limits": {
+              "properties": {
+                "cpu": {
+                  "default": "500m",
+                  "description": "Limits cpu for cmagent container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "160Mi",
+                  "description": "Limits memory for cmagent container. It includes the ephemeral storage 'gitrepo'. For an absolute minimum it should be calculated as memory limit = gitrepo size * 3",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "requests": {
+              "properties": {
+                "cpu": {
+                  "default": "10m",
+                  "description": "Request cpu for cmagent container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "64Mi",
+                  "description": "Request memory for cmagent container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "seccompProfile": {
+      "properties": {
+        "cmagent": {
+          "properties": {
+            "localhostProfile": {
+              "default": "\"\"",
+              "description": "Localhost path to the seccomp profile for the cmagent container. Should only be set if seccompProfile.cmagent.type is set to Localhost.",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "\"\"",
+              "description": "Feature of the Linux kernel for secure computing mode for cmagent container. Available options are `Unconfined`, `RuntimeDefault`, `Localhost` and \"\" [default=\"\"]",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "securityPolicy": {
+      "properties": {
+        "rolename": {
+          "default": "eric-bss-bam-cm-agent",
+          "description": "Rolename sets the name of the security policy role that is bound to the service account.",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "service": {
+      "properties": {
+        "port": {
+          "default": "5000",
+          "description": "Service port",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        },
+        "type": {
+          "default": "ClusterIP",
+          "description": "Service type",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "serviceAccount": {
+      "properties": {
+        "create": {
+          "default": "true",
+          "description": "Create service account",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "enum": [
+                "true",
+                "false"
+              ],
+              "type": "string"
+            }
+          ]
+        },
+        "name": {
+          "default": "secretreader",
+          "description": "Name of the serviceaccount to be used",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "terminationGracePeriodSeconds": {
+      "default": "30",
+      "description": "Number of seconds after SIGTERM caught before shutting down",
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?\\d+$",
+          "type": "string"
+        }
+      ]
+    },
+    "tolerations": {
+      "default": "[]",
+      "description": "Toleration rules",
+      "type": "array"
+    },
+    "topologySpreadConstraints": {
+      "default": "[]",
+      "description": "The topology spread constant for service",
+      "type": "array"
+    },
+    "updateStrategy": {
+      "properties": {
+        "rollingUpdate": {
+          "properties": {
+            "maxSurge": {
+              "default": "50%",
+              "description": "The maximum number of pods that can be created over the desired number of pods",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "maxUnavailable": {
+              "default": "50%",
+              "description": "The maximum number of pods that can be unavailable during the update process",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "type": {
+          "default": "RollingUpdate",
+          "description": "The update strategy type",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        }
+      },
+      "type": "object"
+    }
+  },
+  "type": "object"
+}

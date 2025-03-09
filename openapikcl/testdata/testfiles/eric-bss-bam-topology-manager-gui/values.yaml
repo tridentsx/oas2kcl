@@ -1,0 +1,151 @@
+#global:
+#  labels: {}
+#  annotations: {}
+#  timezone: UTC
+#  pullSecret:
+#  nodeSelector: {}
+#  tolerations: []
+#  security:
+#    tls:
+#      enabled: true
+#  registry:
+#    url: armdocker.rnd.ericsson.se
+#    imagePullPolicy: IfNotPresent
+#    repoPath:
+#  networkPolicy:
+#    enabled: false
+#  securityPolicy:
+#    rolekind: ""
+#  podSecurityContext:
+#    supplementalGroups:
+#  fsGroup:
+#    manual:
+#    namespace:
+#  internalIPFamily:
+#  log:
+#    streamingMethod: "indirect"
+
+replicaCount: 1
+
+imageCredentials:
+  repoPath:
+  pullSecret:
+  registry:
+    url:
+    # Overrides global registry
+    ## Secret must be manually created in the namespace.
+    imagePullPolicy:
+    # Overrides global registry imagePullPolicy value
+
+images:
+  topologymanagergui:
+    name:
+    tag:
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  name:
+
+resources:
+  topologymanagergui:
+    requests:
+      cpu: 40m
+      memory: 32Mi
+    limits:
+      cpu: 60m
+      memory: 64Mi
+
+updateStrategy:
+  topologymanagergui:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 50%
+      maxSurge: 50%
+
+service:
+  port: 8080
+  app:
+    labelName: bss-oam-gui
+    discoveryServices: eric-bss-gui-aggregator
+
+security:
+  tls:
+    gas:
+      ca: eric-bss-gui-aggregator-client-ca
+
+ingress:
+  enabled: true
+  ingressClass:
+  rbacProxy:
+    service: eric-bss-bam-topology-manager-rbac-proxy
+    port: 9443
+    caSecret: eric-sec-sip-tls-trusted-root-cert
+    subjectName: eric-bss-bam-topology-manager-rbac-proxy
+
+config:
+  logLevel: info
+  log:
+    streamingMethod: ""
+  logTransformerHost: "eric-log-transformer:5024"
+  logTransformerNoTlsHost: "eric-log-transformer:5025"
+  logTimeoutSeconds: 5
+  logQueueSize: 1000
+  logConnectionTtlMinutes: 120
+  kafkaHost: eric-bss-kafka-proxy-http:80
+  workloadCategoryName: "Application"
+labels: {}
+
+annotations: {}
+nodeSelector: {}
+
+tolerations: []
+
+affinity:
+  nodeAffinity: {}
+
+probes:
+  topologymanagergui:
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 1
+      periodSeconds: 10
+      timeoutSeconds: 2
+    startupProbe:
+      failureThreshold: 60
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 2
+
+terminationGracePeriodSeconds: 30
+
+podPriority:
+  eric-bss-bam-topology-manager-gui:
+    priorityClassName:
+
+networkPolicy:
+  enabled: true
+  egress:
+    accessLabels:
+      topologymanagergui: {}
+
+topologySpreadConstraints: [] # Configuration for topology-spread constraints.
+
+seccompProfile:
+  topologymanagergui:
+    type: ""
+    localhostProfile: ""
+
+appArmorProfile:
+  topologymanagergui:
+    type: ""
+    localhostProfile: ""
+
+securityPolicy:
+  rolename: ""
+
+podSecurityContext:
+  supplementalGroups:

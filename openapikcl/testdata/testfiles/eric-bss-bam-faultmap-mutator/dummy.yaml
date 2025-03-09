@@ -1,0 +1,82 @@
+{
+  "affinity": {
+    "laborum_af": true,
+    "dolore_ff": 1048547.0253358483,
+    "nodeAffinity": {
+      "enim_c49": -60166392,
+      "aute9d": -32605787.029656515,
+      "aliquac": -57431768.473149255,
+      "Lorem_562": "sed sit"
+    }
+  },
+  "annotations": {
+    "este13": -50518246.807023816,
+    "est_9": -23941966.262683496,
+    "occaecat_8_": true,
+    "laboris_d1": true
+  },
+  "appArmorProfile": {
+    "doloref6_": false,
+    "exercitatione75": true,
+    "officia_8cc": "irure Ut eiusmod nostrud dolore",
+    "faultmap-mutator": {
+      "fugiat_d9": -44147298.93598621,
+      "ipsum_d": "velit deserunt",
+      "velit_a": 98200159.46804023
+    }
+  },
+  "imageCredentials": {
+    "faultmapMutator": {
+      "ad_f": "in amet",
+      "non_dbc": 81314221,
+      "ut_186": -30517223.769729763,
+      "inc": false,
+      "registry": {
+        "ipsum_b7": true,
+        "nulla84": "aliqua deserunt labore",
+        "do91": "esse dolore elit nisi non",
+        "anim_0c": -85445149.38564456,
+        "imagePullPolicy": -44826121,
+        "url": 9959061.313828245
+      },
+      "repoPath": 53082250.12793115
+    }
+  },
+  "images": {
+    "ut6": true,
+    "aute7d": 33268177.234196633,
+    "ad_85": -85125335,
+    "dolor_ea": 45587004,
+    "faultmapMutator": {
+      "consequatcc": -32719700,
+      "restartPolicy": "sit fugiat deserunt in"
+    }
+  },
+  "kafkaHost": -34324850,
+  "logConnectionTtlMinutes": -60184502,
+  "logTimeoutSeconds": -39872598,
+  "logTransformerHost": 27623446,
+  "networkPolicy": {
+    "ut4": false,
+    "egress": {
+      "irureb8": "Duis eiusmod in cupidatat",
+      "culpa936": "dolore in minim consectetur laborum"
+    }
+  },
+  "podPriority": {
+    "elit_a": "commodo in esse laboris aliquip",
+    "utfd": "commodo adipisicing esse",
+    "eu7": 80474425.63757965,
+    "sit_9": "in",
+    "ad_3": 72981177.15249339
+  },
+  "podSecurityContext": {
+    "voluptate_f1": true,
+    "laborum_38": true,
+    "minim00": "sunt ipsum aliqua",
+    "supplementalGroups": null
+  },
+  "sourceConfigMapLabel": -40663399.49640763,
+  "targetConfigMapName": "veniam dolor amet",
+  "terminationGracePeriodSeconds": -20138650
+}

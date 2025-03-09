@@ -1,0 +1,189 @@
+{
+  "ipsum97": -61081210.03257341,
+  "minimfa": 37249305.72668281,
+  "pariatur_9a6": "dolore",
+  "aliqua04a": true,
+  "affinity": {
+    "ad_c": -88833463,
+    "consectetur_da5": true
+  },
+  "annotations": {
+    "ea5": "cupidatat quis mollit laborum irure",
+    "magnac": "commodo sed sunt ut adipisicing"
+  },
+  "appArmorProfile": {
+    "commodo_07": "ut labore do",
+    "dolore_5b7": "consectetur fugiat",
+    "topologymanagergui": {
+      "localhostProfile": "id dolore ipsum nostrud consequat",
+      "type": -72225952.09182826
+    }
+  },
+  "config": {
+    "kafkaHost": "minim reprehenderit consequat mollit",
+    "log": {
+      "in_9": "anim fugiat commodo ipsum est",
+      "voluptate9b1": -98582608,
+      "streamingMethod": "dual"
+    },
+    "logConnectionTtlMinutes": -25730212,
+    "logLevel": -43331154,
+    "logTimeoutSeconds": 49058905,
+    "logTransformerHost": -1050944.876046151,
+    "logTransformerNoTlsHost": -69410512,
+    "workloadCategoryName": "minim"
+  },
+  "fullnameOverride": "dolore",
+  "global": {
+    "networkPolicy": {
+      "incididunt_f": "ea ullamco",
+      "anim_d": false,
+      "enabled": true
+    },
+    "podSecurityContext": {
+      "supplementalGroups": []
+    },
+    "registry": {
+      "imagePullPolicy": -2843933.5734916925,
+      "repoPath": "mollit laboris cupidatat",
+      "url": -11768280
+    },
+    "timezone": "velit quis pariatur",
+    "tolerations": []
+  },
+  "imageCredentials": {
+    "animc": true,
+    "ametd7c": "culpa minim",
+    "ipsum_d_": 94996095,
+    "pullSecret": null,
+    "registry": {
+      "url": "veniam enim"
+    },
+    "repoPath": "proident eu voluptate nostrud dolor"
+  },
+  "images": {
+    "enimc": false,
+    "in745": "et aliquip ea in irure",
+    "topologymanagergui": {
+      "id_7": "nisi deserunt Excepteur veniam",
+      "name": "minim nulla non officia nisi",
+      "tag": null
+    }
+  },
+  "ingress": {
+    "reprehenderitc": false,
+    "enabled": "false",
+    "ingressClass": null,
+    "rbacProxy": {
+      "amet120": -81117124.50076452,
+      "caSecret": "Duis ex sint nisi",
+      "port": "-9852049701",
+      "service": 89936021.07507429,
+      "subjectName": "elit exercitation culpa qui fugiat"
+    }
+  },
+  "labels": {
+    "non_637": 27123271
+  },
+  "nameOverride": null,
+  "networkPolicy": {
+    "fugiat_1e3": "adipisicing id voluptate non",
+    "sedd1b": false,
+    "eu_4d7": true,
+    "id78": true
+  },
+  "nodeSelector": {
+    "ex276": true,
+    "qui2": -14611991,
+    "culpa_7": 24446809.430829436,
+    "adipisicing8d": true
+  },
+  "podPriority": {
+    "ut_e": 20504727.287700623,
+    "eric-bss-bam-topology-manager-gui": {
+      "dolor0b2": false,
+      "priorityClassName": null
+    }
+  },
+  "podSecurityContext": {
+    "supplementalGroups": null
+  },
+  "probes": {
+    "est9": -46345663.45117132,
+    "topologymanagergui": {
+      "ea5": -72845172.18241037,
+      "eiusmod_192": 57043547,
+      "non5d": true,
+      "livenessProbe": {
+        "timeoutSeconds": "-153675"
+      },
+      "startupProbe": {
+        "failureThreshold": "008252336",
+        "initialDelaySeconds": 4777483,
+        "periodSeconds": "78",
+        "successThreshold": "-742923423",
+        "timeoutSeconds": 9935663
+      }
+    }
+  },
+  "replicaCount": "761",
+  "resources": {
+    "veniamb5": true,
+    "eue1": 76309564.14133209
+  },
+  "seccompProfile": {
+    "laborumb6b": "quis sed dolor aliqua qui",
+    "deserunt4": 20744122,
+    "Duis_0": "proident magna esse sint",
+    "topologymanagergui": {
+      "tempor185": false,
+      "Ut7": true,
+      "localhostProfile": 68606363,
+      "type": "sunt mollit"
+    }
+  },
+  "security": {
+    "tempor1a": -51074143,
+    "tls": {
+      "gas": {
+        "ullamcof": true,
+        "exercitationaa": -18660675,
+        "fugiat_f92": -87213959,
+        "ca": 94281015
+      }
+    }
+  },
+  "securityPolicy": {
+    "pariatur1b": true,
+    "laborisf3": "aliquip occaecat cillum Duis",
+    "rolename": 36659322
+  },
+  "service": {
+    "pariatur9": "magna exercitation aliqua irure id",
+    "app": {
+      "discoveryServices": "exercitation do in ullamco ut"
+    },
+    "port": "139572"
+  },
+  "serviceAccount": {
+    "in_9": -49660585,
+    "non_2_": 85508174.57331994,
+    "laborefd": -69392930.1752143,
+    "create": false,
+    "name": null
+  },
+  "terminationGracePeriodSeconds": 87054947,
+  "tolerations": [],
+  "topologySpreadConstraints": [],
+  "updateStrategy": {
+    "officia0_": "eu voluptate Lorem",
+    "topologymanagergui": {
+      "rollingUpdate": {
+        "id_8": 16253194.223169044,
+        "ex5": true,
+        "maxSurge": "minim commodo Ut ex non",
+        "maxUnavailable": "adipisicing veniam minim eiusmod fugiat"
+      }
+    }
+  }
+}

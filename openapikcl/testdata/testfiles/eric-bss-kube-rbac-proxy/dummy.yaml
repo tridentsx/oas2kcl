@@ -1,0 +1,228 @@
+{
+  "annotations": {
+    "dolor_": false,
+    "deserunt__": "proident",
+    "sed_1_b": "est ipsum minim ex"
+  },
+  "appArmorProfile": {
+    "qui_0c": false,
+    "commodo5d": -92338417,
+    "proxy": {
+      "sint3": -14428635,
+      "cupidatat_1": -86578743,
+      "type": -1932337
+    }
+  },
+  "config": {
+    "veniam_667": 47008861,
+    "in4c": 43499860.28358209,
+    "consectetur_4": "dolor",
+    "proident0f9": false,
+    "dolor8c": "incididunt sunt pariatur occaecat et",
+    "non_59c": "tempor ea",
+    "audit": {
+      "Ut_93a": "qui esse non dolor ea",
+      "pariaturd": "Lorem et exercitation",
+      "ullamcob_1": -63740584.22345432,
+      "inc": -12185691.625574797,
+      "disableCertAuthAudit": "false"
+    },
+    "basicAuth": {
+      "tempor30": "magna in esse",
+      "eiusmodf": "Ut et sint Excepteur",
+      "do_9": 77018785.31487504,
+      "elit_094": true,
+      "enabled": "false",
+      "userList": "magna",
+      "userSecretFileName": 58049236.762471765,
+      "userSecretName": -33813238
+    },
+    "certAuth": {
+      "clientCaSecret": "veniam nostrud eu",
+      "clientCaSecretKey": 36367840,
+      "enabled": "true"
+    },
+    "faultIndications": {
+      "enabled": false,
+      "host": 19427332.803049073
+    },
+    "logConnectionTtlMinutes": "75210340",
+    "logLevel": 70530453,
+    "log": {
+      "proidente6": -94865400,
+      "streamingMethod": "direct"
+    },
+    "logQueueSize": 31840824,
+    "logTransformerNoTlsHost": 45428123,
+    "metrics": {
+      "enabled": "true",
+      "path": "aute sint eu anim consectetur",
+      "serviceName": "proident dolor ut in pariatur"
+    },
+    "oidcAuth": {
+      "id_b7b": 69123598.1670757,
+      "sunt_0": false
+    },
+    "rbac": {
+      "Lorem_4b3": "reprehenderit ut fugiat cillum",
+      "eu_8f3": 43583793.04399061,
+      "Lorem_b83": -34478906,
+      "labore_ef6": -29908414,
+      "globalRolePolicyCmLabel": 38667107.17178291,
+      "modelType": -85573976
+    },
+    "upstream": {
+      "caKey": "incididunt in pariatur",
+      "caSecret": null,
+      "certKey": "culpa Lorem velit",
+      "existingSecret": "commodo",
+      "includeAuthHeaders": true,
+      "issuerRef": null,
+      "serverName": null,
+      "url": null
+    },
+    "verbose": "true"
+  },
+  "global": {
+    "in_ab": -51160678,
+    "mollit_31b": 13476055,
+    "nulla3_": true,
+    "ea__f1": false,
+    "estd": false,
+    "consequat_3d": 51478499.399216145,
+    "nisi4": true,
+    "in5": -30489687.844948232,
+    "reprehenderit_8": false,
+    "Utb1": 31202456.508809283,
+    "internalIPFamily": "IPv6",
+    "labels": {
+      "eiusmod_0": -80295962
+    },
+    "nodeSelector": {
+      "ina": "deserunt incididunt velit Ut"
+    },
+    "registry": {
+      "ut4": "Duis nisi enim adipisicing",
+      "imagePullPolicy": -35424386.61422787,
+      "repoPath": "ipsum commodo aliqua",
+      "url": 75571225.54981151
+    },
+    "securityPolicy": {
+      "sunt_c7_": true,
+      "rolekind": 61108658.32196173
+    },
+    "timezone": -57474939.600739196,
+    "tolerations": []
+  },
+  "imageCredentials": {
+    "registry": {
+      "in32": false,
+      "laborec59": "cupidatat et Excepteur",
+      "laborumfc": false,
+      "aute5": true,
+      "reprehenderit_c": "ut ipsum elit veniam Duis"
+    },
+    "repoPath": "ut non exercitation"
+  },
+  "images": {
+    "proident_6": 76914867.44419146,
+    "id46": false,
+    "Excepteure": -66599296.72648217,
+    "ea06": 69409962
+  },
+  "ingress": {
+    "quis_6cc": false,
+    "fugiat6a": 38966273,
+    "cupidatatd86": "officia Duis tempor exercitation",
+    "laborum_2": 72580380,
+    "voluptate9": -32443077,
+    "doa6": false
+  },
+  "labels": {
+    "cupidatat_": "labore ullamco",
+    "consectetur_f": -13577986,
+    "non_9d3": false
+  },
+  "licenseControl": {
+    "functionControlHost": -24068231,
+    "functionControlNoTlsHost": -96495607,
+    "interval": "-68392",
+    "kafkaProxyHost": "cillum anim dolore",
+    "secondsPerSeverity": "21427213416"
+  },
+  "nameOverride": null,
+  "networkPolicy": {
+    "egress": {
+      "do_6f6": 46524199,
+      "accessLabels": {
+        "sint_e83": 2783324,
+        "anim3c": 63648830,
+        "id2": 57160838.19122413,
+        "rbacProxy": {
+          "aliqua_6": -1409277,
+          "ina": true
+        }
+      }
+    },
+    "enabled": "false"
+  },
+  "nodeSelector": {
+    "consequat_a_": false
+  },
+  "podDisruptionBudget": {
+    "in_2": -64074720.07050159,
+    "Excepteur__": -85225523.93700762,
+    "proident__": false,
+    "doloreba": 18746373.148251295,
+    "maxUnavailable": null
+  },
+  "podPriority": {
+    "aute37": 39393021.75647023,
+    "eric-bss-kube-rbac-proxy": {
+      "labore_85b": true,
+      "priorityClassName": null
+    }
+  },
+  "probes": {
+    "dolor_0": -26371580,
+    "esse_d2": true,
+    "dolore432": -53503539,
+    "proxy": {
+      "consequat_7d1": -48232582,
+      "livenessProbe": {
+        "failureThreshold": "569825",
+        "initialDelaySeconds": 24657451,
+        "periodSeconds": "-38",
+        "timeoutSeconds": 44978387
+      },
+      "startupProbe": {
+        "sint2": -82903912,
+        "ut_1": -29918404.049004003,
+        "deserunt_6": 87144156.07986027,
+        "initialDelaySeconds": "28",
+        "periodSeconds": -80451661,
+        "successThreshold": -77755070,
+        "timeoutSeconds": "75"
+      }
+    }
+  },
+  "replicaCount": 95257283,
+  "resources": {
+    "consectetur3b": "do consequat",
+    "aliqua89e": 23303522,
+    "magna_71": true,
+    "cupidatat1": 27900921.680552185,
+    "rbacProxy": {
+      "in_405": true,
+      "pariatur_4cb": 43471980.98575902
+    }
+  },
+  "serviceAccount": {
+    "irure52": "veniam",
+    "exercitation_cb": 86330591,
+    "create": false,
+    "name": null
+  },
+  "terminationGracePeriodSeconds": "067",
+  "topologySpreadConstraints": []
+}

@@ -1,0 +1,1515 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+        "ah": {
+            "type": "object",
+            "properties": {
+                "caName": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9-_]+$"
+                },
+                "clientCertSecret": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9-_]+$"
+                },
+                "host": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9-_]+$"
+                },
+                "port": {
+                    "type": "integer",
+                    "minimum": 1024,
+                    "maximum": 65535
+                },
+                "portTls": {
+                    "type": "integer",
+                    "minimum": 1024,
+                    "maximum": 65535
+                }
+            }
+        },
+        "annotations": {
+            "type": "object"
+        },
+        "appArmorProfile": {
+            "type": "object",
+            "properties": {
+                "cmmJob": {
+                    "type": "object",
+                    "properties": {
+                        "localhostProfile": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string",
+                            "enum": ["unconfined", "runtime/default", "localhost", ""]
+                        }
+                    }
+                },
+                "hooklauncher": {
+                    "type": "object",
+                    "properties": {
+                        "localhostProfile": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string",
+                            "enum": ["unconfined", "runtime/default", "localhost", ""]
+                        }
+                    }
+                },
+                "localhostProfile": {
+                    "type": "string"
+                },
+                "logshipper": {
+                    "type": "object",
+                    "properties": {
+                        "localhostProfile": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string",
+                            "enum": ["unconfined", "runtime/default", "localhost", ""]
+                        }
+                    }
+                },
+                "snmpAP": {
+                    "type": "object",
+                    "properties": {
+                        "localhostProfile": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string",
+                            "enum": ["unconfined", "runtime/default", "localhost", ""]
+                        }
+                    }
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["unconfined", "runtime/default", "localhost", ""]
+                }
+            }
+        },
+        "bandwidth": {
+            "type": "object",
+            "properties": {
+                "cmmJob": {
+                    "type": "object",
+                    "properties": {
+                        "maxEgressRate": {
+                            "type": "string",
+                            "pattern": "^(?:\\d+[.]?\\d*[KMG])?$"
+                        }
+                    }
+                },
+                "snmpAP": {
+                    "type": "object",
+                    "properties": {
+                        "maxEgressRate": {
+                            "type": "string",
+                            "pattern": "^(?:\\d+[.]?\\d*[KMG])?$"
+                        }
+                    }
+                }
+            }
+        },
+        "cmm": {
+            "type": "object",
+            "properties": {
+                "caName": {
+                    "type": "string",
+                   "pattern": "^[a-z0-9-_]+$"
+                },
+                "clientCertSecret": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9-_]+$"
+                },
+                "host": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9-_]+$"
+                },
+                "notifyServerClientCaSecret": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9-_]+$"
+                },
+                "notifyServerPort": {
+                    "type": "integer",
+                    "minimum": 1024,
+                    "maximum": 65535
+                },
+                "notifyServerPortName": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9-_]+$"
+                },
+                "notifyServerPortTls": {
+                    "type": "integer",
+                    "minimum": 1024,
+                    "maximum": 65535
+                },
+                "port": {
+                    "type": "integer",
+                    "minimum": 1024,
+                    "maximum": 65535
+                },
+                "portTls": {
+                    "type": "integer",
+                    "minimum": 1024,
+                    "maximum": 65535
+                }
+            }
+        },
+        "global": {
+            "type": "object",
+            "properties": {
+                "hooklauncher": {
+                    "type": "object",
+                    "properties": {
+                        "executor": {
+                            "type": "string",
+                            "enum": ["service", "integration"]
+                        },
+                        "executorCharts": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "internalIPFamily": {
+                    "type": ["string", "null"],
+                    "enum": ["IPv4", "IPv6", "", null]
+                },
+                "networkPolicy": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "nodeSelector": {
+                    "type": "object"
+                },
+                "podSecurityContext": {
+                    "type": "object",
+                    "properties": {
+                        "supplementalGroups": {
+                            "type": ["array", "null"]
+                        }
+                    }
+                },
+                "pullSecret": {
+                    "oneOf": [
+                        {
+                            "type": "string",
+                            "pattern": "^[a-z0-9-_]+$"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "registry": {
+                    "type": "object",
+                    "properties": {
+                        "imagePullPolicy": {
+                            "type": ["string", "null"],
+                            "enum": ["Always", "Never", "IfNotPresent", null]
+                        },
+                        "repoPath": {
+                            "type": ["string", "null"]
+                        },
+                        "url": {
+                            "type": ["object", "string", "integer", "boolean", "array", "null"]
+                        }
+                    }
+                },
+                "security": {
+                    "type": "object",
+                    "properties": {
+                        "policyBinding": {
+                            "type": "object",
+                            "properties": {
+                                "create": {
+                                    "type": "boolean"
+                                }
+                            }
+                        },
+                        "policyReferenceMap": {
+                            "type": "object",
+                            "properties": {
+                                "default-restricted-security-policy": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "tls": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                },
+                "securityPolicy": {
+                    "type": "object",
+                    "properties": {
+                        "rolekind": {
+                            "type": ["string", "null"],
+                            "enum": ["Role", "ClusterRole", null, ""]
+                        }
+                    }
+                },
+                "timezone": {
+                    "type": "string"
+                },
+                "log": {
+                    "type": "object",
+                    "properties": {
+                        "createControlConfigmap": {
+                            "enum": ["true", "false"]
+                        }
+                    }
+                }
+            }
+        },
+        "hooklauncher": {
+            "title": "The hooklauncher Schema",
+            "type": "object",
+            "mutability": false,
+            "required": [
+                "cleanup",
+                "terminateEarlyOnFailure",
+                "backoffLimit"
+            ],
+            "properties": {
+                "cleanup": {
+                    "title": "The cleanup Schema",
+                    "type": "string",
+                    "mutability": true,
+                    "enum": ["true", "false", "onSuccess"]
+                },
+                "terminateEarlyOnFailure": {
+                    "title": "The terminateEarlyOnFailure Schema",
+                    "type": "string",
+                    "mutability": true,
+                    "enum": ["true", "false"]
+                },
+                "backoffLimit": {
+                    "title": "The backoffLimit Schema",
+                    "mutability": true,
+                    "type": "integer"
+                }
+            },
+            "additionalProperties": false,
+            "examples": [{
+                "cleanup": "true",
+                "terminateEarlyOnFailure": "true",
+                "backoffLimit": 6
+            }]
+        },
+        "imageCredentials": {
+            "type": "object",
+            "properties": {
+                "hooklauncher": {
+                    "type": "object",
+                    "properties": {
+                        "registry": {
+                            "type": "object",
+                            "properties": {
+                                "imagePullPolicy": {
+                                    "type": ["string", "null"],
+                                    "enum": ["Always", "Never", "IfNotPresent", null]
+                                },
+                                "url": {
+                                    "type": ["object", "string", "integer", "boolean", "array", "null"]
+                                }
+                            }
+                        },
+                        "repoPath": {
+                            "type": ["string", "null"]
+                        }
+                    }
+                },
+                "logshipper": {
+                    "type": "object",
+                    "properties": {
+                        "registry": {
+                            "type": "object",
+                            "properties": {
+                                "imagePullPolicy": {
+                                    "type": ["string", "null"],
+                                    "enum": ["Always", "Never", "IfNotPresent", null]
+                                },
+                                "url": {
+                                    "type": ["object", "string", "integer", "boolean", "array", "null"]
+                                }
+                            }
+                        },
+                        "repoPath": {
+                            "type": ["string", "null"]
+                        }
+                    }
+                },
+                "pullSecret": {
+                    "oneOf": [
+                        {
+                            "type": "string",
+                            "pattern": "^[a-z0-9-_]+$"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "registry": {
+                    "type": "object",
+                    "properties": {
+                        "imagePullPolicy": {
+                            "type": ["string", "null"],
+                            "enum": ["Always", "Never", "IfNotPresent", null]
+                        },
+                        "url": {
+                            "type": ["object", "string", "integer", "boolean", "array", "null"]
+                        }
+                    }
+                },
+                "repoPath": {
+                    "type": ["string", "null"]
+                },
+                "restartPolicy": {
+                    "type": "string"
+                },
+                "snmpAP": {
+                    "type": "object",
+                    "properties": {
+                        "registry": {
+                            "type": "object",
+                            "properties": {
+                                "imagePullPolicy": {
+                                    "type": ["string", "null"],
+                                    "enum": ["Always", "Never", "IfNotPresent", null]
+                                },
+                                "url": {
+                                    "type": ["object", "string", "integer", "boolean", "array", "null"]
+                                }
+                            }
+                        },
+                        "repoPath": {
+                            "type": ["string", "null"]
+                        }
+                    }
+                }
+            }
+        },
+        "keyValueDatabaseRD": {
+            "type": "object",
+            "properties": {
+                "acl": {
+                    "type": "object",
+                    "properties": {
+                        "user": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "caName": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9-_]+$"
+                },
+                "clientCertSecret": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9-_]+$"
+                },
+                "clusterName": {
+                    "type": "string"
+                },
+                "connectionPoolsize": {
+                    "type": "integer"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "nettyConnections": {
+                    "type": "integer"
+                },
+                "port": {
+                    "type": "integer",
+                    "minimum": 1024,
+                    "maximum": 65535
+                },
+                "tlsPort": {
+                    "type": "integer",
+                    "minimum": 1024,
+                    "maximum": 65535
+                }
+            }
+        },
+        "kms": {
+            "type": "object",
+            "properties": {
+                "host": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9-_]+$"
+                },
+                "port": {
+                    "type": "integer",
+                    "minimum": 1024,
+                    "maximum": 65535
+                }
+            }
+        },
+        "labels": {
+            "type": "object"
+        },
+        "log": {
+            "type": "object",
+            "properties": {
+                "enabled3PPs": {
+                    "type": "string",
+                    "enum": ["kafka", "redisson", "snmp4j", ""]
+                },
+                "eric-fh-snmp-alarm-provider": {
+                    "type": "object",
+                    "properties": {
+                        "level": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "streamingMethod": {
+                    "type": ["string", "null"],
+                    "enum": ["direct", "indirect", "dual", null]
+                }
+            }
+        },
+        "logShipper": {
+            "type": "object",
+            "properties": {
+                "input": {
+                    "type": "object",
+                    "properties": {
+                        "files": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "enabled": {
+                                        "type": "boolean"
+                                    },
+                                    "buffer": {
+                                        "type": "object",
+                                        "properties": {
+                                            "maxSize": {
+                                                "type": ["string", "integer", "null"]
+                                            }
+                                        }
+                                    },
+                                    "skipLongLines": {
+                                        "type": ["string", "null"]
+                                    },
+                                    "paths": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "logLevel": {
+                    "type": "string"
+                },
+                "output": {
+                    "type": "object",
+                    "properties": {
+                        "logTransformer": {
+                            "type": "object",
+                            "properties": {
+                                "host": {
+                                    "type": "string",
+                                    "pattern": "^[a-z0-9-_]+$"
+                                }
+                            }
+                        }
+                    }
+                },
+                "storage": {
+                    "type": "object",
+                    "properties": {
+                        "medium": {
+                            "type": "string",
+                            "enum": ["Ephemeral", "Memory"]
+                        },
+                        "path": {
+                            "type": "string"
+                        },
+                        "size": {
+                            "type": "string",
+                            "pattern": "^(?:\\d+[.]?\\d*[KMG][i]?)?$"
+                        }
+                    }
+                }
+            }
+        },
+        "messageBusKF": {
+            "type": "object",
+            "properties": {
+                "caName": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9-_]+$"
+                },
+                "clientCertSecret": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9-_]+$"
+                },
+                "clusterName": {
+                    "type": [ "string", "null" ]
+                },
+                "host": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9-_]+$"
+                },
+                "operator": {
+                    "type": "object",
+                    "properties": {
+                        "clusterName": {
+                            "type": "string"
+                        },
+                        "deployDefaultUserCO": {
+                            "oneOf": [
+                                {
+                                    "type": "boolean"
+                                },
+                                {
+                                    "type": "string",
+                                    "enum": ["true", "false"]
+                                }
+                            ]
+                        }
+                    }
+                },
+                "port": {
+                    "type": "integer",
+                    "minimum": 1024,
+                    "maximum": 65535
+                },
+                "portTls": {
+                    "type": "integer",
+                    "minimum": 1024,
+                    "maximum": 65535
+                },
+                "serviceName": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9-_]+$"
+                },
+                "userCustomObject": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "messageBusRd": {
+            "type": "object",
+            "properties": {
+                "acl": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        },
+                        "passKey": {
+                            "type": "string"
+                        },
+                        "user": {
+                            "type": "string"
+                        },
+                        "userKey": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "caName": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9-_]+$"
+                },
+                "clientCertSecret": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9-_]+$"
+                },
+                "connectionPoolsize": {
+                    "type": "integer"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "host": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9-_]+$"
+                },
+                "mode": {
+                    "type": "string",
+                    "enum": ["cluster", "single"]
+                },
+                "nettyConnections": {
+                    "type": "integer"
+                },
+                "port": {
+                    "type": "integer",
+                    "minimum": 1024,
+                    "maximum": 65535
+                },
+                "portTls": {
+                    "type": "integer",
+                    "minimum": 1024,
+                    "maximum": 65535
+                }
+            }
+        },
+        "metrics": {
+            "type": "object",
+            "properties": {
+                "caSecret": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9-_]+$"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "host": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9-_]+$"
+                },
+                "port": {
+                    "type": "integer",
+                    "minimum": 1024,
+                    "maximum": 65535
+                },
+                "portTls": {
+                    "type": "integer",
+                    "minimum": 1024,
+                    "maximum": 65535
+                }
+            }
+        },
+        "multiNet": {
+            "type": "object",
+            "properties": {
+                "snmpAP": {
+                    "type": ["object", "null"],
+                    "properties": {
+                        "serviceSelector": {
+                            "type": ["object", "null"],
+                            "propertyNames": {
+                                "type": "string",
+                                "maxLength": 63,
+                                "pattern": "^[a-z0-9A-Z_.\\-/]*$"
+                            },
+                            "additionalProperties": {
+                                "type": "string",
+                                "maxLength": 63,
+                                "pattern": "^[a-z0-9A-Z_.\\-/]*$"
+                            }
+                        },
+                        "policyAnnotations": {
+                            "type": ["object", "null"],
+                            "propertyNames": {
+                                "type": "string",
+                                "maxLength": 63,
+                                "pattern": "^[a-z0-9A-Z_\\.\\-\\/]*$"
+                            },
+                            "additionalProperties": {
+                                "type": "string",
+                                "maxLength": 63,
+                                "pattern": "^[a-z0-9A-Z_\\.\\-\\/]*$"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "networkPolicy": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "nodeSelector": {
+            "type": "object",
+            "properties": {
+                "cmmJob": {
+                    "type": "object"
+                },
+                "hooklauncher": {
+                    "type": "object"
+                },
+                "snmpAP": {
+                    "type": "object"
+                }
+            }
+        },
+        "podAnnotations": {
+            "type": "object",
+            "properties": {
+                "snmpAP": {
+                    "type": ["object", "null"]
+                }
+            }
+        },
+        "podPriority": {
+            "type": "object",
+            "properties": {
+                "cmmJob": {
+                    "type": "object",
+                    "properties": {
+                        "priorityClassName": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "hooklauncher": {
+                    "type": "object",
+                    "properties": {
+                        "priorityClassName": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "snmpAP": {
+                    "type": "object",
+                    "properties": {
+                        "priorityClassName": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "podSecurityContext": {
+            "type": "object",
+            "properties": {
+                "supplementalGroups": {
+                    "type": ["array", "null"]
+                }
+            }
+        },
+        "probes": {
+            "type": "object",
+            "properties": {
+                "logshipper": {
+                    "type": "object",
+                    "properties": {
+                        "livenessProbe": {
+                            "type": "object",
+                            "properties": {
+                                "failureThreshold": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "initialDelaySeconds": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "periodSeconds": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "timeoutSeconds": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                }
+                            }
+                        }
+                    }
+                },
+                "snmpAP": {
+                    "type": "object",
+                    "properties": {
+                        "livenessProbe": {
+                            "type": "object",
+                            "properties": {
+                                "failureThreshold": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "initialDelaySeconds": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "periodSeconds": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "timeoutSeconds": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                }
+                            }
+                        },
+                        "readinessProbe": {
+                            "type": "object",
+                            "properties": {
+                                "failureThreshold": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "initialDelaySeconds": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "periodSeconds": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "successThreshold": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "timeoutSeconds": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "resources": {
+            "type": "object",
+            "properties": {
+                "alarmprovider": {
+                    "type": "object",
+                    "properties": {
+                        "jvm": {
+                            "type": "object",
+                            "properties": {
+                                "initialMemoryAllocationPercentage": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 100
+                                },
+                                "largeMemoryAllocationMaxPercentage": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 100
+                                },
+                                "smallMemoryAllocationMaxPercentage": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 100
+                                }
+                            }
+                        },
+                        "limits": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["string", "number"],
+                                    "pattern": "^(?:\\d+[.]?\\d*[m]?)?$"
+                                },
+                                "ephemeral-storage": {
+                                    "type": ["string", "number"],
+                                    "pattern": "^(?:\\d+[.]?\\d*[KMG][i]?)?$"
+                                },
+                                "memory": {
+                                    "type": ["string", "number"],
+                                    "pattern": "^(?:\\d+[.]?\\d*[KMG][i]?)?$"
+                                }
+                            }
+                        },
+                        "requests": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["string", "number"],
+                                    "pattern": "^(?:\\d+[.]?\\d*[m]?)?$"
+                                },
+                                "ephemeral-storage": {
+                                    "type": ["string", "number"],
+                                    "pattern": "^(?:\\d+[.]?\\d*[KMG][i]?)?$"
+                                },
+                                "memory": {
+                                    "type": ["string", "number"],
+                                    "pattern": "^(?:\\d+[.]?\\d*[KMG][i]?)?$"
+                                }
+                            }
+                        }
+                    }
+                },
+                "cmmJob": {
+                    "type": "object",
+                    "properties": {
+                        "jvm": {
+                            "type": "object",
+                            "properties": {
+                                "initialMemoryAllocationPercentage": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 100
+                                },
+                                "largeMemoryAllocationMaxPercentage": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 100
+                                },
+                                "smallMemoryAllocationMaxPercentage": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 100
+                                }
+                            }
+                        },
+                        "limits": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["string", "number"],
+                                    "pattern": "^(?:\\d+[.]?\\d*[m]?)?$"
+                                },
+                                "ephemeral-storage": {
+                                    "type": ["string", "number"],
+                                    "pattern": "^(?:\\d+[.]?\\d*[KMG][i]?)?$"
+                                },
+                                "memory": {
+                                    "type": ["string", "number"],
+                                    "pattern": "^(?:\\d+[.]?\\d*[KMG][i]?)?$"
+                                }
+                            }
+                        },
+                        "requests": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["string", "number"],
+                                    "pattern": "^(?:\\d+[.]?\\d*[m]?)?$"
+                                },
+                                "ephemeral-storage": {
+                                    "type": ["string", "number"],
+                                    "pattern": "^(?:\\d+[.]?\\d*[KMG][i]?)?$"
+                                },
+                                "memory": {
+                                    "type": ["string", "number"],
+                                    "pattern": "^(?:\\d+[.]?\\d*[KMG][i]?)?$"
+                                }
+                            }
+                        }
+                    }
+                },
+                "hooklauncher": {
+                    "type": "object",
+                    "properties": {
+                        "limits": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["string", "number"],
+                                    "pattern": "^(?:\\d+[.]?\\d*[m]?)?$"
+                                },
+                                "ephemeral-storage": {
+                                    "type": ["string", "number"],
+                                    "pattern": "^(?:\\d+[.]?\\d*[KMG][i]?)?$"
+                                },
+                                "memory": {
+                                    "type": ["string", "number"],
+                                    "pattern": "^(?:\\d+[.]?\\d*[KMG][i]?)?$"
+                                }
+                            }
+                        },
+                        "requests": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["string", "number"],
+                                    "pattern": "^(?:\\d+[.]?\\d*[m]?)?$"
+                                },
+                                "ephemeral-storage": {
+                                    "type": ["string", "number"],
+                                    "pattern": "^(?:\\d+[.]?\\d*[KMG][i]?)?$"
+                                },
+                                "memory": {
+                                    "type": ["string", "number"],
+                                    "pattern": "^(?:\\d+[.]?\\d*[KMG][i]?)?$"
+                                }
+                            }
+                        }
+                    }
+                },
+                "logshipper": {
+                    "type": "object",
+                    "properties": {
+                        "limits": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["string", "number"],
+                                    "pattern": "^(?:\\d+[.]?\\d*[m]?)?$"
+                                },
+                                "memory": {
+                                    "type": ["string", "number"],
+                                    "pattern": "^(?:\\d+[.]?\\d*[KMG][i]?)?$"
+                                }
+                            }
+                        },
+                        "requests": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["string", "number"],
+                                    "pattern": "^(?:\\d+[.]?\\d*[m]?)?$"
+                                },
+                                "memory": {
+                                    "type": ["string", "number"],
+                                    "pattern": "^(?:\\d+[.]?\\d*[KMG][i]?)?$"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "seccompProfile": {
+            "type": "object",
+            "properties": {
+                "cmmJob": {
+                    "type": "object",
+                    "properties": {
+                        "localhostProfile": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "hooklauncher": {
+                    "type": "object",
+                    "properties": {
+                        "localhostProfile": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "localhostProfile": {
+                    "type": "string"
+                },
+                "logshipper": {
+                    "type": "object",
+                    "properties": {
+                        "localhostProfile": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "snmpAP": {
+                    "type": "object",
+                    "properties": {
+                        "localhostProfile": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "securityPolicy": {
+            "type": "object",
+            "properties": {
+                "rolename": {
+                    "type": "string"
+                },
+                "cmmJob": {
+                    "type": "object",
+                    "properties": {
+                        "rolename": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "hooklauncher": {
+                    "type": "object",
+                    "properties": {
+                        "rolename": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "logshipper": {
+                    "type": "object",
+                    "properties": {
+                        "rolename": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "snmpAP": {
+                    "type": "object",
+                    "properties": {
+                        "rolename": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "service": {
+            "type": "object",
+            "properties": {
+                "allocateLoadBalancerNodePorts": {
+                    "type": "boolean"
+                },
+                "annotations": {
+                    "type": "object",
+                    "properties": {
+                        "addressPoolName": {
+                            "type": "string"
+                        },
+                        "cloudProviderLB": {
+                            "type": "object"
+                        },
+                        "loadBalancerIPs": {
+                            "type": "string"
+                        },
+                        "sharedVIPLabel": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "debug": {
+                    "type": "boolean"
+                },
+                "endpoints": {
+                    "type": "object",
+                    "properties": {
+                        "cmm-notification": {
+                            "type": "object",
+                            "properties": {
+                                "tls": {
+                                    "type": "object",
+                                    "properties": {
+                                        "enforced": {
+                                            "const": "required"
+                                        },
+                                        "verifyClientCertificate": {
+                                            "const": "required"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "externalIPv4": {
+                    "type": "object",
+                    "properties": {
+                        "annotations": {
+                            "type": "object",
+                            "properties": {
+                                "addressPoolName": {
+                                    "type": "string"
+                                },
+                                "cloudProviderLB": {
+                                    "type": "object"
+                                },
+                                "sharedVIPLabel": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "enabled": {
+                            "type": ["boolean", "null"]
+                        },
+                        "loadBalancerIP": {
+                            "type": ["string", "null"],
+                            "pattern": "^(?:\\d{1,3}\\.){3}\\d{1,3}$"
+                        },
+                        "loadBalancerSourceRanges": {
+                            "type": "array"
+                        },
+                        "servicePort": {
+                            "description": "String format is only valid for a deprecation period, please remove it after that!",
+                            "oneOf": [
+                                {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 65535
+                                },
+                                {
+                                    "type": "string",
+                                    "pattern": "^(0*?[1-9][0-9]{0,3}|0*?[1-5][0-9]{4}|0*?6[0-4][0-9]{3}|0*?65[0-4][0-9]{2}|0*?655[0-2][0-9]|0*?6553[0-5])$"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "externalIPv6": {
+                    "type": "object",
+                    "properties": {
+                        "annotations": {
+                            "type": "object",
+                            "properties": {
+                                "addressPoolName": {
+                                    "type": "string"
+                                },
+                                "cloudProviderLB": {
+                                    "type": "object"
+                                },
+                                "sharedVIPLabel": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "enabled": {
+                            "type": ["boolean", "null"]
+                        },
+                        "loadBalancerIP": {
+                            "type": ["string", "null"],
+                            "pattern": "([a-f0-9:]+:+)+[a-f0-9]+"
+                        },
+                        "loadBalancerSourceRanges": {
+                            "type": "array"
+                        },
+                        "servicePort": {
+                            "description": "String format is only valid for a deprecation period, please remove it after that!",
+                            "oneOf": [
+                                {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 65535
+                                },
+                                {
+                                    "type": "string",
+                                    "pattern": "^(0*?[1-9][0-9]{0,3}|0*?[1-5][0-9]{4}|0*?6[0-4][0-9]{3}|0*?65[0-4][0-9]{2}|0*?655[0-2][0-9]|0*?6553[0-5])$"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "udp": {
+                    "type": "object",
+                    "properties": {
+                        "annotations": {
+                            "type": "object",
+                            "properties": {
+                                "loadBalancerIPs": {
+                                    "type": ["string"]
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "enabled": {
+                            "type": ["boolean"]
+                        },
+                        "externalIPFamily": {
+                            "type": ["string"]
+                        },
+                        "externalIPFamilyPolicy": {
+                            "type": ["string"]
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "extraJvmOpts": {
+                    "type": "string"
+                },
+                "httpPort": {
+                    "type": "integer",
+                    "minimum": 1024,
+                    "maximum": 65535
+                },
+                "loadBalancerIP": {
+                    "type": ["string", "null"]
+                },
+                "loadBalancerSourceRanges": {
+                    "type": "array"
+                },
+                "maxAlertListCount": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "readinessTimeoutMinutes": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "replicas": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "servicePort": {
+                    "description": "String format is only valid for a deprecation period, please remove it after that!",
+                    "oneOf": [
+                        {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 65535
+                        },
+                        {
+                            "type": "string",
+                            "pattern": "^(0*?[1-9][0-9]{0,3}|0*?[1-5][0-9]{4}|0*?6[0-4][0-9]{3}|0*?65[0-4][0-9]{2}|0*?655[0-2][0-9]|0*?6553[0-5])$"
+                        }
+                    ]
+                },
+                "snmpAgentPort": {
+                    "type": "integer",
+                    "minimum": 1024,
+                    "maximum": 65535
+                },
+                "snmpPort": {
+                    "type": "object",
+                    "properties": {
+                        "dscp": {
+                            "type": "integer",
+                            "minimum": 0
+                        }
+                    }
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["ClusterIP", "LoadBalancer"]
+                }
+            }
+        },
+        "sipTls": {
+            "type": "object",
+            "properties": {
+                "trustedRootCert": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9-_]+$"
+                }
+            }
+        },
+        "sourceIdentifier": {
+            "anyOf": [
+                {
+                    "type": "string",
+                    "pattern": "^(?:\\d{1,3}\\.){3}\\d{1,3}$"
+                },
+                {
+                    "type": "string",
+                    "pattern": "([a-f0-9:]+:+)+[a-f0-9]+"
+                }
+            ]
+        },
+        "sourceIdentifierType": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2
+        },
+        "terminationGracePeriodSeconds": {
+            "type": "integer",
+            "minimum": 0
+        },
+        "tolerations": {
+            "type": "object",
+            "properties": {
+                "cmmJob": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "effect": {
+                                "type": "string"
+                            },
+                            "key": {
+                                "type": "string"
+                            },
+                            "operator": {
+                                "type": "string"
+                            },
+                            "tolerationSeconds": {
+                                "type": "integer",
+                                "minimum": 0
+                            }
+                        }
+                    }
+                },
+                "hooklauncher": {
+                    "type": "array"
+                },
+                "snmpAP": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "effect": {
+                                "type": "string"
+                            },
+                            "key": {
+                                "type": "string"
+                            },
+                            "operator": {
+                                "type": "string"
+                            },
+                            "tolerationSeconds": {
+                                "type": "integer",
+                                "minimum": 0
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "vpnGw": {
+            "type": "object",
+            "properties": {
+                "sendFromAddress": {
+                    "type": ["string", "null"]
+                },
+                "sendToAddress": {
+                    "type": ["string", "null"],
+                    "pattern": "([a-f0-9:]+:+)+[a-f0-9]+"
+                },
+                "verboseMode": {
+                    "type": ["string", "null"]
+                },
+                "vlanId": {
+                    "type": ["string", "null"]
+                },
+                "vpnGwAddress": {
+                    "type": ["string", "null"]
+                }
+            }
+        },
+        "yang": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "readConfigFromSecret": {
+                    "type": "boolean"
+                },
+                "removeByUninstall": {
+                    "type": "boolean"
+                }
+            }
+        }
+    }
+}

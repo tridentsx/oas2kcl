@@ -1,0 +1,581 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "properties": {
+    "affinity": {
+      "properties": {
+        "nodeAffinity": {
+          "default": "{}",
+          "description": "NodeAffinity rules",
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "annotations": {
+      "default": "{}",
+      "description": "The key-prefix is optional and cannot exceed 253 characters with following character set: [a-z0-9A-Z.].The key cannot exceed 63 characters with following character set: [a-z0-9A-Z_.-]",
+      "type": "object"
+    },
+    "appArmorProfile": {
+      "properties": {
+        "pm-config-aggregator": {
+          "properties": {
+            "localhostProfile": {
+              "default": "\"\"",
+              "description": "Localhost path to the AppArmor profile for the pm-config-aggregator container. Should only be set if appArmorProfile.pm-config-aggregator.type is set to localhost.",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "\"\"",
+              "description": "The AppArmor type for the pm-config-aggregator container. Available options are \"unconfined\", \"runtime/default\", \"localhost\" and \"\" [default=\"\"]",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "cmMediatorHost": {
+      "default": "eric-cm-mediator:5004",
+      "description": "The host name to the CM Mediator.",
+      "type": [
+        "string",
+        "integer",
+        "number"
+      ]
+    },
+    "cmMediatorNoTlsHost": {
+      "default": "eric-cm-mediator:5003",
+      "description": "The host name and port number to the CM Mediator non tls address.",
+      "type": [
+        "string",
+        "integer",
+        "number"
+      ]
+    },
+    "config": {
+      "properties": {
+        "sourceConfigMap": {
+          "properties": {
+            "labels": {
+              "properties": {
+                "pmJobs": {
+                  "default": "\"bss.ericsson.com/bamPMconfigAggregator\"",
+                  "description": "Label selector for config maps providing data for both measurement and threshold jobs.",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "recordingRules": {
+                  "default": "\"bss.ericsson.com/bamPMconfigCustomization\"",
+                  "description": "Label selector for config maps providing data for PM recording rules.",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "targetConfigMap": {
+          "properties": {
+            "recordingRules": {
+              "default": "\"eric-bss-bam-pm-config-aggregator-recording-rules\"",
+              "description": "Target config map name for recording rules.",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "cronjob": {
+      "properties": {
+        "failedJobsHistoryLimit": {
+          "default": "2",
+          "description": "History of failed jobs limits",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        },
+        "schedule": {
+          "default": "*/5 * * * *",
+          "description": "Schedule using standard UNIX cron syntax.",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        },
+        "successfulJobsHistoryLimit": {
+          "default": "1",
+          "description": "History of succcessful jobs limits",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "global": {
+      "properties": {
+        "fsGroup": {
+          "properties": {
+            "manual": {
+              "default": "\u003cempty\u003e",
+              "description": "Sets a fsGroup ID for all services. If manual set to empty namespace default configuration is used.",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "namespace": {
+              "default": "\u003cempty\u003e",
+              "description": "Sets a fsGroup to use namespace default. The following values are possible: true, false and \"\". If global.fsGroup.namespace set to \"\" or false, namespace default configuration is used.",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null",
+                "boolean"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "log": {
+          "properties": {
+            "streamingMethod": {
+              "default": "indirect",
+              "description": "The global parameter for specifying the streaming method of service logs. It can be 'indirect', 'direct', 'dual', or null. If both global.log.streamingMethod and log.streamingMethod are set to null, it will choose 'indirect' by default",
+              "type": "string",
+              "enum": [ "indirect", "direct", "dual", "" ]
+            }
+          }
+        },
+        "podSecurityContext": {
+          "properties": {
+            "supplementalGroups": {
+              "default": "\u003cempty\u003e",
+              "description": "SupplementalGroups is used for setting the GID value(s) for volume data that is used by the services. The value will be merged if both global and local value are set. supplementalGroup will not be set in helmchart if both global and local value are not set.",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null",
+                "array"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "registry": {
+          "properties": {
+            "repoPath": {
+              "default": "\u003cempty\u003e",
+              "description": "Repo where the image is located",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "securityPolicy": {
+          "properties": {
+            "rolekind": {
+              "default": "\"\"",
+              "description": "Configuration of the security policy role kind. The following values are possible: ClusterRole, Role and \"\". Rolebinding will not be created with value \"\".",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "tolerations": {
+          "default": "[]",
+          "description": "Tolerations for pod assignment, this supports the fullAPI.",
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "imageCredentials": {
+      "properties": {
+        "pmConfigAggregator": {
+          "properties": {
+            "imagePullPolicy": {
+              "default": "IfNotPresent",
+              "description": "Pull policy for the image",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "repoPath": {
+              "default": "\u003cnil\u003e",
+              "description": "Repo where the image is located",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "images": {
+      "properties": {
+        "pmConfigAggregator": {
+          "properties": {
+            "name": {
+              "default": "\u003cnil\u003e",
+              "description": "The name for the pm-config-aggregator",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "restartPolicy": {
+              "default": "Never",
+              "description": "The restart policy fo the pm-config-aggregator'",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "tag": {
+              "default": "\u003cnil\u003e",
+              "description": "The tag for the pm-config-aggregator",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "kafkaHost": {
+      "default": "eric-bss-kafka-proxy-http:80",
+      "description": "The host name to the Kafka host.",
+      "type": [
+        "string",
+        "integer",
+        "number"
+      ]
+    },
+    "labels": {
+      "default": "{}",
+      "description": "A map for setting custom labels for all Kubernetes resources",
+      "type": "object"
+    },
+    "logConnectionTtlMinutes": {
+      "default": "15",
+      "description": "Log connection TTL (minutes) towards log transformer service. Connection will reset after configured number of minutes. Required when streamingMethod is set to direct or dual",
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?\\d+$",
+          "type": "string"
+        }
+      ]
+    },
+    "logLevel": {
+      "default": "info",
+      "description": "Log level, possible values are: debug, info, error",
+      "type": [
+        "string",
+        "integer",
+        "number"
+      ]
+    },
+    "log": {
+      "properties": {
+        "streamingMethod": {
+          "default": "indirect",
+          "description": "The local parameter for specifying the streaming method of service logs. It can be 'indirect', 'direct', 'dual', or null. If set to null, global.log.streamingMethod will be used to determine the streaming method",
+          "type": "string",
+          "enum": [ "indirect", "direct", "dual", "" ]
+        }
+      }
+    },
+    "logQueueSize": {
+      "default": "1000",
+      "description": "Size of the log queue for streaming. Required when streamingMethod is set to direct or dual",
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?\\d+$",
+          "type": "string"
+        }
+      ]
+    },
+    "logTimeoutSeconds": {
+      "default": "5",
+      "description": "Timeout waiting for logs to be streamed (in seconds) be terminating. Required when streamingMethod is set to direct or dual",
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?\\d+$",
+          "type": "string"
+        }
+      ]
+    },
+    "logTransformerHost": {
+      "default": "eric-log-transformer:5024",
+      "description": "FQDN including port number of the log transformer service, don't include protocol. Required when streamingMethod is set to direct or dual",
+      "type": [
+        "string",
+        "integer",
+        "number"
+      ]
+    },
+    "logTransformerNoTlsHost": {
+      "default": "eric-log-transformer:5025",
+      "description": "FQDN including port number of the log transformer non tls service, don't include protocol. Required when streamingMethod is set to direct or dual",
+      "type": [
+        "string",
+        "integer",
+        "number"
+      ]
+    },
+    "networkPolicy": {
+      "properties": {
+        "egress": {
+          "properties": {
+            "accessLabels": {
+              "properties": {
+                "pmConfigAggregator": {
+                  "default": "{}",
+                  "description": "This parameter is a placeholder for adding a list of egress traffic network policy labels. If this service wants to send traffic then it should add all its outgoing traffic network policy access labels using this parameter.",
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "nodeSelector": {
+      "default": "{}",
+      "description": "Node labels for pod assignment",
+      "type": "object"
+    },
+    "podPriority": {
+      "properties": {
+        "eric-bss-bam-pm-config-aggregator": {
+          "properties": {
+            "priorityClassName": {
+              "default": "",
+              "description": "The pod priority for the service",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "podSecurityContext": {
+      "properties": {
+        "supplementalGroups": {
+          "default": "\u003cempty\u003e",
+          "description": "SupplementalGroups is used for setting the GID value(s) for volume data that is used by the services. The value will be merged if both global and local value are set. supplementalGroup will not be set in helmchart if both global and local value are not set.",
+          "type": [
+            "string",
+            "integer",
+            "number",
+            "null",
+            "array"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "resources": {
+      "properties": {
+        "pm-config-aggregator": {
+          "properties": {
+            "limits": {
+              "properties": {
+                "cpu": {
+                  "default": "100m",
+                  "description": "The maximum amount of CPU to allocate to the pm-config-aggregator container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "64Mi",
+                  "description": "The maximum amount of memory to allocate to the pm-config-aggregator container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "requests": {
+              "properties": {
+                "cpu": {
+                  "default": "50m",
+                  "description": "The amount of CPU required by the pm-config-aggregator container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "32Mi",
+                  "description": "The amount of memory required by the pm-config-aggregator container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "seccompProfile": {
+      "properties": {
+        "pm-config-aggregator": {
+          "properties": {
+            "localhostProfile": {
+              "default": "\"\"",
+              "description": "Localhost path to the seccomp profile for the pm-config-aggregator container. Should only be set if seccompProfile.pm-config-aggregator.type is set to Localhost.",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "\"\"",
+              "description": "Feature of the Linux kernel for secure computing mode for pm-config-aggregator container. Available options are `Unconfined`, `RuntimeDefault` and `Localhost` and \"\" [default=\"\"].",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "securityPolicy": {
+      "properties": {
+        "rolename": {
+          "default": "eric-bss-bam-pm-config-aggregator",
+          "description": "Rolename sets the name of the security policy role that is bound to the service account.",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "terminationGracePeriodSeconds": {
+      "default": "30",
+      "description": "Number of seconds after SIGTERM caught before shutting down",
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?\\d+$",
+          "type": "string"
+        }
+      ]
+    },
+    "tolerations": {
+      "default": "[]",
+      "description": "Tolerations for pod assignment, this supports the fullAPI",
+      "type": "array"
+    }
+  },
+  "type": "object"
+}

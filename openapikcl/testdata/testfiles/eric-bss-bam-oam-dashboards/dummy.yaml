@@ -1,0 +1,179 @@
+{
+  "appArmorProfile": {
+    "ea42": 51770567,
+    "dolor_6": 86926917,
+    "enim_43b": true
+  },
+  "config": {
+    "dashboards": {
+      "assetConfiguration": {
+        "nulla4a7": "voluptate in occaecat",
+        "opensearch_dashboards": {
+          "yml": "dolor"
+        }
+      },
+      "opensearchHosts": "est nulla dolore sint labore",
+      "rewriteBasePath": true,
+      "serverHost": "dolor laborum incididunt"
+    },
+    "faultIndications": {
+      "nisi4": "et",
+      "enabled": "true",
+      "host": 31604807
+    },
+    "licenseControl": {
+      "functionControlHost": "pariatur",
+      "functionControlNoTlsHost": "Excepteur magna",
+      "interval": 27891208,
+      "secondsPerSeverity": -51303102
+    },
+    "log": {
+      "labore_1d": "sed aliquip",
+      "connectionTtlMinutes": "48",
+      "level": 49833693.248030186,
+      "queueSize": -59980188,
+      "streamingMethod": 76392850.86938119,
+      "timeoutSeconds": "807548957",
+      "transformerHost": 36914124,
+      "transformerNoTlsHost": -63896417
+    },
+    "oidcAuth": {
+      "caSecret": "ut",
+      "clientId": 10490745,
+      "groupsClaim": "irure consectetur veniam exercitation non",
+      "usernameClaim": -48354788,
+      "enabled": "true",
+      "issuerUrl": null
+    },
+    "searchEngine": {
+      "noTlsUrl": 49247930,
+      "url": 37939732.13917625
+    },
+    "service": {
+      "voluptate_": 88366668.1528902,
+      "port": "144133055"
+    }
+  },
+  "global": {
+    "annotations": {
+      "do_44d": "dolor qui"
+    },
+    "internalIPFamily": "",
+    "networkPolicy": {
+      "non_7": 307812,
+      "in__9f": 65472394,
+      "cillum0fc": 35680700.31770104,
+      "enabled": true
+    },
+    "podSecurityContext": {
+      "in_c1": -16039814,
+      "id2": -16565911.101834312,
+      "occaecat_c": 35897158,
+      "supplementalGroups": []
+    },
+    "pullSecret": 25484542.933013186,
+    "security": {
+      "Ute": -13832738.262477398,
+      "est_0d6": -75461809
+    },
+    "timezone": "sed commodo aliqua dolore cillum"
+  },
+  "ingress": {
+    "enabled": true,
+    "frontProxy": {
+      "labore_d": true,
+      "pariaturd": -24668937.287730634,
+      "quis_7_": "consequat ipsum",
+      "caSecret": "occaecat ad"
+    },
+    "ingressClass": null,
+    "tls": {
+      "Ut6": -19349382.67398168,
+      "inf21": true,
+      "in_603": "reprehenderit enim",
+      "sint_f_": false,
+      "ca": -5745827
+    }
+  },
+  "labels": {
+    "ipsum_df": true,
+    "dolor_5": "aute"
+  },
+  "nodeSelector": {
+    "laboris83a": true,
+    "anim72": "occaecat"
+  },
+  "rbac": {
+    "elitf": "ut velit",
+    "reprehenderit3_": 18465583,
+    "create": false
+  },
+  "resources": {
+    "back-proxy": {
+      "pariatur44": "commodo anim",
+      "do_78": -62914891.16822761
+    },
+    "front-proxy": {
+      "limits": {
+        "cpu": -44045138,
+        "memory": -87877156
+      },
+      "requests": {
+        "laborum_e": -3738546,
+        "cpu": 87249138,
+        "memory": -61794484
+      }
+    },
+    "oam-dashboards": {
+      "limits": {
+        "cpu": "Lorem Duis consequat pariatur incididunt",
+        "memory": -23546969.36907974
+      },
+      "requests": {
+        "enim28": true,
+        "dolore7": true,
+        "laborumb": "eu reprehenderit Excepteur",
+        "ipsumb8d": "voluptate adipisicing pariatur"
+      }
+    }
+  },
+  "seccompProfile": {
+    "back-proxy": {
+      "aliquip7c": false,
+      "eu_c": -53610533,
+      "Ut_7": 29513095.554213554,
+      "type": -52881614.29530143
+    },
+    "front-proxy": {
+      "reprehenderit9a": -37548512,
+      "est_08c": true
+    },
+    "oam-dashboards": {
+      "ut4ba": -24132039.024269953,
+      "seda5": false,
+      "velit8": false,
+      "sunte": -6504614.229156718,
+      "aliqua0_9": 79890001,
+      "localhostProfile": 89392558.95019135,
+      "type": 98355266.13159019
+    }
+  },
+  "securityPolicy": {
+    "Duis975": -3838775.894124374,
+    "et4": "incididunt consequat dolor occaecat mollit",
+    "adipisicing_d8": "elit culpa",
+    "laboris__8c": false,
+    "rolename": -99315887.77053748
+  },
+  "service": {
+    "veniam_e2": -43140465,
+    "tempor76": "deserunt velit dolor",
+    "adipisicing2": 15874873.591913864,
+    "app": {
+      "nostrud_7f": -73758854
+    },
+    "port": "-34637770"
+  },
+  "tolerations": [],
+  "topologySpreadConstraints": []
+}

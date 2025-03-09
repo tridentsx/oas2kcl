@@ -1,0 +1,139 @@
+{
+  "annotations": {
+    "reprehenderit_b94": true
+  },
+  "appArmorProfile": {
+    "consectetur_fa7": false,
+    "enimd41": -79167665.27597718,
+    "eiusmod_740": "consequat irure anim",
+    "deserunt_17": "nisi occaecat esse irure tempor",
+    "voluptateb": -13534460
+  },
+  "fcAdminService": {
+    "config": {
+      "aute2_": 33594577,
+      "kafkaHost": -66992686,
+      "logConnectionTtlMinutes": -93417734,
+      "logLevel": -96680673,
+      "log": {
+        "laborum_93b": "non ex eiusmod aute",
+        "laboref": "nulla cupidatat dolore",
+        "pariatur8": 36791182.29916972
+      },
+      "logQueueSize": -32354556,
+      "logTimeoutSeconds": "-525",
+      "logTransformerHost": -37492126.40955819,
+      "logTransformerNoTlsHost": 75916952
+    },
+    "metrics": {
+      "anim21d": -31512468.882652506,
+      "sunt_46": true,
+      "quis_193": 57853180.49242744,
+      "voluptate_ae": true,
+      "enabled": true,
+      "host": 32095992.814175516,
+      "serviceName": -20643490
+    },
+    "reconciliation": {
+      "licenseEvaluationInterval": "538",
+      "queueEvictionInterval": "656386865",
+      "stateSyncRetryInterval": 39591154
+    },
+    "replicaCount": -62209379,
+    "service": {
+      "cillum__": -90404200,
+      "port": 3449197,
+      "tlsport": "-772370153"
+    }
+  },
+  "images": {
+    "fcAdminService": {
+      "enim0f9": 59135922.313277155
+    },
+    "fcCleanup": {
+      "eufb1": 89688358,
+      "Lorem_315": 59610324,
+      "consequat_c": "adipisicing occaecat ullamco Excepteur ad",
+      "irure__45": 52947542
+    },
+    "fcEvaluationService": {
+      "nulla7": "elit",
+      "tag": -70599403.95060772
+    }
+  },
+  "networkPolicy": {
+    "laboris57": -31172838,
+    "ea_a7f": true,
+    "elit62": 11360697,
+    "anim84f": "ut sit Ut",
+    "enabled": "true"
+  },
+  "nodeSelector": {
+    "aliquip_cd6": "commodo",
+    "nulla9": -29119672.788779557,
+    "fugiat_787": 43981569.43190935,
+    "qui_f3": "ea ut amet quis dolore"
+  },
+  "podPriority": {
+    "adipisicing_210": false,
+    "in_d": true,
+    "eric-bss-bam-function-controller": {
+      "consequat_ce": 54716362,
+      "priorityClassName": -75356595.38692711
+    }
+  },
+  "podSecurityContext": {
+    "in4_": false,
+    "supplementalGroups": [
+      20662744,
+      -5930864,
+      60288815
+    ]
+  },
+  "probes": {
+    "exercitation540": -30366895.646310925,
+    "nullada": "exercitation dolore consequat consectetur tempor"
+  },
+  "resources": {
+    "commodo__1": "est",
+    "ida3d": false,
+    "commodoa": -82359648
+  },
+  "seccompProfile": {
+    "dolorf5": "non exercitation id cupidatat",
+    "proident_a": 26215295,
+    "incididuntc_0": 6986247.169162989,
+    "fc-admin-server": {
+      "localhostProfile": "aute",
+      "type": 71379937
+    },
+    "fc-eval-api-server": {
+      "localhostProfile": 6374728,
+      "type": "veniam consequat"
+    },
+    "status-cm-cleanup": {
+      "cupidatat_00": "minim veniam Excepteur",
+      "commodo_5": -33271772,
+      "in_7a7": -41522878.08711979,
+      "localhostProfile": -43740712,
+      "type": "Duis magna"
+    }
+  },
+  "serviceAccount": {
+    "create": "false",
+    "name": -23741371
+  },
+  "terminationGracePeriodSeconds": -49554106,
+  "updateStrategy": {
+    "ea91": "Duis laboris nostrud est esse",
+    "cupidatat_a8": false,
+    "proidentf": 24757210,
+    "fcEvaluationService": {
+      "rollingUpdate": {
+        "maxSurge": 42202647.72233838,
+        "maxUnavailable": "sint ad dolore"
+      },
+      "type": 61179368.77930051
+    }
+  }
+}

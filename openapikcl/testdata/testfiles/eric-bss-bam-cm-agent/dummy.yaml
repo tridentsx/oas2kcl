@@ -1,0 +1,222 @@
+{
+  "affinity": {
+    "velit4": 63345600.21922174,
+    "nodeAffinity": {
+      "eiusmodcf5": 85244445
+    },
+    "podAntiAffinity": -8401394,
+    "topologyKey": -39556100.0351623
+  },
+  "alarms": {
+    "enabled": true,
+    "kafka": {
+      "commodo_c_": -12933460.342059493,
+      "culpa_5d": 98075132.37484637,
+      "aliquip1fd": -32311635.919789955,
+      "host": 11095612
+    }
+  },
+  "annotations": {
+    "laboris_e7": "aute do culpa Duis",
+    "quis_2": "Duis"
+  },
+  "appArmorProfile": {
+    "laboris_9": "pariatur in"
+  },
+  "cmmsync": {
+    "ex_4": -51878298,
+    "in_e": -34599636.32473753,
+    "noTlsHost": "cillum consectetur"
+  },
+  "config": {
+    "gitClient": {
+      "ut_e": true,
+      "Excepteurb": -9651141.79024367,
+      "caKey": "ea incididunt voluptate magna esse",
+      "caSecret": "veniam ad",
+      "tlsEnabled": true
+    },
+    "isPrimary": false,
+    "localStorage": "ut mollit",
+    "logConnectionTtlMinutes": 8001477,
+    "logLevel": "laborum reprehenderit Excepteur dolor",
+    "log": {
+      "ex8": "enim Excepteur et cillum",
+      "streamingMethod": ""
+    },
+    "logQueueSize": 93945773,
+    "logTimeoutSeconds": 35234505,
+    "logTransformerHost": "amet veniam",
+    "logTransformerNoTlsHost": "ipsum ea exercitation veniam minim",
+    "syncInterval": "79665271965"
+  },
+  "fullnameOverride": "dolore dolore ea sunt sint",
+  "gitRepo": {
+    "ut06e": "esse aliquip veniam laboris proident",
+    "ametba8": 13071551,
+    "size": -80671661.04466917
+  },
+  "global": {
+    "annotations": {
+      "dolore_d55": 47919132
+    },
+    "fsGroup": {
+      "manual": -50126482,
+      "namespace": null
+    },
+    "internalIPFamily": "IPv6",
+    "labels": {
+      "qui_8_": false
+    },
+    "log": {
+      "in__6": true,
+      "nulla4": 85185274,
+      "adipisicing_31": false,
+      "streamingMethod": "indirect"
+    },
+    "networkPolicy": {
+      "nostrud_5c": -7115886.427816153,
+      "Lorem_2": 30007666,
+      "deseruntc": -32499200.51465285
+    },
+    "nodeSelector": {
+      "ut33": "laborum",
+      "deserunt_4": 76753075
+    },
+    "tolerations": [],
+    "podSecurityContext": {
+      "cillum_0": "sunt",
+      "sunt04d": "labore eu proident"
+    },
+    "pullSecret": null,
+    "registry": {
+      "url": "nostrud aliqua non amet consequat"
+    },
+    "security": {
+      "proident339": true,
+      "voluptatee": "in consequat in",
+      "laborum5d": true,
+      "tls": {
+        "sit24": 66719779,
+        "eiusmod060": -79291064,
+        "Duis7_6": 9706392,
+        "ipsum_935": "sed Duis esse"
+      }
+    },
+    "securityPolicy": {
+      "ut_3d": 81549056.31750607,
+      "tempor_9": -38197549,
+      "rolekind": 92549610.85312968
+    },
+    "timezone": "dolor elit irure Excepteur"
+  },
+  "imageCredentials": {
+    "cmagent": {
+      "Utbc_": "quis aliqua ullamco tempor nisi",
+      "registry": {
+        "reprehenderit_02a": 10243610.284417674,
+        "magna__": -77325975,
+        "aliquip4f9": -75801010
+      }
+    }
+  },
+  "images": {
+    "voluptate0": -28132819.082843915,
+    "aliqua_a82": false,
+    "autec0_": -122022,
+    "cmagent": {
+      "name": null,
+      "tag": 21056607
+    }
+  },
+  "labels": {
+    "in6c": "Ut"
+  },
+  "metrics": {
+    "Lorem_36": -68955446
+  },
+  "nameOverride": 838521.0867196172,
+  "networkPolicy": {
+    "officia_d": "ea est",
+    "pariatur_": true,
+    "Lorem4": 16102030.430487841,
+    "egress": {
+      "do_d9a": true,
+      "accessLabels": {
+        "est_52": "sit do",
+        "consectetur_a": -1236746,
+        "in81e": 27450415,
+        "qui6": 76698313,
+        "consecteturbc": 73786401,
+        "cmagent": {
+          "Lorem21": 1436486.0406151265
+        }
+      }
+    },
+    "enabled": false
+  },
+  "nodeSelector": {
+    "proident_e5c": 29148216.60825649
+  },
+  "podPriority": {
+    "cupidatat_4f3": -70274645,
+    "dolore47": "minim voluptate do",
+    "eric-bss-bam-cm-agent": {
+      "eiusmod_2a": -45697574.34957542,
+      "in_29": 43023654
+    }
+  },
+  "podSecurityContext": {
+    "minim__ec": true,
+    "dolor_b83": 12353235,
+    "supplementalGroups": null
+  },
+  "probes": {
+    "dolorea9": true,
+    "sint_0e_": true,
+    "quis_e": 5217242,
+    "cmagent": {
+      "elit_8ba": -19369169,
+      "ad_8d3": "cillum tempor nisi aliquip",
+      "sint_0": 50283877,
+      "sed17": false,
+      "et6e": "sed consequat ex do"
+    }
+  },
+  "replicaCount": -6667948,
+  "resources": {
+    "irure5c": 22048392.40786533,
+    "ut1": "tempor"
+  },
+  "seccompProfile": {
+    "magna_5": -37257706.39833614,
+    "cmagent": {
+      "exercitation56": false,
+      "localhostProfile": -5555852.876763552,
+      "type": "occaecat deserunt nulla ad in"
+    }
+  },
+  "securityPolicy": {
+    "velit073": "velit Lorem",
+    "quisd": -44682449.61429435
+  },
+  "service": {
+    "port": -84924687,
+    "type": "dolor consectetur nulla"
+  },
+  "serviceAccount": {
+    "create": false,
+    "name": -90801601.81172365
+  },
+  "terminationGracePeriodSeconds": "-116879",
+  "tolerations": [],
+  "topologySpreadConstraints": [],
+  "updateStrategy": {
+    "mollitd": 62911825.57495746,
+    "in_2a4": 58958342,
+    "rollingUpdate": {
+      "maxSurge": 88210647,
+      "maxUnavailable": 39997400.42365718
+    }
+  }
+}

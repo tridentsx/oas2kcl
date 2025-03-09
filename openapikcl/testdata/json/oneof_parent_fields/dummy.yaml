@@ -1,0 +1,165 @@
+configs:
+  - id: in id ea sint quis
+    config:
+      template: aute
+    type:
+      group: fugiat ipsum quis nostrud
+      Scope: true
+    groupOverrides:
+      - group: qui
+        override:
+          name:
+            description: The name of this configuration - required for Classic Config API types.
+          template: esse
+          skip:
+            description: Defines whether this config should be skipped when deploying.
+          originObjectId: ad occaecat ea Ut eu
+    environmentOverrides:
+      - environment: esse dolor aliqua deserunt
+        override:
+          name:
+            description: The name of this configuration - required for Classic Config API types.
+          parameters:
+            eafe: labore veniam Duis amet fugiat
+            mollitc: true
+            Duis__3d: false
+          template: Excepteur et sint
+          skip:
+            description: Defines whether this config should be skipped when deploying.
+          originObjectId: eu occaecat in anim quis
+      - environment: aute elit non laboris
+        override:
+          name:
+            description: The name of this configuration - required for Classic Config API types.
+          parameters:
+            dolore1c7: false
+          template: aute pariatur quis
+          skip:
+            description: Defines whether this config should be skipped when deploying.
+      - environment: consequat ut amet
+        override:
+          name:
+            description: The name of this configuration - required for Classic Config API types.
+          parameters:
+            quis_e: 27432435
+            adipisicingc0c: adipisicing amet velit in dolor
+          template: quis in
+          originObjectId: amet eiusmod quis tempor
+      - environment: Excepteur
+        override:
+          template: commodo ut nulla Ut
+      - environment: Ut dolor Duis dolore
+        override:
+          parameters:
+            cillumdd2: 6.381813162280229e+07
+            consequat_56: -6589802
+          template: in
+  - id: voluptate ea
+    config:
+      template: elit
+    type:
+      Type: true
+      Scope: true
+    groupOverrides:
+      - group: ut culpa esse qui sed
+        override:
+          name:
+            description: The name of this configuration - required for Classic Config API types.
+          parameters:
+            occaecat20: aliquip culpa laborum occaecat
+            in_: eiusmod nisi
+            voluptate45c: aute
+            in51: true
+            cupidatat5d_: false
+          template: exercitation occaecat reprehenderit
+          skip:
+            description: Defines whether this config should be skipped when deploying.
+          originObjectId: in
+      - group: minim laborum culpa sed ut
+        override:
+          template: in in cillum sint culpa
+      - group: sunt consequat eu fugiat
+        override:
+          name:
+            description: The name of this configuration - required for Classic Config API types.
+          parameters:
+            id8: -9.466503398415843e+07
+          template: sed laboris exercitation tempor non
+          skip:
+            description: Defines whether this config should be skipped when deploying.
+          originObjectId: ut est anim eiusmod Excepteur
+    environmentOverrides:
+      - environment: voluptate
+        override:
+          name:
+            description: The name of this configuration - required for Classic Config API types.
+          parameters:
+            aute_d8b: 12410632
+          template: aute ea esse
+          skip:
+            description: Defines whether this config should be skipped when deploying.
+          originObjectId: Lorem
+  - id: aliqua anim sint ut id
+    config:
+      name:
+        description: The name of this configuration - required for Classic Config API types.
+      parameters:
+        labore_6b8: Excepteur aliqua
+      template: in Ut esse dolore
+      skip:
+        description: Defines whether this config should be skipped when deploying.
+      originObjectId: aliqua mollit dolore esse consectetur
+    type: sed
+    groupOverrides:
+      - group: nostrud
+        override:
+          name:
+            description: The name of this configuration - required for Classic Config API types.
+          template: aute ea amet irure
+      - group: minim
+        override:
+          name:
+            description: The name of this configuration - required for Classic Config API types.
+          parameters:
+            cupidatat_05: 94026165
+          template: magna minim dolor consequat dolore
+          skip:
+            description: Defines whether this config should be skipped when deploying.
+          originObjectId: in Duis sint dolore
+      - group: occaecat sed
+        override:
+          name:
+            description: The name of this configuration - required for Classic Config API types.
+          template: esse enim deserunt ad laborum
+          skip:
+            description: Defines whether this config should be skipped when deploying.
+          originObjectId: qui dolore
+      - group: elit id laborum esse sunt
+        override:
+          template: velit ut et esse
+          originObjectId: esse occaecat eu fugiat aliquip
+    environmentOverrides:
+      - environment: cupidatat
+        override:
+          name:
+            description: The name of this configuration - required for Classic Config API types.
+          parameters:
+            dolore44: false
+            magnae35: -44596052
+          template: sunt consectetur laboris mollit nisi
+          skip:
+            description: Defines whether this config should be skipped when deploying.
+          originObjectId: fugiat
+      - environment: amet in nostrud
+        override:
+          template: nulla
+      - environment: nostrud dolore
+        override:
+          name:
+            description: The name of this configuration - required for Classic Config API types.
+          parameters:
+            proident_30: 2.6601115030176908e+07
+          template: nisi dolore
+          skip:
+            description: Defines whether this config should be skipped when deploying.
+          originObjectId: culpa

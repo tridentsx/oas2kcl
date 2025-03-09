@@ -1,0 +1,6 @@
+name: ethernet-interface
+socket:
+  HTTP: 80
+  HTTPS: 443
+  FTP: 21
+  SSH: 22

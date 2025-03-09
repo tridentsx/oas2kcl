@@ -1,0 +1,1843 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "properties": {
+    "affinity": {
+      "properties": {
+        "nodeAffinity": {
+          "default": "{}",
+          "description": "nodeAffinity rules",
+          "type": "object"
+        },
+        "podAntiAffinity": {
+          "default": "soft",
+          "description": "podAntiAffinity with two possible values: soft and hard",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        },
+        "topologyKey": {
+          "default": "kubernetes.io/hostname",
+          "description": "topologyKey to use",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "annotations": {
+      "default": "{}",
+      "description": "The key-prefix is optional and cannot exceed 253 characters with following character set: [a-z0-9A-Z.].The key cannot exceed 63 characters with following character set: [a-z0-9A-Z_.-]",
+      "type": "object"
+    },
+    "appArmorProfile": {
+      "properties": {
+        "back-proxy": {
+          "properties": {
+            "localhostProfile": {
+              "default": "\"\"",
+              "description": "Localhost path to the apparmor profile for the backproxy container. Should only be set if appArmorProfile.backProxy.type is set to localhost",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "\"\"",
+              "description": "The AppArmor type for the backProxy container. Available options are \"unconfined\", \"runtime/default\", \"localhost\" and \"\" [default=\"\"]",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "front-proxy": {
+          "properties": {
+            "localhostProfile": {
+              "default": "\"\"",
+              "description": "Localhost path to the apparmor profile for the frontproxy container. Should only be set if appArmorProfile.frontProxy.type is set to localhost",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "\"\"",
+              "description": "The AppArmor type for the frontProxy container. Available options are \"unconfined\", \"runtime/default\", \"localhost\" and \"\" [default=\"\"]",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "oam-dashboards": {
+          "properties": {
+            "localhostProfile": {
+              "default": "\"\"",
+              "description": "Localhost path to the apparmor profile for the oamdashboards container. Should only be set if appArmorProfile.oamdashboards.type is set to localhost",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "\"\"",
+              "description": "The AppArmor type for the oamdashboards container. Available options are \"unconfined\", \"runtime/default\", \"localhost\" and \"\" [default=\"\"]",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "config": {
+      "properties": {
+        "dashboards": {
+          "properties": {
+            "assetConfiguration": {
+              "properties": {
+                "opensearch_dashboards": {
+                  "properties": {
+                    "yml": {
+                      "default": "opensearchDashboards.index: \".bam-oam-dashboards\"<br/>opensearchDashboards.branding:<br/>  applicationTitle: \"Ericsson OAM Dashboards\"<br/>logging:<br/>  json: false<br/>  loggers:<br/>    - context: root<br/>      appenders:<br/>        - console<br/>      level: info<br/>  appenders:<br/>    console:<br/>      kind: console<br/>      layout:<br/>        kind: pattern<br/>        highlight: true<br/>        pattern: '[%logger] %meta %message'<br/>",
+                      "description": "",
+                      "type": [
+                        "string",
+                        "integer",
+                        "number"
+                      ]
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "basePath": {
+              "default": "/oam-dashboards",
+              "description": "Enables to specify a path to mount OpenSearch Dashboards if running behind a proxy",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "opensearchHosts": {
+              "default": "http://localhost:8080",
+              "description": "Host configuration for oam-dashboards to back-proxy",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "optionalPlugins": {
+              "properties": {
+                "disabled": {
+                  "default": "true",
+                  "description": "Used to disable optional plugins during Pod Startup",
+                  "oneOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "enum": [
+                        "true",
+                        "false"
+                      ],
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "rewriteBasePath": {
+              "default": "true",
+              "description": "Specifies whether OpenSearch Dashboards should rewrite requests that are prefixed with",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            },
+            "serverHost": {
+              "default": "0.0.0.0",
+              "description": "Host configuration for front-proxy to oam-dashboards",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "faultIndications": {
+          "properties": {
+            "enabled": {
+              "default": "true",
+              "description": "This allows the service to send Fault Indications",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            },
+            "host": {
+              "default": "eric-bss-bam-ah-proxy:5000",
+              "description": "The destination host when sending Fault Indications, no protocol but including port",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "licenseControl": {
+          "properties": {
+            "functionControlHost": {
+              "default": "eric-bss-bam-function-controller-evaluation-service:8443",
+              "description": "Function control evaluation host, no protocol, including port",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "functionControlNoTlsHost": {
+              "default": "eric-bss-bam-function-controller-evaluation-service:8080",
+              "description": "Function control evaluation non TLS host, no protocol, including port",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "interval": {
+              "default": "600",
+              "description": "The interval to check status of featureflag and raise/clear alarms. The maximum allowed value is 600",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            },
+            "secondsPerSeverity": {
+              "default": "43200",
+              "description": "Seconds for each alarm severity to exist before increasing severity. The maximum allowed value is 43200",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "log": {
+          "properties": {
+            "connectionTtlMinutes": {
+              "default": "120",
+              "description": "Log connection TTL (minutes) towards log transformer service. Connection will reset after configured number of minutes. Required when streamingMethod is set to direct or dual",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            },
+            "level": {
+              "default": "info",
+              "description": "Log level, possible values are: debug, info, error",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "queueSize": {
+              "default": "1000",
+              "description": "Size of the log queue for streaming. Required when streamingMethod is set to direct or dual",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            },
+            "streamingMethod": {
+              "default": "indirect",
+              "description": "The local parameter for specifying the streaming method of service logs. It can be ‘indirect', ‘direct', ‘dual', or null. If set to null, global.log.streamingMethod will be used to determine the streaming method",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "timeoutSeconds": {
+              "default": "5",
+              "description": "Timeout waiting for logs to be streamed (in seconds) before terminating. Required when streamingMethod is set to direct or dual",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            },
+            "transformerHost": {
+              "default": "eric-log-transformer:5024",
+              "description": "FQDN including port number of the log transformer service, don't include protocol. Required when streamingMethod is set to direct or dual",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "transformerNoTlsHost": {
+              "default": "eric-log-transformer:5025",
+              "description": "FQDN including port number of the log transformer non tls service, don't include protocol. Required when streamingMethod is set to direct or dual",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "oidcAuth": {
+          "properties": {
+            "authnProxyLoginURL": {
+              "default": "\"\"",
+              "description": "Full login url of the authentication proxy service to perform authorization code grant flow to fetch the tokens from IAM. Mandatory if upstream service requires access from the GUI. Example:",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "caSecret": {
+              "default": "eric-bss-bam-oam-oidc-ca-bundle",
+              "description": "Secret name containing a CA for the oidc connection. Mandatory if config.oidcAuth.enabled=true",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "clientId": {
+              "default": "AuthorizationClient",
+              "description": "ClientId to validate in case of id_tokens, if access tokens will be used then this should be the audience. Mandatory if config.oidcAuth.enabled=true",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "groupsClaim": {
+              "default": "groups",
+              "description": "Claim used to extract group memberships from JWT.",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "usernameClaim": {
+              "default": "email",
+              "description": "Claim used to extract user from JWT.",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "enabled": {
+              "default": "true",
+              "description": "Enables oidc authentication",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            },
+            "issuerUrl": {
+              "default": "\"\"",
+              "description": "Full url to the oidc, only https is accepted. It supports multiple issuerUrl with comma separator. Mandatory if config.oidcAuth.enabled=true",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "searchEngine": {
+          "properties": {
+            "noTlsUrl": {
+              "default": "http://eric-data-search-engine:9200",
+              "description": "Full url including protocol to the searchEngine service with TLS disabled",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "url": {
+              "default": "https://eric-data-search-engine-tls:9200",
+              "description": "Full url including protocol to the searchEngine service",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "service": {
+          "properties": {
+            "port": {
+              "default": "9443",
+              "description": "Port to expose the opensearch dashboard service",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "fullnameOverride": {
+      "default": "\"\"",
+      "description": "Overriding the full name",
+      "type": [
+        "string",
+        "integer",
+        "number"
+      ]
+    },
+    "global": {
+      "properties": {
+        "annotations": {
+          "default": "{}",
+          "description": "Global annotations. Global, service level, and resource-specific labels are merged, no conflicts are allowed",
+          "type": "object"
+        },
+        "fsGroup": {
+          "properties": {
+            "manual": {
+              "default": "\"\"",
+              "description": "Sets a fsGroup ID for all services. If manual set to empty namespace default configuration is used.",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                },
+                {
+                  "pattern": "^-?\\d+$",
+                  "type": "string"
+                }
+              ]
+            },
+            "namespace": {
+              "default": "\"\"",
+              "description": "Sets a fsGroup to use namespace default. The following values are possible: true, false and \"\". If global.fsGroup.namespace set to \"\" or false, namespace default configuration is used.",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "internalIPFamily": {
+          "default": "\"\"",
+          "description": "InternalIPFamily configures the IP address family used for cluster-internal IP address. Available values are: IPv4, IPv6, and empty.",
+          "enum": [
+            "IPv6",
+            "IPv4",
+            ""
+          ],
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "labels": {
+          "default": "{}",
+          "description": "Global labels. Global, service level, and resource-specific labels are merged, no conflicts are allowed",
+          "type": "object"
+        },
+        "log": {
+          "properties": {
+            "streamingMethod": {
+              "default": "indirect",
+              "description": "The global parameter for specifying the streaming method of service logs. It can be ‘indirect', ‘direct', ‘dual', or null. If both global.log.streamingMethod and log.streamingMethod are set to null, it will choose ‘indirect' by default",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "networkPolicy": {
+          "properties": {
+            "enabled": {
+              "default": "false",
+              "description": "Global network policy parameter",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "nodeSelector": {
+          "default": "{}",
+          "description": "Global node selectors",
+          "type": "object"
+        },
+        "podSecurityContext": {
+          "properties": {
+            "supplementalGroups": {
+              "default": "\"\"",
+              "description": "SupplementalGroups is used for setting the GID value(s) for volume data that is used by the services. The value will be merged if both global and local value are set. supplementalGroup will not be set in helmchart if both global and local value are not set",
+              "type": [
+                "array",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "pullSecret": {
+          "default": "\"\"",
+          "description": "PullSecret used when fetching the image",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        },
+        "registry": {
+          "properties": {
+            "imagePullPolicy": {
+              "default": "IfNotPresent",
+              "description": "Pull policy for the image",
+              "type": [
+                "string",
+                "integer",
+                "number"            ]
+            },
+            "repoPath": {
+              "default": "\"\"",
+              "description": "Repository path of the image",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "url": {
+              "default": "armdocker.rnd.ericsson.se",
+              "description": "Registry url to fetch image from",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "security": {
+          "properties": {
+            "tls": {
+              "properties": {
+                "enabled": {
+                  "default": "true",
+                  "description": "Configuration option to enable/disable TLS support",
+                  "oneOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "enum": [
+                        "true",
+                        "false"
+                      ],
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "securityPolicy": {
+          "properties": {
+            "rolekind": {
+              "default": "\"\"",
+              "description": "Configuration of the security policy role kind. The following values are possible: ClusterRole, Role and \"\". Rolebinding will not be created with value \"\"",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "timezone": {
+          "default": "UTC",
+          "description": "Timezone",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "imageCredentials": {
+      "properties": {
+        "oam-dashboards": {
+          "properties": {
+            "registry": {
+              "properties": {
+                "imagePullPolicy": {
+                  "default": "\"\"",
+                  "description": "Pull policy for the image",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number",
+                    "null"
+                  ]
+                },
+                "url": {
+                  "default": "\"\"",
+                  "description": "Registry url to fetch image from",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "repoPath": {
+              "default": "\"\"",
+              "description": "Repo where the image is located",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "proxy": {
+          "properties": {
+            "registry": {
+              "properties": {
+                "imagePullPolicy": {
+                  "default": "\"\"",
+                  "description": "Pull policy for the image",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number",
+                    "null"
+                  ]
+                },
+                "url": {
+                  "default": "armdocker.rnd.ericsson.se",
+                  "description": "Registry url to fetch image from",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "repoPath": {
+              "default": "proj-bam-released",
+              "description": "Repo where the image is located",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "pullSecret": {
+          "default": "\"\"",
+          "description": "PullSecret used when fetching the image",
+          "type": [
+            "string",
+            "integer",
+            "number",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "images": {
+      "properties": {
+        "oam-dashboards": {
+          "properties": {
+            "name": {
+              "default": "\"\"",
+              "description": "BAM OAM Dashboards Image Name",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "tag": {
+              "default": "\"\"",
+              "description": "Image tag, will override the default tag derived from the chart app version",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "proxy": {
+          "properties": {
+            "name": {
+              "default": "kube-rbac-proxy",
+              "description": "Proxy Image Name",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "tag": {
+              "default": "",
+              "description": "Proxy Image version",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "tag"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "ingress": {
+      "properties": {
+        "enabled": {
+          "default": "false",
+          "description": "Set whether to enable ingress",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "enum": [
+                "true",
+                "false"
+              ],
+              "type": "string"
+            }
+          ]
+        },
+        "frontProxy": {
+          "properties": {
+            "caSecret": {
+              "default": "eric-sec-sip-tls-trusted-root-cert",
+              "description": "External CA secret name which is validated by rbac proxy service",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "subjectName": {
+              "default": "eric-bss-bam-oam-dashboards",
+              "description": "Subject name",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "ingressClass": {
+          "default": "\"\"",
+          "description": "IngressClass for ingress",
+          "type": [
+            "string",
+            "integer",
+            "number",
+            "null"
+          ]
+        },
+        "tls": {
+          "properties": {
+            "ca": {
+              "default": "eric-tm-ingress-controller-cr-oam-client-ca",
+              "description": "CA to verify incoming requests from OAM ingress, mandatory if ingress has been installed with clientCertificate.enabled=true",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "labels": {
+      "default": "{}",
+      "description": "A map for setting custom labels for all Kubernetes resources",
+      "type": "object"
+    },
+    "nameOverride": {
+      "default": "\"\"",
+      "description": "Overriding the full name",
+      "type": [
+        "string",
+        "integer",
+        "number"
+      ]
+    },
+    "networkPolicy": {
+      "properties": {
+        "egress": {
+          "properties": {
+            "accessLabels": {
+              "properties": {
+                "oam-dashboards": {
+                  "default": "{}",
+                  "description": "This parameter is a placeholder for adding a list of egress traffic network policy labels. If this service wants to send traffic then it should add all its outgoing traffic network policy access labels using this parameter",
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "enabled": {
+          "default": "true",
+          "description": "The network policy will be enabled if both networkPolicy.enabled and global.networkPolicy.enabled are set to true",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "enum": [
+                "true",
+                "false"
+              ],
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "nodeSelector": {
+      "default": "{}",
+      "description": "Node labels for pod assignment",
+      "type": "object"
+    },
+    "podPriority": {
+      "properties": {
+        "eric-bss-bam-oam-dashboards": {
+          "properties": {
+            "priorityClassName": {
+              "default": "\"\"",
+              "description": "Priority class name to use for the pod.",
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "podSecurityContext": {
+      "properties": {
+        "supplementalGroups": {
+          "default": "\"\"",
+          "description": "SupplementalGroups is used for setting the GID value(s) for volume data that is used by the services. The value will be merged if both global and local value are set. supplementalGroup will not be set in helmchart if both global and local value are not set",
+          "type": [
+            "array",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "probes": {
+      "properties": {
+        "back-proxy": {
+          "properties": {
+            "livenessProbe": {
+              "properties": {
+                "failureThreshold": {
+                  "default": "3",
+                  "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "initialDelaySeconds": {
+                  "default": "1",
+                  "description": "Number of seconds after the container has started before probe is initiated",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "periodSeconds": {
+                  "default": "10",
+                  "description": "How often (in seconds) to perform the probe",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "timeoutSeconds": {
+                  "default": "2",
+                  "description": "Number of seconds after which the probe times out",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "startupProbe": {
+              "properties": {
+                "failureThreshold": {
+                  "default": "60",
+                  "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "initialDelaySeconds": {
+                  "default": "5",
+                  "description": "Number of seconds after the container has started before probe is initiated",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "periodSeconds": {
+                  "default": "5",
+                  "description": "How often (in seconds) to perform the probe",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "successThreshold": {
+                  "default": "1",
+                  "description": "Minimum consecutive successes for the probe to be considered successful after having failed",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "timeoutSeconds": {
+                  "default": "2",
+                  "description": "Number of seconds after which the probe times out",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "front-proxy": {
+          "properties": {
+            "livenessProbe": {
+              "properties": {
+                "failureThreshold": {
+                  "default": "3",
+                  "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "initialDelaySeconds": {
+                  "default": "1",
+                  "description": "Number of seconds after the container has started before probe is initiated",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "periodSeconds": {
+                  "default": "5",
+                  "description": "How often (in seconds) to perform the probe",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "timeoutSeconds": {
+                  "default": "2",
+                  "description": "Number of seconds after which the probe times out",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "startupProbe": {
+              "properties": {
+                "failureThreshold": {
+                  "default": "60",
+                  "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "initialDelaySeconds": {
+                  "default": "5",
+                  "description": "Number of seconds after the container has started before probe is initiated",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "periodSeconds": {
+                  "default": "5",
+                  "description": "How often (in seconds) to perform the probe",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "successThreshold": {
+                  "default": "1",
+                  "description": "Minimum consecutive successes for the probe to be considered successful after having failed",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "timeoutSeconds": {
+                  "default": "2",
+                  "description": "Number of seconds after which the probe times out",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "oam-dashboards": {
+          "properties": {
+            "livenessProbe": {
+              "properties": {
+                "failureThreshold": {
+                  "default": "10",
+                  "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "initialDelaySeconds": {
+                  "default": "10",
+                  "description": "Number of seconds after the container has started before probe is initiated",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "periodSeconds": {
+                  "default": "20",
+                  "description": "How often (in seconds) to perform the probe",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "successThreshold": {
+                  "default": "1",
+                  "description": "Minimum consecutive successes for the probe to be considered successful after having failed",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "timeoutSeconds": {
+                  "default": "5",
+                  "description": "Number of seconds after which the probe times out",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "startupProbe": {
+              "properties": {
+                "failureThreshold": {
+                  "default": "80",
+                  "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "initialDelaySeconds": {
+                  "default": "5",
+                  "description": "Number of seconds after the container has started before probe is initiated",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "periodSeconds": {
+                  "default": "5",
+                  "description": "How often (in seconds) to perform the probe",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "successThreshold": {
+                  "default": "1",
+                  "description": "Minimum consecutive successes for the probe to be considered successful after having failed",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "timeoutSeconds": {
+                  "default": "2",
+                  "description": "Number of seconds after which the probe times out",
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "pattern": "^-?\\d+$",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "rbac": {
+      "properties": {
+        "create": {
+          "default": "true",
+          "description": "Set whether to create the RBAC",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "enum": [
+                "true",
+                "false"
+              ],
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "replicaCount": {
+      "default": "1",
+      "description": "ReplicaCount of Pod",
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?\\d+$",
+          "type": "string"
+        }
+      ]
+    },
+    "resources": {
+      "properties": {
+        "back-proxy": {
+          "properties": {
+            "limits": {
+              "properties": {
+                "cpu": {
+                  "default": "100m",
+                  "description": "The maximum amount of CPU to allocate to the backProxy container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "512M",
+                  "description": "The maximum amount of memory to allocate to the backProxy container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "requests": {
+              "properties": {
+                "cpu": {
+                  "default": "100m",
+                  "description": "The amount of CPU required by the backProxy container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "512M",
+                  "description": "The amount of memory required by the backProxy container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "front-proxy": {
+          "properties": {
+            "limits": {
+              "properties": {
+                "cpu": {
+                  "default": "100m",
+                  "description": "The maximum amount of CPU to allocate to the frontProxy container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "512M",
+                  "description": "The maximum amount of memory to allocate to the frontProxy container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "requests": {
+              "properties": {
+                "cpu": {
+                  "default": "100m",
+                  "description": "The amount of CPU required by the frontProxy container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "512M",
+                  "description": "The amount of memory required by the frontProxy container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "oam-dashboards": {
+          "properties": {
+            "limits": {
+              "properties": {
+                "cpu": {
+                  "default": "100m",
+                  "description": "The maximum amount of CPU to allocate to the oamdashboard container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "512M",
+                  "description": "The maximum amount of memory to allocate to the oamdashboard container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "requests": {
+              "properties": {
+                "cpu": {
+                  "default": "100m",
+                  "description": "The amount of CPU required by the oamdashboard container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "memory": {
+                  "default": "512M",
+                  "description": "The amount of memory required by the oamdashboard container",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "seccompProfile": {
+      "properties": {
+        "back-proxy": {
+          "properties": {
+            "localhostProfile": {
+              "default": "\"\"",
+              "description": "Localhost path to the seccomp profile for the backProxy container. Should only be set if seccompProfile.backProxy.type is set to localhost",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "\"\"",
+              "description": "Feature of the Linux kernel for secure computing mode for backProxy container. Available options are,,and \"\" [default=\"\"]",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "front-proxy": {
+          "properties": {
+            "localhostProfile": {
+              "default": "\"\"",
+              "description": "Localhost path to the seccomp profile for the frontProxy container. Should only be set if seccompProfile.frontProxy.type is set to localhost",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "\"\"",
+              "description": "Feature of the Linux kernel for secure computing mode for frontProxy container. Available options are,,and \"\" [default=\"\"]",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "oam-dashboards": {
+          "properties": {
+            "localhostProfile": {
+              "default": "\"\"",
+              "description": "Localhost path to the seccomp profile for the oamdashboards container. Should only be set if seccompProfile.oamdashboards.type is set to localhost",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "type": {
+              "default": "\"\"",
+              "description": "Feature of the Linux kernel for secure computing mode for oamdashboards container. Available options are,,and \"\" [default=\"\"]",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "securityPolicy": {
+      "properties": {
+        "rolename": {
+          "default": "\"\"",
+          "description": "Rolename sets the name of the security policy role that is bound to the service account.",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "service": {
+      "properties": {
+        "app": {
+          "properties": {
+            "discoveryServices": {
+              "default": "eric-bss-gui-aggregator",
+              "description": "Name of service which discovers this service as a micro front-end service",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            },
+            "labelName": {
+              "default": "bss-oam-gui",
+              "description": "UI micro front-end discovery",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "port": {
+          "default": "5601",
+          "description": "Service port",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "pattern": "^-?\\d+$",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "serviceAccount": {
+      "properties": {
+        "create": {
+          "default": "true",
+          "description": "Set whether to create the service account",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "enum": [
+                "true",
+                "false"
+              ],
+              "type": "string"
+            }
+          ]
+        },
+        "name": {
+          "default": "\"\"",
+          "description": "Name of the serviceaccount to be used",
+          "type": [
+            "string",
+            "integer",
+            "number"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "terminationGracePeriodSeconds": {
+      "default": "30",
+      "description": "Number of seconds after SIGTERM caught before shutting down",
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "pattern": "^-?\\d+$",
+          "type": "string"
+        }
+      ]
+    },
+    "tolerations": {
+      "default": "[]",
+      "description": "Tolerations for pod assignment",
+      "type": "array"
+    },
+    "topologySpreadConstraints": {
+      "default": "[]",
+      "description": "Constraints for Topology Spread",
+      "type": "array"
+    },
+    "updateStrategy": {
+      "properties": {
+        "oam-dashboards": {
+          "properties": {
+            "rollingUpdate": {
+              "properties": {
+                "maxSurge": {
+                  "default": "50%",
+                  "description": "The number of pods that can be created above the desired amount of pods during an update",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                },
+                "maxUnavailable": {
+                  "default": "50%",
+                  "description": "The number of pods that can be unavailable during the update process",
+                  "type": [
+                    "string",
+                    "integer",
+                    "number"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "type": {
+              "default": "RollingUpdate",
+              "description": "Type of UpdateStrategy during Upgrade",
+              "type": [
+                "string",
+                "integer",
+                "number"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "type": "object"
+}

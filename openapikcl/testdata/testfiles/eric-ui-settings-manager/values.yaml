@@ -1,0 +1,343 @@
+# Global parameters shall be defined in the top level values.yaml
+# They are kept here for indicating which are supported and their default values.
+
+#global:
+#  security:
+#    policyBinding:
+#      create:false
+#    policyReferenceMap:
+#      default-restricted-security-policy: "default-restricted-security-policy"
+#    tls:
+#      enabled: true
+#  registry:
+#    url: armdocker.rnd.ericsson.se
+#    imagePullPolicy: IfNotPresent
+#  timezone: UTC
+#  internalIPFamily:
+#  pullSecret:
+#  nodeSelector: {}
+#  locationName: ""
+#  locationDetails:
+#    namespace: ""
+#    cluster: ""
+#    region: ""
+#    site: ""
+#  fsGroup:
+#    manual:
+#    namespace:
+
+imageCredentials:
+  usm:
+    # See default in eric-product-info.yaml
+    # Container image repository path.
+    repoPath:
+    registry:
+      # Image registry URL. Overrides global registry url if not empty.
+      url:
+      # Image pull policy. One of Always, Never, IfNotPresent.
+      imagePullPolicy:
+  usm-hk:
+    # See default in eric-product-info.yaml
+    # Container image repository path.
+    repoPath:
+    registry:
+      # Image registry URL. Overrides global registry url if not empty.
+      url:
+      # Image pull policy. One of Always, Never, IfNotPresent.
+      imagePullPolicy:
+  # Authorization token that stores docker credentials used for accessing a registry.
+  pullSecret:
+
+log:
+  # Default value is empty, meaning that the global.log.streamingMethod value is used.  If the global parameter is also null or empty, indirect streaming is chosen.
+  streamingMethod:
+  # Indicates log transformer host.
+  transformerHost: "eric-log-transformer"
+  # Indicates log transformer SSL port.
+  transformerTlsPort: 5024
+  # Indicates log transformer Non-SSL port.
+  transformerNoTlsPort: 5025
+  tls:
+    # Indicates TTL of client certificate created for log transformer streaming. Default is empty, meaning that SIP-TLS validity value is used
+    clientCertificateTtl:
+    # Indicates issuer based on which client certificate is created.
+    issuer: eric-log-transformer-input-ca-cert
+  # Indicates socket timeout value (in seconds).
+  timeoutSeconds: 5
+  # Indicates internal queue size used for storing log events.
+  queueSize: 1000
+  # Indicates socket connection TTL value (in seconds).
+  connectionTtlSeconds: 15
+
+replication:
+  userAttributeHeader: x-remote-user
+
+# Persistance configuration details.
+persistence:
+  # Db provider name where UI settings data are stored.
+  dbProvider: OBJSTOREMN
+  # The DB service host name.
+  dbHost: eric-data-object-storage-mn
+  # DB port for connectivity.
+  dbPort: 9000
+  # Secret name used for secure communication with DB.
+  dbsecretname: mnsecretname
+  # Configuration for housekeeping of UI settings data in DB.
+  housekeepingDays: 60
+  # One of DB or Disk to provide flexibility of storage
+  type: Disk
+  persistentVolumeClaim:
+    # The size of the allocated data volume, min size of volume claim is 3 Mi and max size is 1 Gi
+    size: 1Gi
+    # Name of the data volume storageClass. When left empty, the default storageClass of the Kubernetes cluster will be used.
+    storageClassName: ""
+  # Provider where settings data are stored. DDPG if DB is configured as the type
+  provider: DDPG
+  # The service host name in case DB is configured as the type
+  host: eric-ui-settings-manager-database-pg
+  # Port for connectivity in case DB is configured
+  port: 5432
+  # Flexibility of exposing DB name configuration which is created in the Postgres
+  dbName: usm_data_db
+  # DB username for connecting with the Postgres instance
+  dbUser: usm
+  credentials:
+    # Secret name used for secure communication if type is configured as DB
+    dbSecretName: eric-data-document-database-pg-credentials
+    # UserIdkey to connect to usm_data_db
+    keyForUserId: usmUKey
+    # password to connect to usm_data_db
+    keyForUserPw: usmPKey
+    # Client certificate time-to-live in seconds.
+    clientCertificateTtl: 3600
+
+# Overridden name of the chart.
+nameOverride: ""
+# Overridden fully qualified chart name.
+fullnameOverride: ""
+
+# Details of the GUI Aggregator service
+gas:
+  service:
+    name: eric-gui-aggregator
+
+# To enable or disable the XDC data collection
+dataCollection:
+  enabled: false
+
+networkPolicy:
+# Pod-level firewall. If enabled, pod can only be accessed via Ingress.
+  enabled: true
+
+cmMediator:
+  # Indicates flag to enable or disable CM mediator dependency in USM.
+  enabled: true
+  # Indicates CM mediator service name.
+  serviceName: eric-cm-mediator
+  # Indicates CM mediator service port.
+  port: 5004
+  tls:
+    # Indicates TTL value of client certificate created for CM mediator communication.
+    clientCertificateTtl:
+    # Indicates issuer based on which client certificate is created for CM mediator.
+    issuer: eric-cm-mediator-ca
+
+ingress:
+  # Flexibility to enable/disable the deployment of ingress resource.
+  enabled: false
+  # CA to verify incoming requests from ingress, mandatory if ingress has been installed with clientCertificate.enabled=true
+  ca: eric-tm-ingress-controller-cr-client-ca
+  # Ingress class name indicates which ingress controller instance will consume the ingress resource.
+  ingressClass: ""
+  proxy:
+    # The calls will be routed to this configured RBAC proxy from ingress.
+    service:
+    # The port of configured RBAC proxy service.
+    port:
+
+sfc:
+  # Provides flexibility to enable or disable system function control check for GUI Applications. Enabling this will control the availability of GUI applications based on function control status.
+  enabled: false
+   # Name of the system function control service.
+  service:
+    # Name of the system function control service.
+    name: "eric-bss-bam-function-controller-evaluation-service"
+    # The port of system function control service.
+    port: 8443
+  tls:
+    # CA certificate issuer for system function control service.
+    issuer: eric-bss-bam-function-controller-eval-client-ca
+    # Client certificate time-to-live in seconds.
+    clientCertificateTtl:
+
+service:
+  app:
+    # Label name used for UI settings discovery.
+    labelName: workspace-gui
+
+updateStrategy:
+  # Type of deployment strategy.
+  type: RollingUpdate
+
+# Configuration for node selection constraints, based on labels on the node.
+nodeSelector:
+  # Configuration for node selection constraints, based on labels on the node for USM deployments
+  usm: {}
+  # Configuration for node selection constraints, based on labels on the node for USM cronjobs
+  usm-hk: {}
+
+# This will be deprecated in the future. Configuration of node selection constraints moved to workload specific parameters.
+nodeSelector: {}
+
+# PM counter scrape configuration.
+prometheus:
+  # Flag to determine if the scraping should be done.
+  scrape: true
+
+#Certificate refresh configuration.
+security:
+  tls:
+    karaf:
+      # Client certificate time-to-live in seconds.
+      clientCertificateTtl:
+      # Server certificate time-to-live in seconds.
+      serverCertificateTtl:
+
+# Configuration for scheduling based on taints on the nodes.
+tolerations:
+  # Configuration for scheduling based on taints on the nodes for USM deployment
+  usm:
+    - key: node.kubernetes.io/not-ready
+      operator: Exists
+      effect: NoExecute
+      tolerationSeconds: 0
+    - key: node.kubernetes.io/unreachable
+      operator: Exists
+      effect: NoExecute
+      tolerationSeconds: 0
+  # Configuration for scheduling based on taints on the nodes for USM cronjob.
+  usm-hk:
+    - key: node.kubernetes.io/not-ready
+      operator: Exists
+      effect: NoExecute
+      tolerationSeconds: 0
+    - key: node.kubernetes.io/unreachable
+      operator: Exists
+      effect: NoExecute
+      tolerationSeconds: 0
+
+# This will be deprecated in the future. Configuration for scheduling based on taints on the nodes moved to workload specific parameters.
+tolerations:
+  - key: node.kubernetes.io/not-ready
+    operator: Exists
+    effect: NoExecute
+    tolerationSeconds: 0
+  - key: node.kubernetes.io/unreachable
+    operator: Exists
+    effect: NoExecute
+    tolerationSeconds: 0
+
+# Maximum graceful termination timeout in seconds.
+terminationGracePeriodSeconds:
+  # Maximum graceful termination timeout in seconds for usm deployments
+  usm: 30
+  # Maximum graceful termination timeout in seconds for housekeeping cronjobs.
+  usm-hk: 30
+
+# Custom labels added to all chart resources.
+labels: {}
+
+# Custom annotations added to all chart resources.
+annotations: {}
+
+affinity:
+  # TopologyKey is the key of a label attached to a node. If two Nodes are labelled with this key and have identical values for that label, the scheduler treats both Nodes as being in the same topology. The scheduler tries to place a balanced number of Pods into each topology domain
+  topologyKey: "kubernetes.io/hostname"
+  # Configuration to constrain the nodes the pods are eligible to be scheduled on, based on labels on the node.
+  nodeAffinity:
+    # Configuration to constrain the nodes the pods are eligible to be scheduled on, based on labels on the node for USM deployments
+    usm: {}
+    # Configuration to constrain the nodes the pods are eligible to be scheduled on, based on labels on the node for USM cronjobs
+    usm-hk: {}
+  # This will be deprecated in the future. Configuration to constrain the nodes the pods moved to workload specific parameters.
+  nodeAffinity: {}
+
+
+resources:
+  usm:
+    requests:
+      # Memory resource request for the container
+      memory: "512Mi"
+      # CPU resource request for the container
+      cpu: "100m"
+      # Ephemeral storage resource request for the container
+      ephemeral-storage: "256Mi"
+    limits:
+      # Memory resource limit for the container. The container will be killed with an out of memory error if it goes above this limit
+      memory: "1Gi"
+      # CPU resource limit for the container. The container CPU usage may be throttled to this value
+      cpu: "500m"
+      # Ephemeral storage resource request for the container. The container will be killed with an out of memory error if it goes above this limit.
+      ephemeral-storage: "512Mi"
+  usm-hk:
+    requests:
+      # Memory resource request for the cronjob
+      memory: "256Mi"
+      # CPU resource request for the cronjob
+      cpu: "100m"
+      # Ephemeral storage resource request for the cronjob
+      ephemeral-storage: "256Mi"
+    limits:
+      # Memory resource limit for the cronjob. The job will be killed with an out of memory error if it goes above this limit
+      memory: "512Mi"
+      # CPU resource limit for the cronjob. The job CPU usage may be throttled to this value
+      cpu: "500m"
+      # Ephemeral storage resource request for the cronjob. The job will be killed with an out of memory error if it goes above this limit.
+      ephemeral-storage: "512Mi"
+
+probes:
+  usm:
+    livenessProbe:
+      # Minimum consecutive failures for the probe to be considered failed after having succeeded.
+      failureThreshold: 20
+      # Number of seconds after the container has started before the probe is initiated.
+      initialDelaySeconds: 20
+      # How often (in seconds) to perform the probe.
+      periodSeconds: 10
+      # Number of seconds after which the probe times out.
+      timeoutSeconds: 10
+    readinessProbe:
+      # Minimum consecutive failures for the probe to be considered failed after having succeeded.
+      failureThreshold: 20
+      # Number of seconds after the container has started before the probe is initiated.
+      initialDelaySeconds: 20
+      # How often (in seconds) to perform the probe.
+      periodSeconds: 10
+      # Minimum consecutive successes for the probe to be considered successful after having failed
+      successThreshold: 1
+      # Number of seconds after which the probe times out
+      timeoutSeconds: 10
+
+appArmorProfile:
+  usm:
+    # Sets the AppArmor type. The following values are possible; 'unconfined' - Indicates that there is no profile loaded. 'runtime/default' - Applies the default profile of the container engine. 'localhost' - Applies a specific profile loaded on the host. "" - The appArmor is not set in the Helm chart.
+    type:
+    # The 'localhostProfile' requires a profile name to be provided. The name of the local AppArmor profile to be used. Applicable only if type is set to 'localhost'.
+    localhostProfile:
+  usm-hk:
+    # Sets the AppArmor type. The following values are possible; 'unconfined' - Indicates that there is no profile loaded. 'runtime/default' - Applies the default profile of the container engine. 'localhost' - Applies a specific profile loaded on the host. "" - The appArmor is not set in the Helm chart.
+    type:
+    # The 'localhostProfile' requires a profile name to be provided. The name of the local AppArmor profile to be used. Applicable only if type is set to 'localhost'.
+    localhostProfile:
+
+seccompProfile:
+  usm:
+    # Configuration of seccomp profile types. The following values are possible; 'Unconfined' - Indicates that there is no profile loaded. 'RuntimeDefault' - Applies the default profile of the container engine. 'Localhost' - Applies a specific profile loaded on the host. "" - The seccomp is not set in the Helm chart.
+    type:
+    # The variable 'localhostProfile' contains the name of the local seccomp profile to be used. Applicable only if type is set to 'Localhost'.
+    localhostProfile:
+  usm-hk:
+    # Configuration of seccomp profile types. The following values are possible; 'Unconfined' - Indicates that there is no profile loaded. 'RuntimeDefault' - Applies the default profile of the container engine. 'Localhost' - Applies a specific profile loaded on the host. "" - The seccomp is not set in the Helm chart.
+    type:
+    # The variable 'localhostProfile' contains the name of the local seccomp profile to be used. Applicable only if type is set to 'Localhost'.
+    localhostProfile:

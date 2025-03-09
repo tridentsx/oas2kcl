@@ -1,0 +1,1417 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+        "affinity": {
+            "type": "object",
+            "properties": {
+                "podAntiAffinity": {
+                    "type": "string"
+                },
+                "topologyKey": {
+                    "type": "string"
+                }
+            }
+        },
+        "annotations": {
+            "type": "object"
+        },
+        "appArmorProfile": {
+            "type": "object",
+            "properties": {
+                "brAgent": {
+                    "type": "object",
+                    "properties": {
+                        "localhostProfile": {
+                             "type": ["null", "string"]
+                        },
+                        "type": {
+                            "type": ["null", "string"]
+                        }
+                    }
+                },
+                "datacoordinatorzk": {
+                    "type": "object",
+                    "properties": {
+                        "localhostProfile": {
+                             "type": ["null", "string"]
+                        },
+                        "type": {
+                            "type": ["null", "string"]
+                        }
+                    }
+                },
+                "localhostProfile": {
+                    "type": ["null", "string"]
+                },
+                "logshipper": {
+                    "type": "object",
+                    "properties": {
+                        "localhostProfile": {
+                             "type": ["null", "string"]
+                        },
+                        "type": {
+                            "type": ["null", "string"]
+                        }
+                    }
+                },
+                "metricsexporter": {
+                    "type": "object",
+                    "properties": {
+                        "localhostProfile": {
+                             "type": ["null", "string"]
+                        },
+                        "type": {
+                            "type": ["null", "string"]
+                        }
+                    }
+                },
+                "type": {
+                    "type": ["null", "string"]
+                }
+            }
+        },
+        "bandwidth": {
+            "type": "object",
+            "properties": {
+                "maxEgressRate": {
+                     "type": ["null", "integer", "string"]
+                }
+            }
+        },
+        "brAgent": {
+            "type": "object",
+            "properties": {
+                "backupTypeList": {
+                     "type": ["null", "string", "array"]
+                },
+                "brLabelValue": {
+                     "type": ["null", "string"]
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "grpc": {
+                    "type": "object",
+                    "properties": {
+                        "backup": {
+                            "type": "object",
+                            "properties": {
+                                "dataChannelTimeoutSecs": {
+                                    "type": "integer"
+                                },
+                                "fragmentChunkSize": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
+                    }
+                },
+                "logLevel": {
+                    "type": "string"
+                },
+                "logging": {
+                    "type": "object",
+                    "properties": {
+                        "fileName": {
+                            "type": "string"
+                        },
+                        "log4jxml": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "properties": {
+                    "type": "object",
+                    "properties": {
+                        "applicationProperties": {
+                            "type": ["string"]
+                        },
+                        "fileName": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "replicaCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "broBragentCertValidity": {
+            "type": "object",
+            "properties": {
+                "overrideLeadTime": {
+                    "type": ["null", "integer"]
+                },
+                "overrideTtl": {
+                    "type": ["null", "integer"]
+                }
+            }
+        },
+        "clientPort": {
+            "type": "integer"
+        },
+        "clusterDomain": {
+            "type": "string"
+        },
+        "dczkJvmFlags": {
+             "type": ["null", "string", "object"]
+        },
+        "dzckBragentCertValidity": {
+            "type": "object",
+            "properties": {
+                "overrideLeadTime": {
+                    "type": ["null", "integer"]
+                },
+                "overrideTtl": {
+                    "type": ["null", "integer"]
+                }
+            }
+        },
+        "fullnameOverride": {
+             "type": ["null", "string"]
+        },
+        "global": {
+            "type": "object",
+            "properties": {
+                "adpBR": {
+                    "type": "object",
+                    "properties": {
+                        "brLabelKey": {
+                            "type": "string"
+                        },
+                        "broGrpcServicePort": {
+                            "type": "integer"
+                        },
+                        "broServiceName": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "fsGroup": {
+                    "type": "object",
+                    "properties": {
+                        "manual": {
+                            "type": ["null", "integer"]
+                        },
+                        "namespace": {
+                            "type": ["null", "boolean"]
+                        }
+                    }
+                },
+                "hooklauncher": {
+                    "type": "object",
+                    "properties": {
+                        "executor": {
+                            "type": "string"
+                        },
+                        "executorCharts": {
+                            "type": "array"
+                        }
+                    }
+                },
+                "internalIPFamily": {
+                     "type": ["null", "string", "array"]
+                },
+                "log": {
+                    "type": "object",
+                    "properties": {
+                        "outputs": {
+                            "type": "array",
+                            "items": {
+                                "type": ["null","string"]
+                            }
+                        },
+                        "streamingMethod": {
+                             "type": ["null", "string"]
+                        }
+                    }
+                },
+                "logShipper": {
+                    "type": "object",
+                    "properties": {
+                        "deployment": {
+                             "type": "object",
+                             "properties": {
+                                 "type": { "type": "string" }
+                            }
+                        }
+                    }
+                },
+                "networkPolicy": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "nodeSelector": {
+                    "type": "object"
+                },
+                "pullSecret": {
+                    "type": ["null", "string"]
+                },
+                "registry": {
+                    "type": "object",
+                    "properties": {
+                        "repoPath": {
+                             "type": ["null", "string"]
+                        },
+                        "url": {
+                            "type": ["null", "string"]
+                        }
+                    }
+                },
+                "security": {
+                    "type": "object",
+                    "properties": {
+                        "sasl": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean"
+                                }
+                            }
+                        },
+                        "tls": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                },
+                "securityPolicy": {
+                    "type": "object",
+                    "properties": {
+                        "rolekind": {
+                            "type": ["null", "string"]
+                        }
+                    }
+                },
+                "timezone": {
+                    "type": "string"
+                }
+            }
+        },
+        "heap": {
+            "type": ["null", "string"]
+        },
+        "imageCredentials": {
+            "type": "object",
+            "properties": {
+                "brAgent": {
+                    "type": "object",
+                    "properties": {
+                        "registry": {
+                            "type": "object",
+                            "properties": {
+                                "imagePullPolicy": {
+                                     "type": ["null", "string"]
+                                },
+                                "url": {
+                                     "type": ["null", "string"]
+                                }
+                            }
+                        },
+                        "repoPath": {
+                             "type": ["null", "string"]
+                        }
+                    }
+                },
+                "datacoordinatorzk": {
+                    "type": "object",
+                    "properties": {
+                        "registry": {
+                            "type": "object",
+                            "properties": {
+                                "imagePullPolicy": {
+                                     "type": ["null", "string"]
+                                },
+                                "url": {
+                                     "type": ["null", "string"]
+                                }
+                            }
+                        },
+                        "repoPath": {
+                             "type": ["null", "string"]
+                        }
+                    }
+                },
+                "hooklauncher": {
+                    "type": "object",
+                    "properties": {
+                        "registry": {
+                            "type": "object",
+                            "properties": {
+                                "imagePullPolicy": {
+                                     "type": ["null", "string"]
+                                },
+                                "url": {
+                                     "type": ["null", "string"]
+                                }
+                            }
+                        },
+                        "repoPath": {
+                             "type": ["null", "string"]
+                        }
+                    }
+                },
+                "logshipper": {
+                    "type": "object",
+                    "properties": {
+                        "registry": {
+                            "type": "object",
+                            "properties": {
+                                "imagePullPolicy": {
+                                     "type": ["null", "string"]
+                                },
+                                "url": {
+                                     "type": ["null", "string"]
+                                }
+                            }
+                        },
+                        "repoPath": {
+                            "type": ["null","string"]
+                        }
+                    }
+                },
+                "metricsexporter": {
+                    "type": "object",
+                    "properties": {
+                        "registry": {
+                            "type": "object",
+                            "properties": {
+                                "imagePullPolicy": {
+                                     "type": ["null", "string"]
+                                },
+                                "url": {
+                                     "type": ["null", "string"]
+                                }
+                            }
+                        },
+                        "repoPath": {
+                             "type": ["null", "string"]
+                        }
+                    }
+                },
+                "pullSecret": {
+                    "type": ["null", "string"]
+                },
+                "repoPath": {
+                     "type": ["null", "string", "object"]
+                }
+            }
+        },
+        "initLimit": {
+            "type": "integer"
+        },
+        "labels": {
+            "type": "object"
+        },
+        "leaderElectionPort": {
+            "type": "integer"
+        },
+        "log": {
+            "type": "object",
+            "properties": {
+                "outputs": {
+                    "type": "array"
+                },
+                "streamingMethod": {
+                     "type": ["null", "string"]
+                }
+            }
+        },
+        "logFilterMessage": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "logLevel": {
+            "type": "string"
+        },
+        "logShipper": {
+            "type": "object",
+            "properties": {
+                "filters": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        },
+                        "modify": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean"
+                                },
+                                "rules": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "input": {
+                    "type": "object",
+                    "properties": {
+                        "files": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "enabled": {
+                                        "type": "boolean"
+                                    },
+                                    "multilines": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "parsers": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "paths": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "logLevel": {
+                    "type": "string"
+                },
+                "multilines": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "cont": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "next": {
+                                            "type": "string"
+                                        },
+                                        "pattern": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "start": {
+                                "type": "object",
+                                "properties": {
+                                    "next": {
+                                        "type": "string"
+                                    },
+                                    "pattern": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "output": {
+                    "type": "object",
+                    "properties": {
+                        "logTransformer": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean"
+                                },
+                                "host": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                },
+                "parsers": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "pattern": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "shutdownDelay": {
+                    "type": "integer"
+                },
+                "storage": {
+                    "type": "object",
+                    "properties": {
+                        "medium": {
+                            "type": "string"
+                        },
+                        "path": {
+                            "type": "string"
+                        },
+                        "size": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "maxClientCnxns": {
+            "type": "integer"
+        },
+        "metrics": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "metricsexporter": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "port": {
+                    "type": "integer"
+                }
+            }
+        },
+        "network": {
+            "type": "object",
+            "properties": {
+                "datacoordinatorzk": {
+                    "type": "object",
+                    "properties": {
+                        "adminServer": {
+                            "type": "object",
+                            "properties": {
+                                "address": {
+                                    "type": "string"
+                                },
+                                "port": {
+                                    "type": "integer"
+                                }
+                            }
+                        },
+                        "client": {
+                            "type": "object",
+                            "properties": {
+                                "tlsPort": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "networkPolicy": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "nodeSelector": {
+            "type": "object",
+            "properties": {
+                "brAgent": {
+                    "type": "object"
+                },
+                "datacoordinatorzk": {
+                    "type": "object"
+                }
+            }
+        },
+        "persistence": {
+            "type": "object",
+            "properties": {
+                "persistentVolumeClaim": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        },
+                        "size": {
+                            "type": ["null", "integer","string"]
+                        },
+                        "storageClassName": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "podDisruptionBudget": {
+            "anyOf": [
+                {
+                    "properties": {
+                        "minAvailable": {
+                            "$ref": "#/$defs/pdbValue"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "maxUnavailable": {
+                            "$ref": "#/$defs/pdbValue"
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            ]
+        },
+        "podPriority": {
+            "type": "object",
+            "properties": {
+                "eric-data-coordinator-zk": {
+                    "type": "object",
+                    "properties": {
+                        "priorityClassName": {
+                            "type": ["null","string"]
+                        }
+                    }
+                },
+                "eric-data-coordinator-zk-agent": {
+                    "type": "object",
+                    "properties": {
+                        "priorityClassName": {
+                            "type": ["null","string"]
+                        }
+                    }
+                },
+                "hooklauncher": {
+                    "type": "object",
+                    "properties": {
+                        "priorityClassName": {
+                            "type": ["null","string"]
+                        }
+                    }
+                }
+            }
+        },
+        "probes": {
+            "type": "object",
+            "properties": {
+                "brAgent": {
+                    "type": "object",
+                    "properties": {
+                        "livenessProbe": {
+                            "type": "object",
+                            "properties": {
+                                "failureThreshold": {
+                                    "type": "integer"
+                                },
+                                "initialDelaySeconds": {
+                                    "type": "integer"
+                                },
+                                "periodSeconds": {
+                                    "type": "integer"
+                                },
+                                "timeoutSeconds": {
+                                    "type": "integer"
+                                }
+                            }
+                        },
+                        "readinessProbe": {
+                            "type": "object",
+                            "properties": {
+                                "failureThreshold": {
+                                    "type": "integer"
+                                },
+                                "initialDelaySeconds": {
+                                    "type": "integer"
+                                },
+                                "periodSeconds": {
+                                    "type": "integer"
+                                },
+                                "successThreshold": {
+                                    "type": "integer"
+                                },
+                                "timeoutSeconds": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
+                    }
+                },
+                "datacoordinatorzk": {
+                    "type": "object",
+                    "properties": {
+                        "livenessProbe": {
+                            "type": "object",
+                            "properties": {
+                                "failureThreshold": {
+                                    "type": "integer"
+                                },
+                                "initialDelaySeconds": {
+                                    "type": "integer"
+                                },
+                                "periodSeconds": {
+                                    "type": "integer"
+                                },
+                                "timeoutSeconds": {
+                                    "type": "integer"
+                                }
+                            }
+                        },
+                        "readinessProbe": {
+                            "type": "object",
+                            "properties": {
+                                "failureThreshold": {
+                                    "type": "integer"
+                                },
+                                "initialDelaySeconds": {
+                                    "type": "integer"
+                                },
+                                "periodSeconds": {
+                                    "type": "integer"
+                                },
+                                "successThreshold": {
+                                    "type": "integer"
+                                },
+                                "timeoutSeconds": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
+                    }
+                },
+                "logshipper": {
+                    "type": "object",
+                    "properties": {
+                        "livenessProbe": {
+                            "type": "object",
+                            "properties": {
+                                "failureThreshold": {
+                                    "type": "integer"
+                                },
+                                "initialDelaySeconds": {
+                                    "type": "integer"
+                                },
+                                "periodSeconds": {
+                                    "type": "integer"
+                                },
+                                "timeoutSeconds": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
+                    }
+                },
+                "metricsexporter": {
+                    "type": "object",
+                    "properties": {
+                        "livenessProbe": {
+                            "type": "object",
+                            "properties": {
+                                "failureThreshold": {
+                                    "type": "integer"
+                                },
+                                "initialDelaySeconds": {
+                                    "type": "integer"
+                                },
+                                "periodSeconds": {
+                                    "type": "integer"
+                                },
+                                "timeoutSeconds": {
+                                    "type": "integer"
+                                }
+                            }
+                        },
+                        "readinessProbe": {
+                            "type": "object",
+                            "properties": {
+                                "failureThreshold": {
+                                    "type": "integer"
+                                },
+                                "initialDelaySeconds": {
+                                    "type": "integer"
+                                },
+                                "periodSeconds": {
+                                    "type": "integer"
+                                },
+                                "successThreshold": {
+                                    "type": "integer"
+                                },
+                                "timeoutSeconds": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "productInfo": {
+            "type": "object",
+            "properties": {
+                "rstate": {
+                    "type": "string"
+                }
+            }
+        },
+        "purgeIntervalHours": {
+            "type": "integer"
+        },
+        "readinessProbe": {
+            "type": "object",
+            "properties": {
+                "logshipper": {
+                    "type": "object",
+                    "properties": {
+                        "initialDelaySeconds": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "replicaCount": {
+            "type": "integer"
+        },
+        "resources": {
+            "type": "object",
+            "properties": {
+                "brAgent": {
+                    "type": "object",
+                    "properties": {
+                        "jvm": {
+                            "type": "object",
+                            "properties": {
+                                "initialMemoryAllocationPercentage": {
+                                    "type": "integer"
+                                },
+                                "largeMemoryAllocationMaxPercentage": {
+                                    "type": "integer"
+                                },
+                                "smallMemoryAllocationMaxPercentage": {
+                                    "type": "integer"
+                                }
+                            }
+                        },
+                        "limits": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["null","integer","string","number"]
+                                },
+                                "ephemeral-storage": {
+                                     "type": ["null", "integer", "string"]
+                                },
+                                "memory": {
+                                    "type": ["null","integer","string"]
+                                }
+                            }
+                        },
+                        "requests": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["null","integer","string","number"]
+                                },
+                                "ephemeral-storage": {
+                                     "type": ["null", "integer", "string"]
+                                },
+                                "memory": {
+                                    "type": ["null","integer","string"]
+                                }
+                            }
+                        }
+                    }
+                },
+                "datacoordinatorzk": {
+                    "type": "object",
+                    "properties": {
+                        "jvm": {
+                            "type": "object",
+                            "properties": {
+                                "initialMemoryAllocationPercentage": {
+                                    "type": "integer"
+                                },
+                                "largeMemoryAllocationMaxPercentage": {
+                                    "type": "integer"
+                                },
+                                "smallMemoryAllocationMaxPercentage": {
+                                    "type": "integer"
+                                }
+                            }
+                        },
+                        "limits": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["null", "integer", "string","number"]
+                                },
+                                "ephemeral-storage": {
+                                     "type": ["null", "integer", "string"]
+                                },
+                                "memory": {
+                                    "type": ["null", "integer", "string"]
+                                }
+                            }
+                        },
+                        "requests": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["null", "integer", "string","number"]
+                                },
+                                "ephemeral-storage": {
+                                     "type": ["null", "integer", "string"]
+                                },
+                                "memory": {
+                                    "type": ["null", "integer", "string"]
+                                }
+                            }
+                        }
+                    }
+                },
+                "hooklauncher": {
+                    "type": "object",
+                    "properties": {
+                        "limits": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["null", "integer", "string","number"]
+                                },
+                                "ephemeral-storage": {
+                                    "type": ["null", "integer", "string"]
+                                },
+                                "memory": {
+                                    "type": ["null", "integer", "string"]
+                                }
+                            }
+                        },
+                        "requests": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["null", "integer", "string","number"]
+                                },
+                                "ephemeral-storage": {
+                                    "type": ["null", "integer", "string"]
+                                },
+                                "memory": {
+                                    "type": ["null", "integer", "string"]
+                                }
+                            }
+                        }
+                    }
+                },
+                "logshipper": {
+                    "type": "object",
+                    "properties": {
+                        "limits": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["null", "integer", "string","number"]
+                                },
+                                "ephemeral-storage": {
+                                     "type": ["null", "integer", "string"]
+                                },
+                                "memory": {
+                                    "type": ["null", "integer", "string"]
+                                }
+                            }
+                        },
+                        "requests": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["null", "integer", "string","number"]
+                                },
+                                "ephemeral-storage": {
+                                     "type": ["null", "integer", "string"]
+                                },
+                                "memory": {
+                                    "type": ["null", "integer", "string"]
+                                }
+                            }
+                        }
+                    }
+                },
+                "metricsexporter": {
+                    "type": "object",
+                    "properties": {
+                        "limits": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["null", "integer", "string","number"]
+                                },
+                                "ephemeral-storage": {
+                                     "type": ["null", "integer", "string"]
+                                },
+                                "memory": {
+                                    "type": ["null", "integer", "string"]
+                                }
+                            }
+                        },
+                        "requests": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["null", "integer", "string","number"]
+                                },
+                                "ephemeral-storage": {
+                                     "type": ["null", "integer", "string"]
+                                },
+                                "memory": {
+                                    "type": ["null", "integer", "string"]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "seccompProfile": {
+            "type": "object",
+            "properties": {
+                "brAgent": {
+                    "type": "object",
+                    "properties": {
+                        "localhostProfile": {
+                             "type": ["null", "string"]
+                        },
+                        "type": {
+                            "type": ["null", "string"]
+                        }
+                    }
+                },
+                "datacoordinatorzk": {
+                    "type": "object",
+                    "properties": {
+                        "localhostProfile": {
+                             "type": ["null", "string"]
+                        },
+                        "type": {
+                            "type": ["null", "string"]
+                        }
+                    }
+                },
+                "localhostProfile": {
+                    "type": ["null", "string"]
+                },
+                "logshipper": {
+                    "type": "object",
+                    "properties": {
+                        "localhostProfile": {
+                             "type": ["null", "string"]
+                        },
+                        "type": {
+                            "type": ["null", "string"]
+                        }
+                    }
+                },
+                "metricsexporter": {
+                    "type": "object",
+                    "properties": {
+                        "localhostProfile": {
+                             "type": ["null", "string"]
+                        },
+                        "type": {
+                            "type": ["null", "string"]
+                        }
+                    }
+                },
+                "type": {
+                    "type": ["null", "string"]
+                }
+            }
+        },
+        "security": {
+            "type": "object",
+            "properties": {
+                "sasl": {
+                    "type": "object",
+                    "properties": {
+                        "credentials": {
+                            "type": "object",
+                            "properties": {
+                                "kubernetesSecretName": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "securityPolicy": {
+            "type": "object",
+            "properties": {
+                "rolename": {
+                    "type": "string"
+                }
+            }
+        },
+        "serverNameParameter": {
+            "type": "object",
+            "properties": {
+                "pmServer": {
+                    "type": "string"
+                }
+            }
+        },
+        "serverPort": {
+            "type": "integer"
+        },
+        "service": {
+            "type": "object",
+            "properties": {
+                "endpoints": {
+                    "type": "object",
+                    "properties": {
+                        "datacoordinatorzk": {
+                            "type": "object",
+                            "properties": {
+                                "edaTls": {
+                                    "type": "object",
+                                    "properties": {
+                                        "clientAuth": {
+                                            "type": "string"
+                                        },
+                                        "keystoreFile": {
+                                            "type": "string"
+                                        },
+                                        "keystorePasswordFile": {
+                                            "type": "string"
+                                        },
+                                        "secretName": {
+                                            "type": "string"
+                                        },
+                                        "truststoreFile": {
+                                            "type": "string"
+                                        },
+                                        "truststorePasswordFile": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "metricsPort": {
+                                    "type": "integer"
+                                },
+                                "tls": {
+                                    "type": "object",
+                                    "properties": {
+                                        "clientcertRenewalLeadTime": {
+                                            "type": ["null", "integer"]
+                                        },
+                                        "clientcertTimeToLive": {
+                                            "type": ["null", "integer"]
+                                        },
+                                        "enforced": {
+                                            "type": "string"
+                                        },
+                                        "peer": {
+                                            "type": "object",
+                                            "properties": {
+                                                "enforced": {
+                                                    "type": "string"
+                                                },
+                                                "portUnification": {
+                                                    "type": "boolean"
+                                                }
+                                            }
+                                        },
+                                        "provider": {
+                                            "type": "string"
+                                        },
+                                        "servcertRenewalLeadTime": {
+                                            "type": ["null", "integer"]
+                                        },
+                                        "servcertTimeToLive": {
+                                            "type": ["null", "integer"]
+                                        },
+                                        "verifyClientCertificate": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "pm": {
+                            "type": "object",
+                            "properties": {
+                                "tls": {
+                                    "type": "object",
+                                    "properties": {
+                                        "enforced": {
+                                            "type": "string"
+                                        },
+                                        "port": {
+                                            "type": "integer"
+                                        },
+                                        "verifyClientCertificate": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "snapCount": {
+            "type": "integer"
+        },
+        "snapRetainCount": {
+            "type": "integer"
+        },
+        "syncLimit": {
+            "type": "integer"
+        },
+        "terminationGracePeriodSeconds": {
+            "type": "object",
+            "properties": {
+                "brAgent": {
+                    "type": "integer"
+                },
+                "datacoordinatorzk": {
+                    "type": "integer"
+                }
+            }
+        },
+        "tickTimeMs": {
+            "type": "integer"
+        },
+        "tlsCiphers": {
+            "type": "string"
+        },
+        "tolerations": {
+            "type": "object",
+            "properties": {
+                "brAgent": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "effect": {
+                                "type": "string"
+                            },
+                            "key": {
+                                "type": "string"
+                            },
+                            "operator": {
+                                "type": "string"
+                            },
+                            "tolerationSeconds": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                },
+                "datacoordinatorzk": {
+                    "type": "array"
+                },
+                "hooklauncher": {
+                    "type": "array"
+                },
+                "shhpostupgrade": {
+                    "type": "array"
+                }
+            }
+        },
+        "topologySpreadConstraints": {
+            "type": "object",
+            "properties": {
+                "datacoordinatorzk": {
+                    "$ref": "#/$defs/topologySpreadConstraintsValue"
+                }
+            }
+        },
+        "updateStrategy": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+	 "$defs": {
+        "topologySpreadConstraintsValue": {
+            "type": "array",
+             "items": {
+                "$ref": "#/$defs/topologySpreadConstraintsItemValue"
+            }
+        },
+        "topologySpreadConstraintsItemValue": {
+            "type": "object",
+            "properties": {
+                "maxSkew": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "topologyKey": {
+                    "type": "string"
+                },
+                "whenUnsatisfiable": {
+                    "type": "string",
+                    "oneOf": [
+                        {
+                            "enum": [
+                                "DoNotSchedule",
+                                "ScheduleAnyway"
+                            ]
+                        }
+                    ]
+                }
+            },
+            "required": [
+                "maxSkew",
+                "topologyKey",
+                "whenUnsatisfiable"
+            ]
+        },
+        "pdbValue": {
+            "oneOf": [
+                {
+                    "type": "string",
+                    "pattern": "^(([0-9])|([1-9][0-9])|100)%$"
+                },
+                {
+                    "type": "number"
+                }
+            ]
+        }
+    }
+}

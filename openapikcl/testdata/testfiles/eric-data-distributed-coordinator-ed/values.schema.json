@@ -1,0 +1,81 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+        "podDisruptionBudget": {
+            "anyOf": [
+                {
+                    "properties": {
+                        "minAvailable": {
+                            "$ref": "#/$defs/pdbValue"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "maxUnavailable": {
+                            "$ref": "#/$defs/pdbValue"
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            ]
+        },
+        "topologySpreadConstraints": {
+            "type": "object",
+            "properties": {
+                "dced": {
+                    "$ref": "#/$defs/topologySpreadConstraintsValue"
+                }
+            }
+        }
+    },
+    "$defs": {
+        "topologySpreadConstraintsValue": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/topologySpreadConstraintsItemValue"
+            }
+        },
+        "topologySpreadConstraintsItemValue": {
+            "type": "object",
+            "properties": {
+                "maxSkew": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "topologyKey": {
+                    "type": "string"
+                },
+                "whenUnsatisfiable": {
+                    "type": "string",
+                    "oneOf": [
+                        {
+                            "enum": [
+                                "DoNotSchedule",
+                                "ScheduleAnyway"
+                            ]
+                        }
+                    ]
+                }
+            },
+            "required": [
+                "maxSkew",
+                "topologyKey",
+                "whenUnsatisfiable"
+            ]
+        },
+        "pdbValue": {
+            "oneOf": [
+                {
+                    "type": "string",
+                    "pattern": "^(([0-9])|([1-9][0-9])|100)%$"
+                },
+                {
+                    "type": "number"
+                }
+            ]
+        }
+    }
+}

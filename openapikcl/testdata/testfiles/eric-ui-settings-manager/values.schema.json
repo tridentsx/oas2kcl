@@ -1,0 +1,1788 @@
+{
+    "$schema": "http://json-schema.org/draft-2020-12/schema",
+    "$id": "eric-ui-settings-manager.1.0.0.json",
+    "type": "object",
+    "title": "USM json schema definition",
+    "description": "The detailed schema definition for the helm chart parameters of USM",
+    "properties": {
+        "global": {
+            "$id": "#/properties/global",
+            "type": "object",
+            "additionalProperties": true,
+            "properties": { }
+        },
+        "helmDefaults": {
+            "$id": "#/properties/helmDefaults",
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {  }
+        },
+        "enabled": {
+            "$id": "#/properties/enabled",
+            "type": "boolean",
+            "default": true
+        },
+        "imageCredentials": {
+            "$id": "#/properties/imageCredentials",
+            "type": "object",
+            "properties": {
+                "pullSecret": {
+                    "$id": "#/properties/imageCredentials/properties/pullSecret",
+                    "type": ["string","null"],
+                    "description": "Authorization token that stores docker credentials used for accessing a registry.",
+                    "typeOfParameter": "Static",
+                    "optionality": "Optional",
+                    "responsible": "External",
+                    "default": null
+                },
+                "usm": {
+                    "$id": "#/properties/imageCredentials/properties/usm",
+                    "type": "object",
+                    "properties": {
+                        "repoPath": {
+                            "$id": "#/properties/imageCredentials/properties/usm/properties/repoPath",
+                            "type": ["string","null"],
+                            "description": "Container image repository path.",
+                            "typeOfParameter": "Static",
+                            "optionality": "Optional",
+                            "responsible": "External",
+                            "default": null,
+                            "examples": ["proj-cus-drop"]
+                        },
+                        "registry": {
+                            "$id": "#/properties/imageCredentials/properties/usm/properties/registry",
+                            "type": "object",
+                            "properties": {
+                                "url": {
+                                    "$id": "#/properties/imageCredentials/properties/usm/properties/registry/properties/url",
+                                    "type": ["string","null"],
+                                    "description": "Image registry URL. Overrides global registry url if not empty.",
+                                    "default": null,
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "External"
+                                },
+                                "imagePullPolicy": {
+                                    "$id": "#/properties/imageCredentials/properties/usm/properties/registry/properties/imagePullPolicy",
+                                    "type": ["string","null"],
+                                    "description": "Image pull policy. One of Always, Never, IfNotPresent.",
+                                    "default": null,
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "External",
+                                    "pattern": "^(Always|Never|IfNotPresent)$"
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "usm-hk": {
+                    "$id": "#/properties/imageCredentials/properties/usm-hk",
+                    "type": "object",
+                    "properties": {
+                        "repoPath": {
+                            "$id": "#/properties/imageCredentials/properties/usm-hk/properties/repoPath",
+                            "type": ["string","null"],
+                            "description": "Container image repository path.",
+                            "typeOfParameter": "Static",
+                            "optionality": "Optional",
+                            "responsible": "External",
+                            "default": null,
+                            "examples": ["proj-cus-drop"]
+                        },
+                        "registry": {
+                            "$id": "#/properties/imageCredentials/properties/usm-hk/properties/registry",
+                            "type": "object",
+                            "properties": {
+                                "url": {
+                                    "$id": "#/properties/imageCredentials/properties/usm-hk/properties/registry/properties/url",
+                                    "type": ["string","null"],
+                                    "description": "Image registry URL. Overrides global registry url if not empty.",
+                                    "default": null,
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "External"
+                                },
+                                "imagePullPolicy": {
+                                    "$id": "#/properties/imageCredentials/properties/usm-hk/properties/registry/properties/imagePullPolicy",
+                                    "type": ["string","null"],
+                                    "description": "Image pull policy. One of Always, Never, IfNotPresent.",
+                                    "default": null,
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "External",
+                                    "pattern": "^(Always|Never|IfNotPresent)$"
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "replication": {
+            "$id": "#/properties/replication",
+            "type": "object",
+            "properties": {
+                "userAttributeHeader": {
+                    "$id": "#/properties/replication/properties/userAttributeHeader",
+                    "type": ["string"],
+                    "description": "User attribute header value used in rbac proxy headers.",
+                    "typeOfParameter": "Dynamic",
+                    "optionality": "Optional",
+                    "responsible": "Internal",
+                    "default": "x-remote-user"
+                }
+            },
+            "additionalProperties": false
+        },
+        "persistence": {
+            "$id": "#/properties/persistence",
+            "type": "object",
+            "properties": {
+                "dbProvider": {
+                    "$id": "#/properties/persistence/properties/dbProvider",
+                    "type": "string",
+                    "description": "Db provider name where UI settings data are stored.",
+                    "default": "OBJSTOREMN",
+                    "typeOfParameter": "Static",
+                    "optionality": "Optional",
+                    "responsible": "Internal"
+                },
+                "dbHost": {
+                    "$id": "#/properties/persistence/properties/dbHost",
+                    "type": "string",
+                    "description": "The DB service host name.",
+                    "default": "eric-data-object-storage-mn",
+                    "typeOfParameter": "Static",
+                    "optionality": "Optional",
+                    "responsible": "Internal"
+                },
+                "dbPort": {
+                    "$id": "#/properties/persistence/properties/dbPort",
+                    "type": "integer",
+                    "description": "DB port for connectivity.",
+                    "default": 9000,
+                    "typeOfParameter": "Static",
+                    "optionality": "Optional",
+                    "responsible": "Internal"
+                },
+                "dbsecretname": {
+                    "$id": "#/properties/persistence/properties/dbsecretname",
+                    "type": "string",
+                    "description": "Secret name used for secure communication with DB.",
+                    "default": "mnsecretname",
+                    "typeOfParameter": "Static",
+                    "optionality": "Optional",
+                    "responsible": "External"
+                },
+                "housekeepingDays": {
+                    "$id": "#/properties/persistence/properties/housekeepingDays",
+                    "type": "integer",
+                    "description": "Configuration for housekeeping of UI settings data in DB.",
+                    "typeOfParameter": "Static",
+                    "optionality": "Optional",
+                    "responsible": "Internal",
+                    "default": 60
+                },
+                "type": {
+                    "$id": "#/properties/persistence/properties/type",
+                    "type": "string",
+                    "description": "One of DB or Disk to provide flexibility of storage",
+                    "default": "Disk",
+                    "typeOfParameter": "Static",
+                    "optionality": "Optional",
+                    "responsible": "External"
+                },
+                "provider": {
+                    "$id": "#/properties/persistence/properties/provider",
+                    "type": "string",
+                    "description": "Provider where settings data are stored. DDPG if DB is configured as the type",
+                    "default": "DDPG",
+                    "typeOfParameter": "Dynamic",
+                    "optionality": "Optional",
+                    "responsible": "Internal"
+                },
+                "host": {
+                    "$id": "#/properties/persistence/properties/host",
+                    "type": "string",
+                    "description": "The service host name in case DB is configured as the type",
+                    "default": "eric-ui-settings-manager-database-pg",
+                    "typeOfParameter": "Dynamic",
+                    "optionality": "Optional",
+                    "responsible": "External"
+                },
+                "port": {
+                    "$id": "#/properties/persistence/properties/port",
+                    "type": "integer",
+                    "description": "Port for connectivity in case DB is configured",
+                    "default": "5432",
+                    "typeOfParameter": "Dynamic",
+                    "optionality": "Optional",
+                    "responsible": "External"
+                },
+                "dbName": {
+                    "$id": "#/properties/persistence/properties/dbName",
+                    "type": "string",
+                    "description": "Flexibility of exposing DB name configuration which is created in the Postgres",
+                    "default": "usm_data_db",
+                    "typeOfParameter": "Dynamic",
+                    "optionality": "Optional",
+                    "responsible": "Internal"
+                },
+                "dbUser": {
+                    "$id": "#/properties/persistence/properties/dbUser",
+                    "type": "string",
+                    "description": "DB username for connecting with the Postgres instance",
+                    "default": "usm",
+                    "typeOfParameter": "Dynamic",
+                    "optionality": "Optional",
+                    "responsible": "Internal"
+                },
+                "persistentVolumeClaim": {
+                    "$id": "#/properties/persistence/properties/persistentVolumeClaim",
+                    "type": "object",
+                    "properties": {
+                        "size": {
+                            "$id": "#/properties/persistence/properties/persistentVolumeClaim/properties/size",
+                            "type": "string",
+                            "description": "The size of the allocated data volume, min size of volume claim is 3 Mi and max size is 1 Gi",
+                            "default": "OBJSTOREMN",
+                            "typeOfParameter": "Static",
+                            "optionality": "Optional",
+                            "responsible": "External"
+                        },
+                        "storageClassName": {
+                            "$id": "#/properties/persistence/properties/persistentVolumeClaim/properties/storageClassName",
+                            "type": "string",
+                            "description": "Name of the data volume storageClass. When left empty, the default storageClass of the Kubernetes cluster will be used.",
+                            "default": "",
+                            "typeOfParameter": "Static",
+                            "optionality": "Optional",
+                            "responsible": "External"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "credentials": {
+                    "$id": "#/properties/persistence/properties/credentials",
+                    "type": "object",
+                    "properties": {
+                        "dbSecretName": {
+                            "$id": "#/properties/persistence/properties/credentials/properties/dbSecretName",
+                            "type": "string",
+                            "description": "Secret name used for secure communication if type is configured as DB",
+                            "default": "eric-data-document-database-pg-credentials",
+                            "typeOfParameter": "Dynamic",
+                            "optionality": "Optional",
+                            "responsible": "External"
+                        },
+                        "keyForUserId": {
+                            "$id": "#/properties/persistence/properties/credentials/properties/keyForUserId",
+                            "type": "string",
+                            "description": "UserIdkey to connect to usm_data_db",
+                            "default": "usmUKey",
+                            "typeOfParameter": "Dynamic",
+                            "optionality": "Optional",
+                            "responsible": "External"
+                        },
+                        "keyForUserPw": {
+                            "$id": "#/properties/persistence/properties/credentials/properties/keyForUserPw",
+                            "type": "string",
+                            "description": "password to connect to usm_data_db",
+                            "default": "usmPKey",
+                            "typeOfParameter": "Dynamic",
+                            "optionality": "Optional",
+                            "responsible": "External"
+                        },
+                        "clientCertificateTtl": {
+                            "$id": "#/properties/persistence/properties/credentials/properties/clientCertificateTtl",
+                            "type": ["integer", "null"],
+                            "description": "Client certificate time-to-live in seconds.",
+                            "default": null,
+                            "typeOfParameter": "Dynamic",
+                            "optionality": "Optional",
+                            "responsible": "External",
+                            "examples": ["3600"]
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "nameOverride": {
+            "$id": "#/properties/nameOverride",
+            "type": "string",
+            "description": "Override the name of the chart in chart.yaml.",
+            "default": "",
+            "typeOfParameter": "Static",
+            "optionality": "Optional",
+            "responsible": "Internal",
+            "examples": [
+                "eric-ui-settings-manager-oam"
+            ]
+        },
+        "appArmorProfile": {
+            "optionality": "Optional",
+            "responsible": "External",
+            "typeOfParameter": "Static",
+            "description": "",
+            "type": "object",
+            "properties": {
+                "usm": {
+                    " $id": "#/properties/appArmorProfile/properties/usm",
+                    "optionality": "Optional",
+                    "responsible": "External",
+                    "typeOfParameter": "Static",
+                    "type": "object",
+                    "properties": {
+                        "localhostProfile": {
+                            "optionality": "Optional",
+                            "responsible": "External",
+                            "typeOfParameter": "Static",
+                            "description": "The localhostProfile should be provided if type is localhost",
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "$id": "#/properties/appArmorProfile/properties/usm/properties/localhostProfile"
+                        },
+                        "type": {
+                            "default": "",
+                            "optionality": "Optional",
+                            "responsible": "External",
+                            "typeOfParameter": "Static",
+                            "description": "If the type is localhost then localhostProfile should be provided. Acceptable values are [unconfined, runtime/default, localhost, null]",
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "enum": [
+                                "unconfined",
+                                "Unconfined",
+                                "runtime/default",
+                                "RuntimeDefault",
+                                "localhost",
+                                "Localhost",
+                                null
+                            ],
+                            "$id": "#/properties/appArmorProfile/properties/usm/properties/type"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "usm-hk": {
+                    " $id": "#/properties/appArmorProfile/properties/usm-hk",
+                    "optionality": "Optional",
+                    "responsible": "External",
+                    "typeOfParameter": "Static",
+                    "type": "object",
+                    "properties": {
+                        "localhostProfile": {
+                            "optionality": "Optional",
+                            "responsible": "External",
+                            "typeOfParameter": "Static",
+                            "description": "The localhostProfile should be provided if type is localhost",
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "$id": "#/properties/appArmorProfile/properties/usm-hk/properties/localhostProfile"
+                        },
+                        "type": {
+                            "default": "",
+                            "optionality": "Optional",
+                            "responsible": "External",
+                            "typeOfParameter": "Static",
+                            "description": "If the type is localhost then localhostProfile should be provided. Acceptable values are [unconfined, runtime/default, localhost, null]",
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "enum": [
+                                "unconfined",
+                                "Unconfined",
+                                "runtime/default",
+                                "RuntimeDefault",
+                                "localhost",
+                                "Localhost",
+                                null
+                            ],
+                            "$id": "#/properties/appArmorProfile/properties/usm-hk/properties/type"
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false,
+            "$id": "#/properties/appArmorProfile"
+        },
+        "fullnameOverride": {
+            "$id": "#/properties/fullnameOverride",
+            "type": "string",
+            "description": "Override the full name of resources.",
+            "default": "",
+            "typeOfParameter": "Static",
+            "optionality": "Optional",
+            "responsible": "Internal",
+            "examples": [
+                "eric-ui-settings-manager-oam"
+            ]
+        },
+        "seccompProfile": {
+            "$id": "#/properties/seccompProfile",
+            "type": "object",
+            "properties": {
+                "usm": {
+                    "$id": "#/properties/seccompProfile/properties/usm",
+                    "then": {
+                        "properties": {
+                            "localhostProfile": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "type": "object",
+                    "if": {
+                        "properties": {
+                            "type": {
+                                "const": "localhost"
+                            }
+                        }
+                    },
+                    "properties": {
+                        "type": {
+                            "default": "",
+                            "optionality": "Optional",
+                            "responsible": "External",
+                            "typeOfParameter": "Static",
+                            "description": "If the type is localhost then localhostProfile should be provided. Acceptable values are [Unconfined, RuntimeDefault, Localhost, null].",
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "enum": [
+                                "Unconfined",
+                                "RuntimeDefault",
+                                "Localhost",
+                                null
+                            ],
+                            "$id": "#/properties/seccompProfile/properties/usm/properties/type"
+                        },
+                        "localhostProfile": {
+                            "optionality": "Optional",
+                            "responsible": "External",
+                            "typeOfParameter": "Static",
+                            "description": "The localhostProfile should be provided if type is localhost.",
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "$id": "#/properties/seccompProfile/properties/usm/properties/localhostProfile"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "usm-hk": {
+                    "$id": "#/properties/seccompProfile/properties/usm-hk",
+                    "then": {
+                        "properties": {
+                            "localhostProfile": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "type": "object",
+                    "if": {
+                        "properties": {
+                            "type": {
+                                "const": "localhost"
+                            }
+                        }
+                    },
+                    "properties": {
+                        "type": {
+                            "default": "",
+                            "optionality": "Optional",
+                            "responsible": "External",
+                            "typeOfParameter": "Static",
+                            "description": "If the type is localhost then localhostProfile should be provided. Acceptable values are [Unconfined, RuntimeDefault, Localhost, null].",
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "enum": [
+                                "Unconfined",
+                                "RuntimeDefault",
+                                "Localhost",
+                                null
+                            ],
+                            "$id": "#/properties/seccompProfile/properties/usm-hk/properties/type"
+                        },
+                        "localhostProfile": {
+                            "optionality": "Optional",
+                            "responsible": "External",
+                            "typeOfParameter": "Static",
+                            "description": "The localhostProfile should be provided if type is localhost.",
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "$id": "#/properties/seccompProfile/properties/usm-hk/properties/localhostProfile"
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "replicaCount": {
+            "$id": "#/properties/replicaCount",
+            "type": "integer",
+            "description": "Number of replicas. This value is currently under deprication, Changing this value is not recommended for singletons.",
+            "typeOfParameter": "Dynamic",
+            "optionality": "Optional",
+            "responsible": "External",
+            "minimum": 1,
+            "default": 2
+        },
+        "dataCollection": {
+            "$id": "#/properties/dataCollection",
+            "type": "object",
+            "description": "XDC data collection properties.",
+            "typeOfParameter": "Dynamic",
+            "optionality": "Optional",
+            "responsible": "External",
+            "properties": {
+                "enabled": {
+                    "$id": "#/properties/dataCollection/properties/enabled",
+                    "type": "boolean",
+                    "description": "Option to switch between enable and disable of data collection",
+                    "typeOfParameter": "Dynamic",
+                    "optionality": "Optional",
+                    "responsible": "External",
+                    "default": true
+                }
+            },
+            "additionalProperties": false
+        },
+        "sfc": {
+            "$id": "#/properties/sfc",
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "$id": "#/properties/sfc/properties/enabled",
+                    "type": "boolean",
+                    "description": "Provides flexibility to enable or disable system function control check for GUI Applications. Enabling this will control the availability of GUI applications based on function control status.",
+                    "typeOfParameter": "Dynamic",
+                    "optionality": "Optional",
+                    "responsible": "External",
+                    "default": false
+                },
+                "service": {
+                    "$id": "#/properties/sfc/properties/service",
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "$id": "#/properties/sfc/properties/service/properties/name",
+                            "type": "string",
+                            "description": "Name of the system function control service.",
+                            "typeOfParameter": "Dynamic",
+                            "optionality": "Conditional if sfc.enabled is true",
+                            "responsible": "External",
+                            "default": "eric-bss-bam-function-controller-evaluation-service"
+                        },
+                        "port": {
+                            "$id": "#/properties/sfc/properties/service/properties/port",
+                            "type": "integer",
+                            "description": "The port of system function control service.",
+                            "typeOfParameter": "Dynamic",
+                            "optionality": "Conditional if sfc.enabled is true",
+                            "responsible": "External",
+                            "default": 8443
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "tls": {
+                    "$id": "#/properties/sfc/properties/tls",
+                    "type": "object",
+                    "properties": {
+                        "issuer": {
+                            "$id": "#/properties/sfc/properties/tls/properties/issuer",
+                            "type": "string",
+                            "description": "CA certificate issuer for system function control service.",
+                            "typeOfParameter": "Dynamic",
+                            "optionality": "Conditional if global.security.tls.enabled is true and sfc.enabled is true",
+                            "responsible": "External",
+                            "default": "eric-bss-bam-function-controller-eval-client-ca"
+                        },
+                        "clientCertificateTtl": {
+                            "$id": "#/properties/sfc/properties/tls/properties/clientCertificateTtl",
+                            "type": ["integer", "null"],
+                            "description": "TTL value for the system function control client certificate.",
+                            "typeOfParameter": "Dynamic",
+                            "optionality": "Conditional if global.security.tls.enabled is true and sfc.enabled is true",
+                            "responsible": "External",
+                            "default": null,
+                            "examples": ["3600"]
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "service": {
+            "$id": "#/properties/service",
+            "type": "object",
+            "properties": {
+                "app": {
+                    "$id": "#/properties/service/properties/app",
+                    "type": "object",
+                    "properties": {
+                        "labelName": {
+                            "$id": "#/properties/service/properties/app/properties/labelName",
+                            "type": "string",
+                            "description": "Label name used for UI settings discovery.",
+                            "typeOfParameter": "Static",
+                            "optionality": "Optional",
+                            "responsible": "External",
+                            "default": "bss-oam-gui"
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "updateStrategy": {
+            "$id": "#/properties/updateStrategy",
+            "type": "object",
+            "examples": [
+                {
+                    "type": "RollingUpdate"
+                }
+            ],
+            "properties": {
+                "type": {
+                    "$id": "#/properties/updateStrategy/properties/type",
+                    "type": "string",
+                    "description": "Type of update strategy.",
+                    "default": "RollingUpdate",
+                    "typeOfParameter": "Static",
+                    "optionality": "Optional",
+                    "responsible": "Internal",
+                    "enum": ["RollingUpdate", "Recreate"]
+                },
+                "rollingUpdate": {
+                    "$id": "#/properties/updateStrategy/properties/rollingUpdate",
+                    "type": "object",
+                    "properties": {
+                        "maxUnavailable": {
+                            "$id": "#/properties/updateStrategy/properties/rollingUpdate/properties/maxUnavailable",
+                            "type": "string",
+                            "description": "Describes how many pods can be unavailable at a given time during the rolling update. This value is currently under deprication, Changing this value is not recommended for singletons.",
+                            "typeOfParameter": "Static",
+                            "optionality": "Conditional If updateStrategy.type is RollingUpdate",
+                            "responsible": "Internal",
+                            "default": "25%"
+                        },
+                        "maxSurge": {
+                            "$id": "#/properties/updateStrategy/properties/rollingUpdate/properties/maxSurge",
+                            "type": "string",
+                            "description": "Describes how many pods can be added at a time. This value is currently under deprication, Changing this value is not recommended for singletons.",
+                            "typeOfParameter": "Static",
+                            "optionality": "Conditional If updateStrategy.type is RollingUpdate",
+                            "responsible": "Internal",
+                            "default": "25%"
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "prometheus": {
+            "$id": "#/properties/prometheus",
+            "type": "object",
+            "properties": {
+                "scrape": {
+                    "$id": "#/properties/prometheus/properties/scrape",
+                    "type": "boolean",
+                    "description": "Flag to determine if the scraping should be done.",
+                    "typeOfParameter": "Dynamic",
+                    "optionality": "Optional",
+                    "responsible": "External",
+                    "default": true
+                }
+            },
+            "additionalProperties": false
+        },
+        "nodeSelector": {
+           "$id": "#/properties/nodeSelector",
+           "type": "object",
+           "description": "Configuration for node selection constraints, based on labels on the node.",
+           "properties": {
+              "usm": {
+                "$id": "#/properties/nodeSelector/usm",
+                "type": "object",
+                "description": "Configuration for node selection constraints, based on labels on the node for USM deployment",
+                "typeOfParameter": "Static",
+                "optionality": "Mandatory",
+                "responsible": "Automated",
+                "default": {},
+                "examples": [{"disktype": "ssd"}]
+              },
+              "usm-hk": {
+                "$id": "#/properties/nodeSelector/usm-hk",
+                "type": "object",
+                "description": "Configuration for node selection constraints, based on labels on the node for USM for cronjob",
+                "typeOfParameter": "Static",
+                "optionality": "Mandatory",
+                "responsible": "Automated",
+                "default": {},
+                "examples": [{"disktype": "ssd"}]
+              }
+            }
+        },
+        "topologySpreadConstraints": {
+            "$id": "#/properties/topologySpreadConstraints",
+            "type": "array",
+            "description": "Configuration for topology-spread constraints.  This value is currently under deprication, Changing this value is not recommended for singletons.",
+            "typeOfParameter": "Static",
+            "optionality": "Optional",
+            "responsible": "External",
+            "default": [],
+            "examples": [
+                [{
+                    "maxSkew": 1,
+                    "topologyKey": "zone",
+                    "whenUnsatisfiable": "DoNotSchedule",
+                    "labelSelector": {
+                        "matchLabels": {
+                        "foo": "bar"
+                        }
+                    }
+                }]
+            ],
+            "additionalItems": false,
+            "items": {
+                "$id": "#/properties/topologySpreadConstraints/items"
+            }
+        },
+        "gas": {
+            "$id": "#/properties/gas",
+            "type": "object",
+            "required": [
+                "service"
+            ],
+            "properties": {
+                "service": {
+                    "$id": "#/properties/gas/service",
+                    "type": "object",
+                    "required": [
+                        "name"
+                    ],
+                    "properties": {
+                        "name": {
+                            "$id": "#/properties/gas/service/name",
+                            "type": "string",
+                            "description": "Parameter denotes the GUI aggregator service name based on which client CA resource name is looked up during deployment and trusted in UI settings manager service for mTLS UI handshake",
+                            "typeOfParameter": "Static",
+                            "optionality": "Optional",
+                            "responsible": "External",
+                            "default": "eric-gui-aggregator"
+                        }
+                    }
+                }
+            },
+            "additionalProperties": false
+        },
+        "log": {
+            "$id": "#/properties/log",
+            "type": "object",
+            "properties": {
+                "streamingMethod": {
+                    "$id": "#/properties/imageCredentials/properties/streamingMethod",
+                    "type": ["string", "null"],
+                    "description": "Default value is empty, meaning that the global.log.streamingMethod value is used.  If the global parameter is also null or empty, indirect streaming is chosen.",
+                    "typeOfParameter": "Static",
+                    "optionality": "Optional",
+                    "responsible": "Internal",
+                    "default": null,
+                    "enum": [ "direct", "indirect", "dual", "", null ]
+                },
+                "transformerHost": {
+                    "$id": "#/properties/imageCredentials/properties/transformerHost",
+                    "type": ["string"],
+                    "description": "Indicates log transformer host",
+                    "typeOfParameter": "Dynamic",
+                    "optionality": "Optional",
+                    "responsible": "Internal",
+                    "default": "eric-log-transformer"
+                },
+                "transformerTlsPort": {
+                    "$id": "#/properties/imageCredentials/properties/transformerTlsPort",
+                    "type": ["integer"],
+                    "description": "Indicates log transformer SSL port",
+                    "typeOfParameter": "Dynamic",
+                    "optionality": "Optional",
+                    "responsible": "Internal",
+                    "default": "5024"
+                },
+                "transformerNoTlsPort": {
+                    "$id": "#/properties/imageCredentials/properties/transformerNoTlsPort",
+                    "type": ["integer"],
+                    "description": "Indicates log transformer Non-SSL port",
+                    "typeOfParameter": "Dynamic",
+                    "optionality": "Optional",
+                    "responsible": "Internal",
+                    "default": "5025"
+                },
+                "tls": {
+                    "$id": "#/properties/imageCredentials/properties/tls",
+                    "type": "object",
+                    "properties": {
+                        "clientCertificateTtl": {
+                            "$id": "#/properties/imageCredentials/properties/tls/properties/clientCertificateTtl",
+                            "type": ["integer", "null"],
+                            "description": "Indicates TTL of client certificate created for log transformer streaming. Default is empty, meaning that SIP-TLS validity value is used.",
+                            "typeOfParameter": "Dynamic",
+                            "optionality": "Optional",
+                            "responsible": "Internal",
+                            "default": null
+                        },
+                        "issuer": {
+                            "$id": "#/properties/imageCredentials/properties/tls/properties/issuer",
+                            "type": ["string", "null"],
+                            "description": "Indicates issuer based on which client certificate is created",
+                            "typeOfParameter": "Dynamic",
+                            "optionality": "Optional",
+                            "responsible": "Internal",
+                            "default": "eric-log-transformer-input-ca-cert"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "timeoutSeconds": {
+                    "$id": "#/properties/imageCredentials/properties/timeoutSeconds",
+                    "type": ["integer"],
+                    "description": "Indicates socket timeout value (in seconds)",
+                    "typeOfParameter": "Dynamic",
+                    "optionality": "Optional",
+                    "responsible": "Internal",
+                    "default": 5
+                },
+                "queueSize": {
+                    "$id": "#/properties/imageCredentials/properties/queueSize",
+                    "type": ["integer"],
+                    "description": "Indicates internal queue size used for storing log events",
+                    "typeOfParameter": "Dynamic",
+                    "optionality": "Optional",
+                    "responsible": "Internal",
+                    "default": 1000
+                },
+                "connectionTtlSeconds": {
+                    "$id": "#/properties/imageCredentials/properties/connectionTtlSeconds",
+                    "type": ["integer"],
+                    "description": "Indicates socket connection TTL value (in seconds)",
+                    "typeOfParameter": "Dynamic",
+                    "optionality": "Optional",
+                    "responsible": "Internal",
+                    "default": 15
+                }
+            },
+            "additionalProperties": false
+        },
+        "networkPolicy": {
+            "$id": "#/properties/networkPolicy",
+            "type": "object",
+            "required": [
+                "enabled"
+            ],
+            "properties": {
+                "enabled": {
+                    "$id": "#/properties/networkPolicy/properties/enabled",
+                    "type": "boolean",
+                    "description": "Pod-level firewall. If enabled, pod can only be accessed via Ingress.",
+                    "typeOfParameter": "Static",
+                    "optionality": "Optional",
+                    "responsible": "External",
+                    "default": true
+                }
+            },
+            "additionalProperties": false
+        },
+        "autoScaling": {
+            "$id": "#/properties/autoScaling",
+            "type": "object",
+            "description": "Allows to dynamically scale number of replicas without intervention based on a criteria. This value is currently under deprication, Changing this value is not recommended for singletons.",
+            "properties": {
+                "enabled": {
+                    "$id": "#/properties/autoScaling/properties/enabled",
+                    "type": "boolean",
+                    "description": "Flag that determines if autoScaling should be enabled/disabled.",
+                    "typeOfParameter": "Static",
+                    "optionality": "Optional",
+                    "responsible": "External",
+                    "default": false
+                },
+                "minReplicas": {
+                    "$id": "#/properties/autoScaling/properties/minReplicas",
+                    "type": "integer",
+                    "description": "Number of minimum replicas.",
+                    "typeOfParameter": "Static",
+                    "optionality": "Conditional if autoScaling.enabled is true",
+                    "responsible": "Internal",
+                    "minimum": 1,
+                    "default": 2
+                },
+                "maxReplicas": {
+                    "$id": "#/properties/autoScaling/properties/maxReplicas",
+                    "type": "integer",
+                    "description": "Number of maximum replicas.",
+                    "typeOfParameter": "Static",
+                    "optionality": "Conditional if autoScaling.enabled is true",
+                    "responsible": "Internal",
+                    "minimum": 1,
+                    "default": 5
+                },
+                "targetCPUUtilizationPercentage": {
+                    "$id": "#/properties/autoScaling/properties/targetCPUUtilizationPercentage",
+                    "type": "integer",
+                    "description": "If the mean of the pod's CPU utilization is higher than the target defined, the replicas will be adjusted.",
+                    "typeOfParameter": "Static",
+                    "optionality": "Conditional if autoScaling.enabled is true",
+                    "responsible": "Internal",
+                    "default": 95
+                }
+            },
+            "additionalProperties": false
+        },
+        "security": {
+            "$id": "#/properties/security",
+            "type": "object",
+            "properties": {
+                "tls": {
+                    "$id": "#/properties/security/properties/tls",
+                    "type": "object",
+                    "properties": {
+                        "karaf": {
+                            "$id": "#/properties/security/properties/tls/properties/karaf",
+                            "type": "object",
+                            "properties": {
+                                "clientCertificateTtl": {
+                                    "$id": "#/properties/security/properties/tls/properties/karaf/properties/clientCertificateTtl",
+                                    "type": ["integer", "null"],
+                                    "description": "Client certificate time-to-live in seconds.",
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Conditional if global.security.tls.enabled is true",
+                                    "responsible": "Internal",
+                                    "default": 3600
+                                },
+                                "serverCertificateTtl": {
+                                    "$id": "#/properties/security/properties/tls/properties/karaf/properties/serverCertificateTtl",
+                                    "type": ["integer", "null"],
+                                    "description": "Server certificate time-to-live in seconds.",
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Conditional if global.security.tls.enabled is true",
+                                    "responsible": "Internal",
+                                    "default": 3600
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "cmMediator": {
+            "$id": "#/properties/cmMediator",
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "$id": "#/properties/cmMediator/properties/enabled",
+                    "type": "boolean",
+                    "description": "Indicates flag to enable or disable CM mediator dependency in USM",
+                    "typeOfParameter": "Dynamic",
+                    "optionality": "Optional",
+                    "responsible": "External",
+                    "default": true
+                },
+                "serviceName": {
+                    "$id": "#/properties/cmMediator/properties/serviceName",
+                    "type": "string",
+                    "description": "Indicates CM mediator service name.",
+                    "typeOfParameter": "Dynamic",
+                    "optionality": "Optional",
+                    "responsible": "External",
+                    "default": "eric-cm-mediator"
+                },
+                "port": {
+                    "$id": "#/properties/cmMediator/properties/port",
+                    "type": "integer",
+                    "description": "Indicates CM mediator service port.",
+                    "typeOfParameter": "Dynamic",
+                    "optionality": "Optional",
+                    "responsible": "External",
+                    "default": 5004
+                },
+                "tls": {
+                    "$id": "#/properties/cmMediator/properties/tls",
+                    "type": "object",
+                    "properties": {
+                        "clientCertificateTtl": {
+                            "$id": "#/properties/cmMediator/properties/tls/properties/clientCertificateTtl",
+                            "type": ["integer", "null"],
+                            "description": "Indicates TTL value of client certificate created for CM mediator communication.",
+                            "typeOfParameter": "Dynamic",
+                            "optionality": "Conditional if global.security.tls.enabled is true",
+                            "responsible": "External",
+                            "default": 3600
+                        },
+                        "issuer": {
+                            "$id": "#/properties/cmMediator/properties/tls/properties/issuer",
+                            "type": "string",
+                            "description": "Indicates issuer based on which client certificate is created for CM mediator.",
+                            "default": "eric-cm-mediator-ca",
+                            "typeOfParameter": "Dynamic",
+                            "optionality": "Conditional if global.security.tls.enabled is true",
+                            "responsible": "External"
+                        }
+                    }
+                }
+            },
+            "additionalProperties": false
+        },
+        "ingress": {
+            "$id": "#/properties/ingress",
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "$id": "#/properties/ingress/properties/enabled",
+                    "type": "boolean",
+                    "description": "Flexibility to enable/disable the deployment of ingress resource.",
+                    "typeOfParameter": "Dynamic",
+                    "optionality": "Optional",
+                    "responsible": "External",
+                    "default": false
+                },
+                "ca": {
+                    "$id": "#/properties/ingress/properties/ca",
+                    "type": "string",
+                    "description": "CA to verify incoming requests from ingress, mandatory if ingress has been installed with clientCertificate.enabled=true",
+                    "typeOfParameter": "Static",
+                    "optionality": "Optional",
+                    "responsible": "External",
+                    "default": "eric-tm-ingress-controller-cr-client-ca"
+                },
+                "ingressClass": {
+                    "$id": "#/properties/ingress/properties/ingressClass",
+                    "type": "string",
+                    "description": "Ingress class name indicates which ingress controller instance will consume the ingress resource.",
+                    "typeOfParameter": "Dynamic",
+                    "optionality": "Conditional if ingress.enabled is true",
+                    "responsible": "External",
+                    "default": "",
+                    "examples": [
+                        "oam-namespace"
+                    ]
+                },
+                "proxy": {
+                    "$id": "#/properties/ingress/properties/proxy",
+                    "type": "object",
+                    "properties": {
+                        "service": {
+                            "$id": "#/properties/ingress/properties/proxy/properties/service",
+                            "type": ["string","null"],
+                            "description": "The calls will be routed to this configured RBAC proxy from ingress.",
+                            "typeOfParameter": "Dynamic",
+                            "optionality": "Conditional if ingress.enabled is true",
+                            "responsible": "External",
+                            "default": null,
+                            "examples": ["eric-ui-settings-manager-rbac-proxy"]
+                        },
+                        "port": {
+                            "$id": "#/properties/ingress/properties/proxy/properties/port",
+                            "type": ["integer","null"],
+                            "description": "The port of configured RBAC proxy service.",
+                            "typeOfParameter": "Dynamic",
+                            "optionality": "Conditional if ingress.enabled is true",
+                            "responsible": "External",
+                            "default": null,
+                            "examples": ["9443"]
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "tolerations": {
+            "$id": "#/properties/tolerations",
+            "description": "Configuration for scheduling based on taints on the nodes.",
+            "oneOf": [
+                {
+                    "type": "array",
+                    "description": "Configuration for scheduling based on taints on the nodes.",
+                    "typeOfParameter": "Static",
+                    "optionality": "Mandatory",
+                    "responsible": "External",
+                    "default": [],
+                    "examples": [
+                        [{
+                            "key": "key1",
+                            "operator": "Equal",
+                            "value": "value1",
+                            "effect": "NoSchedule"
+                        }]
+                    ],
+                    "additionalItems": false,
+                    "items": {
+                        "$id": "#/properties/tolerations/items"
+                    }
+                },
+                {
+                    "type": "object",
+                    "description": "Configuration for scheduling based on taints on the nodes.",
+                    "properties": {
+                        "usm":{
+                            "$id": "#/properties/tolerations/usm",
+                            "type": "array",
+                            "description": "Configuration for scheduling based on taints on the nodes for USM deployment",
+                            "typeOfParameter": "Static",
+                            "optionality": "Mandatory",
+                            "responsible": "External",
+                            "default": [],
+                            "examples": [
+                                [{
+                                    "key": "key1",
+                                    "operator": "Equal",
+                                    "value": "value1",
+                                    "effect": "NoSchedule"
+                                }]
+                            ],
+                            "additionalItems": false,
+                            "items": {
+                                "$id": "#/properties/tolerations/usm/items"
+                            }
+                        },
+                        "usm-hk":{
+                            "$id": "#/properties/tolerations/usm-hk",
+                            "type": "array",
+                            "description": "Configuration for scheduling based on taints on the nodes for USM cronjob",
+                            "typeOfParameter": "Static",
+                            "optionality": "Mandatory",
+                            "responsible": "External",
+                            "default": [],
+                            "examples": [
+                                [{
+                                    "key": "key1",
+                                    "operator": "Equal",
+                                    "value": "value1",
+                                    "effect": "NoSchedule"
+                                }]
+                            ],
+                            "additionalItems": false,
+                            "items": {
+                                "$id": "#/properties/tolerations/usm-hk/items"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "terminationGracePeriodSeconds": {
+            "$id": "#/properties/terminationGracePeriodSeconds",
+            "description": "Maximum graceful termination timeout in seconds.",
+            "oneOf": [
+                {
+                    "type": "integer",
+                    "description": "Maximum graceful termination timeout in seconds.",
+                    "typeOfParameter": "Dynamic",
+                    "optionality": "Optional",
+                    "responsible": "Internal",
+                    "default": 30
+                },
+                {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "usm",
+                        "usm-hk"
+                    ],
+                    "properties": {
+                        "usm": {
+                            "$id": "#/properties/terminationGracePeriodSeconds/usm",
+                            "type": "integer",
+                            "description": "Maximum graceful termination timeout in seconds for usm deployments",
+                            "typeOfParameter": "Dynamic",
+                            "optionality": "Optional",
+                            "responsible": "Internal",
+                            "default": 30
+                        },
+                        "usm-hk": {
+                            "$id": "#/properties/terminationGracePeriodSeconds/usm-hk",
+                            "type": "integer",
+                            "description": "Maximum graceful termination timeout in seconds for usm cronjobs",
+                            "typeOfParameter": "Dynamic",
+                            "optionality": "Optional",
+                            "responsible": "Internal",
+                            "default": 30
+                        }
+                    }
+                }
+            ]
+        },
+        "labels": {
+            "$id": "#/properties/labels",
+            "type": "object",
+            "description": "Custom labels added to all chart resources.",
+            "typeOfParameter": "Static",
+            "optionality": "Optional",
+            "responsible": "External",
+            "default": {},
+            "examples": [
+                {"ericsson.com/my-info-key": "my-info-value"}
+            ]
+        },
+        "annotations": {
+            "$id": "#/properties/annotations",
+            "type": "object",
+            "description": "Custom annotations added to all chart resources.",
+            "typeOfParameter": "Static",
+            "optionality": "Optional",
+            "responsible": "External",
+            "default": {},
+            "examples": [
+                {"ericsson.com/more-key": "more-value"}
+            ]
+        },
+        "affinity": {
+            "$id": "#/properties/affinity",
+            "type": "object",
+            "Optional": [
+                "podAntiAffinity",
+                "topologyKey",
+                "nodeAffinity"
+            ],
+            "properties": {
+                "podAntiAffinity": {
+                    "$id": "#/properties/affinity/properties/podAntiAffinity",
+                    "type": "string",
+                    "description": "Anti-affinity config. The value hard will require one node per replica, while soft is best-effort anti-affinity. This value is currently under deprication, Changing this value is not recommended for singletons.",
+                    "typeOfParameter": "Static",
+                    "optionality": "Optional",
+                    "responsible": "External",
+                    "default": "soft",
+                    "enum": [
+                        "hard",
+                        "soft"
+                    ]
+                },
+                "topologyKey": {
+                    "$id": "#/properties/affinity/properties/topologyKey",
+                    "type": "string",
+                    "description": "TopologyKey is the key of a label attached to a node. If two Nodes are labelled with this key and have identical values for that label, the scheduler treats both Nodes as being in the same topology. The scheduler tries to place a balanced number of Pods into each topology domain",
+                    "typeOfParameter": "Static",
+                    "optionality": "Optional",
+                    "responsible": "External",
+                    "default": "kubernetes.io/hostname"
+                },
+                "nodeAffinity": {
+                    "$id": "#/properties/affinity/properties/nodeAffinity",
+                    "description": "Configuration to constrain the nodes the pods are eligible to be scheduled on, based on labels on the node.",
+                    "anyOf": [
+                        {
+                            "type": "object",
+                            "description": "Configuration to constrain the nodes the pods are eligible to be scheduled on, based on labels on the node.",
+                            "typeOfParameter": "Static",
+                            "optionality": "Optional",
+                            "responsible": "External",
+                            "default": {},
+                            "examples": [
+                                {  "requiredDuringSchedulingIgnoredDuringExecution": {
+                                    "nodeSelectorTerms": [
+                                        {
+                                            "matchExpressions": [
+                                                {
+                                                    "key": "kubernetes.io/e2e-az-name",
+                                                    "operator": "In",
+                                                    "values": [
+                                                        "e2e-az1",
+                                                        "e2e-az2"
+                                                    ]
+                                                }]
+                                        }
+                                    ]
+                                },
+                                    "preferredDuringSchedulingIgnoredDuringExecution": [
+                                        {
+                                            "weight": 1,
+                                            "preference": {
+                                                "matchExpressions": [
+                                                    {
+                                                        "key": "another-node-label-key",
+                                                        "operator": "In",
+                                                        "values": [
+                                                            "another-node-label-value"
+                                                        ]
+                                                    }]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                                "usm",
+                                "usm-hk"
+                            ],
+                            "properties": {
+                                "usm": {
+                                    "type": "object",
+                                    "description": "Configuration to constrain the nodes the pods are eligible to be scheduled on, based on labels on the node.",
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "External",
+                                    "default": {},
+                                    "examples": [
+                                        {  "requiredDuringSchedulingIgnoredDuringExecution": {
+                                            "nodeSelectorTerms": [
+                                                {
+                                                    "matchExpressions": [
+                                                        {
+                                                            "key": "kubernetes.io/e2e-az-name",
+                                                            "operator": "In",
+                                                            "values": [
+                                                                "e2e-az1",
+                                                                "e2e-az2"
+                                                            ]
+                                                        }]
+                                                }
+                                            ]
+                                        },
+                                            "preferredDuringSchedulingIgnoredDuringExecution": [
+                                                {
+                                                    "weight": 1,
+                                                    "preference": {
+                                                        "matchExpressions": [
+                                                            {
+                                                                "key": "another-node-label-key",
+                                                                "operator": "In",
+                                                                "values": [
+                                                                    "another-node-label-value"
+                                                                ]
+                                                            }]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                "usm-hk": {
+                                    "type": "object",
+                                    "description": "Configuration to constrain the nodes the pods are eligible to be scheduled on, based on labels on the node.",
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "External",
+                                    "default": {},
+                                    "examples": [
+                                        {  "requiredDuringSchedulingIgnoredDuringExecution": {
+                                            "nodeSelectorTerms": [
+                                                {
+                                                    "matchExpressions": [
+                                                        {
+                                                            "key": "kubernetes.io/e2e-az-name",
+                                                            "operator": "In",
+                                                            "values": [
+                                                                "e2e-az1",
+                                                                "e2e-az2"
+                                                            ]
+                                                        }]
+                                                }
+                                            ]
+                                        },
+                                            "preferredDuringSchedulingIgnoredDuringExecution": [
+                                                {
+                                                    "weight": 1,
+                                                    "preference": {
+                                                        "matchExpressions": [
+                                                            {
+                                                                "key": "another-node-label-key",
+                                                                "operator": "In",
+                                                                "values": [
+                                                                    "another-node-label-value"
+                                                                ]
+                                                            }]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            "additionalProperties": false
+        },
+        "podDisruptionBudget": {
+            "$id": "#/properties/podDisruptionBudget",
+            "description": "Specifies the number/percentage of Pods that must remain available during voluntary disruptions. Either minAvailable or maxUnavailable shall be configured and not both. This value is currently under deprication, Changing this value is not recommended for singletons.",
+            "oneOf": [
+                {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "minAvailable"
+                    ],
+                    "properties": {
+                        "minAvailable": {
+                            "$id": "#/properties/podDisruptionBudget/properties/minAvailable",
+                            "type": ["string", "integer"],
+                            "description": "Number of pods from the set that must still be available after the eviction, even in the absence of the evicted pod.",
+                            "typeOfParameter": "Static",
+                            "optionality": "Optional",
+                            "responsible": "Internal",
+                            "default": "50%",
+                            "examples": [
+                                "50%",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "maxUnavailable"
+                    ],
+                    "properties": {
+                        "maxUnavailable": {
+                            "$id": "#/properties/podDisruptionBudget/properties/maxUnavailable",
+                            "type": ["string", "integer"],
+                            "description": "Number of pods from the set that can be unavailable after the eviction.",
+                            "typeOfParameter": "Static",
+                            "optionality": "Optional",
+                            "responsible": "Internal",
+                            "examples": [
+                                "50%",
+                                "1"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        "resources": {
+            "$id": "#/properties/resources",
+            "type": "object",
+            "properties": {
+                "usm": {
+                    "$id": "#/properties/resources/properties/usm",
+                    "type": "object",
+                    "properties": {
+                        "requests": {
+                            "$id": "#/properties/resources/properties/usm/properties/requests",
+                            "type": "object",
+                            "required": [
+                                "memory",
+                                "cpu",
+                                "ephemeral-storage"
+                            ],
+                            "properties": {
+                                "memory": {
+                                    "$id": "#/properties/resources/properties/usm/properties/requests/properties/memory",
+                                    "type": "string",
+                                    "description": "Memory resource request for the container.",
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "Internal",
+                                    "default": "256Mi"
+                                },
+                                "cpu": {
+                                    "$id": "#/properties/resources/properties/usm/properties/requests/properties/cpu",
+                                    "type": ["string","number"],
+                                    "description": "CPU resource request for the container.",
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "Internal",
+                                    "default": "100m"
+                                },
+                                "ephemeral-storage": {
+                                    "$id": "#/properties/resources/properties/usm/properties/requests/properties/ephemeral-storage",
+                                    "type": "string",
+                                    "description": "Ephemeral storage resource request for the container.",
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "Internal",
+                                    "default": "256Mi"
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "limits": {
+                            "$id": "#/properties/resources/properties/usm/properties/limits",
+                            "type": "object",
+                            "required": [
+                                "memory",
+                                "cpu",
+                                "ephemeral-storage"
+                            ],
+                            "properties": {
+                                "memory": {
+                                    "$id": "#/properties/resources/properties/usm/properties/limits/properties/memory",
+                                    "type": "string",
+                                    "description": "Memory resource limit for the container. The container will be killed with an out of memory error if it goes above this limit.",
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "Internal",
+                                    "default": "512Mi"
+                                },
+                                "cpu": {
+                                    "$id": "#/properties/resources/properties/usm/properties/limits/properties/cpu",
+                                    "type": ["string","number"],
+                                    "description": "CPU resource limit for the container. The container CPU usage may be throttled to this value.",
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "Internal",
+                                    "default": "500m"
+                                },
+                                "ephemeral-storage": {
+                                    "$id": "#/properties/resources/properties/usm/properties/limits/properties/ephemeral-storage",
+                                    "type": "string",
+                                    "description": "Ephemeral storage resource request for the container. The container will be killed with an out of memory error if it goes above this limit.",
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "Internal",
+                                    "default": "512Mi"
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "usm-hk": {
+                    "$id": "#/properties/resources/properties/usm-hk",
+                    "type": "object",
+                    "properties": {
+                        "requests": {
+                            "$id": "#/properties/resources/properties/usm-hk/properties/requests",
+                            "type": "object",
+                            "required": [
+                                "memory",
+                                "cpu",
+                                "ephemeral-storage"
+                            ],
+                            "properties": {
+                                "memory": {
+                                    "$id": "#/properties/resources/properties/usm-hk/properties/requests/properties/memory",
+                                    "type": "string",
+                                    "description": "Memory resource request for the cronjob.",
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "Internal",
+                                    "default": "256Mi"
+                                },
+                                "cpu": {
+                                    "$id": "#/properties/resources/properties/usm-hk/properties/requests/properties/cpu",
+                                    "type": ["string","number"],
+                                    "description": "CPU resource request for the cronjob.",
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "Internal",
+                                    "default": "100m"
+                                },
+                                "ephemeral-storage": {
+                                    "$id": "#/properties/resources/properties/usm-hk/properties/requests/properties/ephemeral-storage",
+                                    "type": "string",
+                                    "description": "Ephemeral storage resource request for the cronjob.",
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "Internal",
+                                    "default": "256Mi"
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "limits": {
+                            "$id": "#/properties/resources/properties/usm-hk/properties/limits",
+                            "type": "object",
+                            "required": [
+                                "memory",
+                                "cpu",
+                                "ephemeral-storage"
+                            ],
+                            "properties": {
+                                "memory": {
+                                    "$id": "#/properties/resources/properties/usm-hk/properties/limits/properties/memory",
+                                    "type": "string",
+                                    "description": "Memory resource limit for the cronjob. The job will be killed with an out of memory error if it goes above this limit.",
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "Internal",
+                                    "default": "512Mi"
+                                },
+                                "cpu": {
+                                    "$id": "#/properties/resources/properties/usm-hk/properties/limits/properties/cpu",
+                                    "type": ["string","number"],
+                                    "description": "CPU resource limit for the cronjob. The job CPU usage may be throttled to this value.",
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "Internal",
+                                    "default": "500m"
+                                },
+                                "ephemeral-storage": {
+                                    "$id": "#/properties/resources/properties/usm-hk/properties/limits/properties/ephemeral-storage",
+                                    "type": "string",
+                                    "description": "Ephemeral storage resource request for the cronjob. The job will be killed with an out of memory error if it goes above this limit.",
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "Internal",
+                                    "default": "512Mi"
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "probes": {
+            "$id": "#/properties/probes",
+            "type": "object",
+            "properties": {
+                "usm": {
+                    "$id": "#/properties/probes/properties/usm",
+                    "type": "object",
+                    "properties": {
+                        "livenessProbe": {
+                            "$id": "#/properties/probes/properties/usm/properties/livenessProbe",
+                            "type": "object",
+                            "properties": {
+                                "failureThreshold": {
+                                    "$id": "#/properties/probes/properties/usm/properties/livenessProbe/properties/failureThreshold",
+                                    "type": "integer",
+                                    "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded.",
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "Internal",
+                                    "minimum": 10,
+                                    "default": 20
+                                },
+                                "initialDelaySeconds": {
+                                    "$id": "#/properties/probes/properties/usm/properties/livenessProbe/properties/initialDelaySeconds",
+                                    "type": "integer",
+                                    "description": "Number of seconds after the container has started before the probes are initiated.",
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "Internal",
+                                    "minimum": 20,
+                                    "default": 20
+                                },
+                                "periodSeconds": {
+                                    "$id": "#/properties/probes/properties/usm/properties/livenessProbe/properties/periodSeconds",
+                                    "type": "integer",
+                                    "description": "How often (in seconds) to perform the probe.",
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "Internal",
+                                    "minimum": 10,
+                                    "default": 10
+                                },
+                                "timeoutSeconds": {
+                                    "$id": "#/properties/probes/properties/usm/properties/livenessProbe/properties/timeoutSeconds",
+                                    "type": "integer",
+                                    "description": "Number of seconds after which the probe times out.",
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "Internal",
+                                    "minimum": 10,
+                                    "default": 10
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "readinessProbe": {
+                            "$id": "#/properties/probes/properties/usm/properties/readinessProbe",
+                            "type": "object",
+                            "properties": {
+                                "failureThreshold": {
+                                    "$id": "#/properties/probes/properties/usm/properties/readinessProbe/properties/failureThreshold",
+                                    "type": "integer",
+                                    "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded.",
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "Internal",
+                                    "minimum": 10,
+                                    "default": 20
+                                },
+                                "initialDelaySeconds": {
+                                    "$id": "#/properties/probes/properties/usm/properties/readinessProbe/properties/initialDelaySeconds",
+                                    "type": "integer",
+                                    "description": "Number of seconds after the container has started before the probes are initiated.",
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "Internal",
+                                    "minimum": 20,
+                                    "default": 20
+                                },
+                                "periodSeconds": {
+                                    "$id": "#/properties/probes/properties/usm/properties/readinessProbe/properties/periodSeconds",
+                                    "type": "integer",
+                                    "description": "How often (in seconds) to perform the probe.",
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "Internal",
+                                    "minimum": 10,
+                                    "default": 10
+                                },
+                                "successThreshold": {
+                                    "$id": "#/properties/probes/properties/usm/properties/readinessProbe/properties/successThreshold",
+                                    "type": "integer",
+                                    "description": "Minimum consecutive successes for the probe to be considered successful after having failed.",
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "Internal",
+                                    "minimum": 1,
+                                    "default": 1
+                                },
+                                "timeoutSeconds": {
+                                    "$id": "#/properties/probes/properties/usm/properties/readinessProbe/properties/timeoutSeconds",
+                                    "type": "integer",
+                                    "description": "Number of seconds after which the probe times out.",
+                                    "typeOfParameter": "Static",
+                                    "optionality": "Optional",
+                                    "responsible": "Internal",
+                                    "minimum": 10,
+                                    "default": 10
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "additionalProperties": false
+}

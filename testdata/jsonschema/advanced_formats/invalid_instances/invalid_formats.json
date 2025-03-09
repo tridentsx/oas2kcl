@@ -1,0 +1,11 @@
+{
+  "dateTime": "2024-03-09 15:30:45",
+  "date": "03/09/2024",
+  "time": "3:30 PM",
+  "email": "invalid-email",
+  "hostname": "invalid..hostname",
+  "ipv4": "300.168.1.1",
+  "ipv6": "not:a:valid:ipv6:address",
+  "uri": "invalid-uri",
+  "uuid": "not-a-valid-uuid"
+} 

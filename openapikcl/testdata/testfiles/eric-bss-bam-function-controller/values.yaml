@@ -1,0 +1,283 @@
+# global:
+#  labels: {}
+#  annotations: {}
+#  internalIPFamily:
+#  timezone: UTC
+#  pullSecret:
+#  nodeSelector: {}
+#  tolerations: []
+#  security:
+#    tls:
+#      enabled: true
+#  registry:
+#    url: armdocker.rnd.ericsson.se
+#    imagePullPolicy: IfNotPresent
+#    repoPath:
+#  networkPolicy:
+#    enabled: false
+#  securityPolicy:
+#    rolekind: ""
+#  podSecurityContext:
+#    supplementalGroups:
+#  fsGroup:
+#    manual:
+#    namespace:
+#  log:
+#    streamingMethod: "indirect"
+
+nameOverride: ""
+fullnameOverride: ""
+
+annotations: {}
+labels: {}
+
+imageCredentials:
+  fcAdminService:
+    repoPath:
+    registry:
+      url:
+      imagePullPolicy:
+  fcEvaluationService:
+    repoPath:
+    registry:
+      url:
+      imagePullPolicy:
+  fcCleanup:
+    repoPath:
+    registry:
+      url:
+      imagePullPolicy:
+  pullSecret:
+
+images:
+  fcAdminService:
+    name:
+    tag:
+  fcEvaluationService:
+    name:
+    tag:
+  fcCleanup:
+    name:
+    tag:
+
+serviceAccount:
+  create: true
+  name:
+
+fcEvaluationService:
+  replicaCount: 2
+  service:
+    port: 8080
+    tlsport: 8443
+  config:
+    logLevel: info
+    log:
+      streamingMethod: ""
+    logTransformerHost: "eric-log-transformer:5024"
+    logTransformerNoTlsHost: "eric-log-transformer:5025"
+    logTimeoutSeconds: 5
+    logQueueSize: 1000
+    logConnectionTtlMinutes: 120
+    kafkaHost: eric-bss-kafka-proxy-http:80
+  metrics:
+    enabled: true
+    host: eric-pm-server
+    serviceName: fc_eval_server
+  # Configuration Deprecated to support DR-D1120-056
+  # During deprecation period below config has precedence.
+  # podDisruptionBudget:
+  #   minAvailable: 1
+  #   maxUnavailable:
+
+fcAdminService:
+  replicaCount: 2
+  service:
+    port: 8090
+    tlsport: 8443
+  config:
+    logLevel: info
+    log:
+      streamingMethod: ""
+    logTransformerHost: "eric-log-transformer:5024"
+    logTransformerNoTlsHost: "eric-log-transformer:5025"
+    logTimeoutSeconds: 5
+    logQueueSize: 1000
+    logConnectionTtlMinutes: 120
+    kafkaHost: eric-bss-kafka-proxy-http:80
+  reconciliation:
+    licenseEvaluationInterval: 1440 # minutes
+    queueEvictionInterval: 60 # minutes
+    stateSyncRetryInterval: 600 # seconds
+  metrics:
+    enabled: true
+    host: eric-pm-server
+    serviceName: fc_admin_server
+
+resources:
+  # Below commented out resource config is also supported but
+  # deprecated in BAM 3.3. If boths ways are configured the
+  # deprecated values has precedence.
+  #
+  #fcAdminService:
+  #  limits:
+  #    cpu:
+  #    memory:
+  #  requests:
+  #    cpu:
+  #    memory:
+  #fcEvaluationService:
+  #  limits:
+  #    cpu:
+  #    memory:
+  #  requests:
+  #    cpu:
+  #    memory:
+  fc-admin-server:
+    limits:
+      cpu: 500m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 32Mi
+  fc-eval-api-server:
+    limits:
+      cpu: 100m
+      memory: 64Mi
+    requests:
+      cpu: 10m
+      memory: 32Mi
+  status-cm-cleanup:
+    limits:
+      cpu: 100m
+      memory: 64Mi
+    requests:
+      cpu: 10m
+      memory: 32Mi
+
+updateStrategy:
+  fcAdminService:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 50%
+      maxSurge: 50%
+  fcEvaluationService:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 50%
+      maxSurge: 50%
+
+backend:
+  fcAdminService:
+    licenseManager:
+      hostName: eric-lm-combined-server
+      port: 8080
+      tlsport: 18326
+    cmAgent:
+      enabled: true
+      hostName: eric-bss-bam-cm-agent
+      port: 5000
+
+nodeSelector: {}
+tolerations: []
+
+affinity:
+  podAntiAffinity: "soft"
+  nodeAffinity: {}
+  # topologyKey value to use when setting podAntiAffinity
+  # Default: "kubernetes.io/hostname"
+  # Example: "kubernetes.io/zone" - specify kubernetes.io/zone as antiAffinity key
+  topologyKey: "kubernetes.io/hostname"
+
+probes:
+  fcAdminService:
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 1
+      periodSeconds: 30
+      timeoutSeconds: 1
+    readinessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 1
+      periodSeconds: 30
+      successThreshold: 1
+      timeoutSeconds: 1
+    startupProbe:
+      failureThreshold: 60
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 1
+  fcEvaluationService:
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 1
+      periodSeconds: 10
+      timeoutSeconds: 2
+    startupProbe:
+      failureThreshold: 60
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 2
+
+terminationGracePeriodSeconds: 30
+
+podPriority:
+  eric-bss-bam-function-controller:
+    priorityClassName:
+
+networkPolicy:
+  enabled: true
+  egress:
+    accessLabels:
+      fcAdminService: {}
+      fcEvaluationService: {}
+
+topologySpreadConstraints:
+  fcAdminService: []
+  fcEvaluationService: []
+
+seccompProfile:
+  fc-eval-api-server:
+    type: ""
+    localhostProfile: ""
+  fc-admin-server:
+    type: ""
+    localhostProfile: ""
+  status-cm-cleanup:
+    type: ""
+    localhostProfile: ""
+
+appArmorProfile:
+  fc-admin-server:
+    type: ""
+    localhostProfile: ""
+  fc-eval-api-server:
+    type: ""
+    localhostProfile: ""
+  status-cm-cleanup:
+    type: ""
+    localhostProfile: ""
+
+securityPolicy:
+  rolename: ""
+
+podSecurityContext:
+  supplementalGroups:
+
+autoScaling:
+  fcEvaluationService:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 20
+    averageUtilization:
+      cpu: 800
+      memory: 160
+
+podDisruptionBudget:
+  fcEvaluationService:
+    minAvailable: 1
+    maxUnavailable:
+  fcAdminService:
+    minAvailable: 1
+    maxUnavailable:

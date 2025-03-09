@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Person",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "The person's full name"
+        },
+        "age": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Age in years"
+        },
+        "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email address"
+        }
+    },
+    "required": ["name"]
+} 

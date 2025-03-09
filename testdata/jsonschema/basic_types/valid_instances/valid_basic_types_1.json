@@ -1,0 +1,16 @@
+{
+  "stringValue": "Hello, World!",
+  "integerValue": 42,
+  "numberValue": 3.14159,
+  "booleanValue": true,
+  "nullValue": null,
+  "arrayOfStrings": ["one", "two", "three"],
+  "arrayOfIntegers": [1, 2, 3, 4, 5],
+  "arrayOfNumbers": [1.1, 2.2, 3.3, 4.4, 5.5],
+  "arrayOfBooleans": [true, false, true],
+  "objectValue": {
+    "nestedString": "I'm nested!",
+    "nestedInteger": 100
+  },
+  "multiTypeArray": ["string", 123, true]
+} 

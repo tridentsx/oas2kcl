@@ -1,0 +1,6 @@
+name: ethernet-interface
+socket:
+  HTTP: 80
+  HTTPS: 443
+  FTP: "not-an-integer"  # This should fail validation
+  SSH: 22 

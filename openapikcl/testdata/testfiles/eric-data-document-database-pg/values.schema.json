@@ -1,0 +1,2201 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "type": "object",
+  "default": {},
+  "title": "Root Schema",
+  "$comment": "DR-D1121-210 - Helm JSON validation schema.",
+  "$defs": {
+    "labels-annotations": {
+      "type": "object",
+      "$comment": "DR-D1121-060 labels and annotations",
+      "default": {},
+      "patternProperties": {
+        "^[a-zA-Z0-9.]/[a-zA-Z0-9_.\\-]$": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 63,
+          "pattern": "[a-z0-9A-Z_.\\-]"
+        }
+      }
+    },
+    "labels": {
+      "$ref": "#/$defs/labels-annotations"
+    },
+    "annotations": {
+      "$ref": "#/$defs/labels-annotations"
+    },
+    "streamingMethod": {
+      "$comment": "PREL-DR-4702xx-010-AD - Configuration of Log Collection Streaming Method.",
+      "type": ["string","null"],
+      "if": {
+        "type": "string"
+      },
+      "then": {
+        "default": "",
+        "enum": [
+          "",
+          "dual",
+          "direct",
+          "indirect"
+        ]
+      }
+    },
+    "pullSecret": {
+      "type": ["string", "null"],
+      "if": {
+        "type": "string"
+      },
+      "then": {
+        "default": "",
+        "maxLength": 255
+      }
+    },
+    "imagePullPolicy": {
+      "type": ["string","null"],
+      "if": {
+        "type": "string"
+      },
+      "then": {
+        "enum": [
+          "",
+          "Always",
+          "Never",
+          "IfNotPresent"
+        ],
+        "default": "IfNotPresent"
+      },
+      "else": {
+        "default": null
+      }
+    },
+    "repoPath": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "if": {
+        "type": "string"
+      },
+      "then": {
+        "pattern": "\\s*|^[a-z0-9A-Z_.\\-\/]+$"
+      }
+    },
+    "podSecurityContext": {
+      "type": ["object","null"],
+      "properties": {
+        "supplementalGroups": {
+          "type": ["array","null"],
+          "if": {
+            "type": "array"
+          },
+          "then": {
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        }
+      }
+    },
+    "networkPolicy": {
+      "type": ["object","null"],
+      "title": "Use Kubernetes NetworkPolicy to configure access control for DDB pods",
+      "$comment": "NetworkPolicy & NetworkPolicy DR Analyze. By default, the networkpolicy function is disabled, which means that there is no flow control on any DDB pod.",
+      "properties": {
+        "enabled": {
+          "type": ["boolean","null"],
+          "title": "This parameter only takes effect when global.networkPolicy.enabled is set to true, which means networkPolicy function is enabled.",
+          "$comment": "PREL-DR-D1125-059 - Provide an option in order to render the Network policy Helm chart using 'networkPolicy' parameter as a global parameter and as per service-level parameter.",
+          "if": {
+            "type": "boolean"
+          },
+          "then": {
+            "default": false
+          }
+        }
+      }
+    },
+    "bandwidth.maxEgressRate": {
+      "type": "object",
+      "title": "The rate in megabit-per-second at which traffic can leave a service pod interface.",
+      "properties": {
+        "maxEgressRate": {
+          "type": ["string","null"],
+          "if": {
+            "type": "string"
+          },
+          "then": {
+            "default": ""
+          }
+        }
+      }
+    },
+    "empty.object": {
+      "type": "object",
+      "default": {},
+      "patternProperties": {
+        "^[a-zA-Z0-9\\-]$": {
+          "type": "string"
+        }
+      }
+    },
+    "empty.string": {
+      "type": "string",
+      "default": ""
+    },
+    "podDisruptionBudget.available": {
+      "type": ["string", "null"],
+      "if": {
+        "type": "string"
+      },
+      "then": {
+        "default": "50%",
+        "pattern": "^((([0-9]{1,2})|100)%|(\\d+))$"
+      }
+    },
+    "podDisruptionBudget": {
+      "type": "object",
+      "properties": {
+        "minAvailable": {
+          "$ref": "#/$defs/podDisruptionBudget.available"
+        },
+        "maxUnavailable": {
+          "$ref": "#/$defs/podDisruptionBudget.available"
+        }
+      }
+    },
+    "podPriority.priorityClassName": {
+      "type": "object",
+      "properties": {
+        "priorityClassName": {
+          "$ref": "#/$defs/empty.string"
+        }
+      }
+    },
+    "profile.properties": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": ["string", "null"]
+        },
+        "localhostProfile": {
+          "type": ["string", "null"],
+          "if": {
+            "type": "string"
+          },
+          "then": {
+            "default": ""
+          }
+        }
+      }
+    },
+    "appArmorProfile.properties": {
+      "$ref": "#/$defs/profile.properties"
+    },
+    "seccompProfile.properties": {
+      "$ref": "#/$defs/profile.properties",
+      "properties": {
+        "type":{
+          "type": "string",
+          "default": "",
+          "enum": [
+            "",
+            "Unconfined",
+            "RuntimeDefault",
+            "Localhost"
+          ]
+        }
+      }
+    },
+    "terminationGracePeriodSeconds.properties": {
+      "type": "integer",
+      "default": 30,
+      "minimum": 1
+    },
+    "tolerations.properties": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "pattern": "^([a-z0-9.-]+/[a-z0-9-]+|[a-z0-9.-]+)$",
+            "maxLength": 63
+          },
+          "operator": {
+            "type": "string",
+            "enum": [
+              "Exists",
+              "Equal"
+            ]
+          },
+          "value": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "effect": {
+            "type": "string",
+            "enum": [
+              "NoExecute",
+              "PreferNoSchedule",
+              "NoSchedule"
+            ]
+          },
+          "tolerationSeconds": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "operator": {
+                  "const": "Exists"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "value": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "value": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "securityPolicy.properties": {
+      "type": "object",
+      "properties": {
+        "rolename": {
+          "type": "string",
+          "default": "eric-data-document-database-pg"
+        }
+      }
+    },
+    "resources.storage.pattern": {
+      "pattern": "^\\s*|(\\d+(.\\d+)?[kMGTPE]i?)$"
+    },
+    "resources.cpu.pattern": {
+      "pattern": "^(((\\d+)m?)|(\\d+(.\\d{1,3})))$"
+    }
+  },
+  "properties": {
+    "global": {
+      "type": "object",
+      "properties": {
+        "pullSecret": {
+          "$ref": "#/$defs/pullSecret"
+        },
+        "registry": {
+          "type": "object",
+          "properties": {
+            "url": {
+              "type": ["string", "null"],
+              "$comment": "Domain name, default: 'armdocker.rnd.ericsson.se'",
+              "if": {
+                "type": "string"
+              },
+              "then": {
+                "default": "armdocker.rnd.ericsson.se",
+                "minLength": 0,
+                "maxLength": 256
+              }
+            },
+            "pullSecret": {
+              "$ref": "#/$defs/pullSecret",
+              "$comment": "Values 'pullSecret' marked deprecated!"
+            },
+            "imagePullPolicy": {
+              "$ref": "#/$defs/imagePullPolicy"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/repoPath"
+            }
+          }
+        },
+        "adpBR": {
+          "type": "object",
+          "properties": {
+            "broServiceName": {
+              "type": ["string","null"],
+              "if": {
+                "type": "string"
+              },
+              "then": {
+                "default": "eric-ctrl-bro",
+                "maxLength": 255
+              }
+            },
+            "broGrpcServicePort": {
+              "type": ["integer","null"],
+              "if": {
+                "type": "integer"
+              },
+              "then": {
+                "default": 3000,
+                "minimum": 1000,
+                "maximum": 65535
+              }
+            },
+            "brLabelKey": {
+              "type": ["string","null"],
+              "if": {
+                "type": "string"
+              },
+              "then": {
+                "default": "adpbrlabelkey",
+                "maxLength": 255
+              }
+            }
+          }
+        },
+        "timezone": {
+          "type": ["string", "null"],
+          "if": {
+            "type": "string"
+          },
+          "then": {
+            "default": "UTC"
+          }
+        },
+        "security": {
+          "type": ["object","null"],
+          "properties": {
+            "tls": {
+              "type": ["object","null"],
+              "properties": {
+                "enabled": {
+                  "type": ["boolean","null"],
+                  "if": {
+                    "type": "boolean"
+                  },
+                  "then": {
+                    "default": true
+                  }
+                }
+              }
+            },
+            "policyBinding": {
+              "type": ["object","null"],
+              "properties": {
+                "create": {
+                  "type": ["boolean","null"]
+                }
+              }
+            },
+            "policyReferenceMap": {
+              "type": ["string", "null", "object"]
+            }
+          }
+        },
+        "securityPolicy": {
+          "type": ["object","null"],
+          "properties": {
+            "rolekind": {
+              "type": ["string","null"],
+              "if": {
+                "type": "string"
+              },
+              "then": {
+                "maxLength": 255,
+                "default": ""
+              }
+            }
+          }
+        },
+        "internalIPFamily": {
+          "type": ["string", "null"],
+          "if": {
+            "type": "string"
+          },
+          "then": {
+            "default": ""
+          }
+        },
+        "fsGroup": {
+          "type": ["object", "null"],
+          "properties": {
+            "manual": {
+              "type": ["integer", "null"]
+            },
+            "namespace": {
+              "type": ["boolean", "null"]
+            }
+          }
+        },
+        "nodeSelector": {
+          "type": ["object","null"]
+        },
+        "networkPolicy": {
+          "type": ["object","null"],
+          "properties": {
+            "enabled": {
+              "type": ["boolean","null"],
+              "if": {
+                "type": "boolean"
+              },
+              "then": {
+                "default": false
+              }
+            }
+          }
+        },
+        "hooklauncher": {
+          "type": ["object","null"],
+          "properties": {
+            "executor": {
+              "type": ["string","null"],
+              "if": {
+                "type": "string"
+              },
+              "then": {
+                "default": "service"
+              }
+            }
+          }
+        },
+        "log": {
+          "type": ["object","null"],
+          "properties": {
+            "streamingMethod": {
+              "$ref": "#/$defs/streamingMethod"
+            }
+          }
+        },
+        "labels": {
+          "$ref": "#/$defs/labels"
+        },
+        "tolerations": {
+          "type": ["array", "null"],
+          "if": {
+            "type": "array"
+          },
+          "then": {
+            "items": {
+              "type": ["object", "string"]
+            }
+          }
+        },
+        "podSecurityContext": {
+          "refs": "#/$defs/podSecurityContext"
+        },
+        "logShipper": {
+          "type": ["object","null"],
+          "properties": {
+            "deployment": {
+              "type": ["object","null"],
+              "properties": {
+                "model": {
+                  "type": ["string","null"],
+                  "if": {
+                    "type": "string"
+                  },
+                  "then": {
+                    "default": ""
+                  }
+                }
+              }
+            },
+            "config": {
+              "type": ["object","null"],
+              "properties": {
+                "image": {
+                  "type": ["object","null"],
+                  "properties": {
+                    "registry": {
+                      "type": ["null", "string", "object"]
+                    },
+                    "repoPath": {
+                      "$ref": "#/$defs/repoPath"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "imageCredentials": {
+          "type": ["object","null"],
+          "properties": {
+            "registry": {
+              "type": ["object","null"],
+              "properties": {
+                "url": {
+                  "type": ["null", "string"]
+                }
+              }
+            },
+            "repoPath": {
+              "$ref": "#/$defs/repoPath"
+            }
+          }
+        }
+      }
+    },
+    "affinity": {
+      "type": "object",
+      "properties": {
+        "podAntiAffinity": {
+          "type": "string",
+          "pattern": "^(soft|hard)$"
+        },
+        "topologyKey": {
+          "type": "string",
+          "default": "kubernetes.io/hostname"
+        }
+      }
+    },
+    "annotations": {
+      "$ref": "#/$defs/annotations"
+    },
+    "brAgent": {
+      "type": "object",
+      "properties": {
+        "PGAgentLogLevel": {
+          "type": "string",
+          "default": "info",
+          "maxLength": 255
+        },
+        "RootLogLevel": {
+          "type": "string",
+          "default": "info",
+          "maxLength": 255
+        },
+        "backupTypeList": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "brLabelValue": {
+          "type": ["null", "string"]
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": false
+        },
+        "logLevel": {
+          "type": "string",
+          "default": "info",
+          "maxLength": 255
+        },
+        "logicalDBBackupEnable": {
+          "type": "boolean",
+          "default": false
+        },
+        "brmConfigmapPath": {
+          "type": ["string","null"],
+          "if": {
+            "type": "string"
+          },
+          "then": {
+            "default": "/opt/brm_backup",
+            "maxLength": 255
+          }
+        },
+
+        "properties": {
+          "type": "object",
+          "properties": {
+            "production_date": {
+              "oneOf": [
+                {
+                  "if": {
+                    "type": "null"
+                  },
+                  "then": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "if": {
+                    "type": "string"
+                  },
+                  "then": {
+                    "type": "string"
+                  }
+                }
+              ],
+              "default": "BUILD_DATE",
+              "maxLength": 255
+            }
+          }
+        }
+      },
+
+      "if": {
+        "properties": {
+          "logicalDBBackupEnable": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "backupDataModelConfig": {
+            "type": ["string","null"],
+            "if": {
+              "type": "string"
+            },
+            "then": {
+              "default": "",
+              "maxLength": 255
+            }
+          }
+        }
+      }
+    },
+    "bandwidth": {
+      "type": "object",
+      "title": "",
+      "$comment": "Pod bandwidth limit comply with DR-D1125-040-AD",
+      "properties": {
+        "postgres": {
+          "$ref": "#/$defs/bandwidth.maxEgressRate"
+        },
+        "brAgent": {
+          "$ref": "#/$defs/bandwidth.maxEgressRate"
+        },
+        "cleanuphook": {
+          "$ref": "#/$defs/bandwidth.maxEgressRate"
+        },
+        "feoperator": {
+          "$ref": "#/$defs/bandwidth.maxEgressRate"
+        },
+        "beoperator": {
+          "$ref": "#/$defs/bandwidth.maxEgressRate"
+        }
+      }
+
+    },
+    "credentials": {
+      "type": "object",
+      "properties": {
+        "keyForMetricsPw": {
+          "type": "string",
+          "maxLength": 255,
+          "pattern": "^([a-zA-Z0-9\\-_]+)$"
+        },
+        "keyForReplicaId": {
+          "type": "string",
+          "maxLength": 255,
+          "pattern": "^([a-zA-Z0-9\\-_]+)$"
+        },
+        "keyForReplicaPw": {
+          "type": "string",
+          "maxLength": 255,
+          "pattern": "^([a-zA-Z0-9\\-_]+)$"
+        },
+        "keyForSuperPw": {
+          "type": "string",
+          "maxLength": 255,
+          "pattern": "^([a-zA-Z0-9\\-_]+)$"
+        },
+        "keyForUserId": {
+          "type": "string",
+          "maxLength": 255,
+          "pattern": "^([a-zA-Z0-9\\-_]+)$"
+        },
+        "keyForUserPw": {
+          "type": "string",
+          "maxLength": 255,
+          "pattern": "^([a-zA-Z0-9\\-_]+)$"
+        },
+        "kubernetesSecretName": {
+          "type": ["null", "string"]
+        }
+      }
+    },
+    "highAvailability": {
+      "type": "object",
+      "properties": {
+        "replicaCount": {
+          "type": "integer",
+          "default": 2,
+          "minimum": 0
+        },
+        "synchronousModeEnabled": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "hooklauncher": {
+      "type": "object",
+      "properties": {
+        "backoffLimit": {
+          "type": "integer",
+          "default": 2,
+          "minimum": 0
+        },
+        "cleanup": {
+          "type": ["string", "boolean"],
+          "if": {
+            "type": "string"
+          },
+          "then": {
+            "default": "onSuccess",
+            "pattern": "^(true|false|onSuccess)$"
+          }
+        },
+        "terminateEarlyOnFailure": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "hooks": {
+      "type": "object",
+      "properties": {
+        "pre_install": {
+          "type": "object",
+          "properties": {
+            "activeDeadlineSeconds": {
+              "type": "integer",
+              "default": 300,
+              "minimum": 0,
+              "maximum": 300
+            }
+          }
+        }
+      }
+    },
+    "imageCredentials": {
+      "type": "object",
+      "properties": {
+        "beoperator": {
+          "type": "object",
+          "properties": {
+            "repoPath": {
+              "$ref": "#/$defs/repoPath"
+            }
+          }
+        },
+        "bra": {
+          "type": "object",
+          "properties": {
+            "repoPath": {
+              "$ref": "#/$defs/repoPath"
+            }
+          }
+        },
+        "brm13": {
+          "type": "object",
+          "properties": {
+            "repoPath": {
+              "$ref": "#/$defs/repoPath"
+            }
+          }
+        },
+        "feoperator": {
+          "type": "object",
+          "properties": {
+            "repoPath": {
+              "$ref": "#/$defs/repoPath"
+            }
+          }
+        },
+        "hooklauncher": {
+          "type": "object",
+          "properties": {
+            "registry": {
+              "type": "object",
+              "properties": {
+                "imagePullPolicy": {
+                  "type": ["string", "null"]
+                },
+                "url": {
+                  "$ref": "#/$defs/repoPath"
+                }
+              }
+            },
+            "repoPath": {
+              "$ref": "#/$defs/repoPath"
+            }
+          }
+        },
+        "kubeclient": {
+          "type": "object",
+          "properties": {
+            "repoPath": {
+              "$ref": "#/$defs/repoPath"
+            }
+          }
+        },
+        "logshipper": {
+          "type": "object",
+          "properties": {
+            "registry": {
+              "type": "object",
+              "properties": {
+                "imagePullPolicy": {
+                  "$ref": "#/$defs/imagePullPolicy"
+                },
+                "url": {
+                  "$ref": "#/$defs/repoPath"
+                }
+              }
+            },
+            "repoPath": {
+              "$ref": "#/$defs/repoPath"
+            }
+          }
+        },
+        "metrics": {
+          "type": "object",
+          "properties": {
+            "repoPath": {
+              "$ref": "#/$defs/repoPath"
+            }
+          }
+        },
+        "pg13": {
+          "type": "object",
+          "properties": {
+            "repoPath": {
+              "$ref": "#/$defs/repoPath"
+            }
+          }
+        },
+        "pullSecret": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "registry": {
+          "type": "object",
+          "properties": {
+            "imagePullPolicy": {
+              "type": ["string", "null"]
+            },
+            "url": {
+              "type": [
+                "null",
+                "string"
+              ]
+            }
+          }
+        },
+        "repoPath": {
+          "$ref": "#/$defs/repoPath"
+        }
+      }
+    },
+    "k8sClusterInfo": {
+      "type": "object",
+      "properties": {
+        "clusterDomain": {
+          "type": "string",
+          "const": "cluster.local"
+        }
+      }
+    },
+    "labels": {
+      "$ref": "#/$defs/labels"
+    },
+    "log": {
+      "type": "object",
+      "properties": {
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(stdout|stream)$"
+          },
+          "multipleOf": 2
+        },
+        "schema": {
+          "type": ["null", "string"],
+          "default": "none"
+        },
+        "streamingMethod": {
+          "$ref": "#/$defs/streamingMethod"
+        }
+      }
+    },
+    "logShipper": {
+      "type": "object",
+      "title": "Entry point for sidecar configurations.",
+      "$comment": "LogShipper Sidecar Design",
+      "properties": {
+        "logLevel": {
+          "type": "string",
+          "title": "Supports debug, info, warning, error, and critical.",
+          "default": "",
+          "pattern": "^(debug|info|warning|error|critical)$"
+        },
+        "output": {
+          "type": "object",
+          "properties": {
+            "logTransformer": {
+              "type": "object",
+              "title": "Ship logs to Log Transformer microservice using HTTP.",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "default": "eric-log-transformer"
+                }
+              }
+            }
+          }
+        },
+        "storage": {
+          "type": "object",
+          "properties": {
+            "medium": {
+              "type": "string",
+              "title": "Storage medium to use for the volume. Supports Ephemeral. Empty value defaults to Memory.",
+              "default": "Ephemeral",
+              "pattern": "^(Memory|Ephemeral)$"
+            },
+            "path": {
+              "type": "string",
+              "title": "Path to mount the volume used to host logs. This path will be used by all containers.",
+              "default": "/logs"
+            },
+            "size": {
+              "type": "string",
+              "default": "500Mi"
+            }
+          },
+          "if": {
+            "properties": {
+              "medium": {
+                "const": ""
+              }
+            },
+            "then": {
+              "properties": {
+                "medium": {
+                  "default": "Ephemeral"
+                }
+              }
+            }
+          },
+          "required": [
+            "size"
+          ]
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "autoDiscoverDatabases": {
+          "type": "boolean",
+          "default": false
+        },
+        "datasource": {
+          "type": "string",
+          "title": "Specify the name of database where to acquire metrics. If the value is left empty, \"postgres\" will set in Helm template files and used by the service.",
+          "default": "",
+          "pattern": "^(|^[a-z0-9_]+)$"
+        },
+        "enabled": {
+          "type": "boolean",
+          "title": "Set whether PM Metrics is enabled or not. The value is either true or false.",
+          "default": true
+        },
+        "hostname": {
+          "type": "string",
+          "default": "eric-pm-server"
+        },
+        "logLevel": {
+          "type": "string",
+          "title": "Set PM Metrics logging level to be debug, info, warn, error, or fatal.",
+          "default": "info",
+          "pattern": "^(debug|info|warn|error|fatal)$"
+        },
+        "queryMetrics": {
+          "type": "object",
+          "patternProperties": {
+            "^pg_": {
+              "type": "object",
+              "properties": {
+                "master": {
+                  "type": "boolean"
+                },
+                "query": {
+                  "type": "string",
+                  "title": "Sql query"
+                },
+                "metrics": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "patternProperties": {
+                      "^[a-z0-9_]+$": {
+                        "type": "object",
+                        "properties": {
+                          "usage": {
+                            "type": "string",
+                            "pattern": "^[A-Z]+$"
+                          },
+                          "description": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "usage",
+                          "description"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "service": {
+          "type": "object",
+          "properties": {
+            "port": {
+              "type": "integer",
+              "title": "TCP port, default 9187",
+              "default": 9187
+            }
+          },
+          "required": [
+            "port"
+          ]
+        }
+      },
+      "if": {
+        "properties": {
+          "autoDiscoverDatabases": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "queryMetrics": {
+            "patternProperties": {
+              "^pg_": {
+                "type": "object",
+                "properties": {
+                  "includeDatabases": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minItems": 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "networkPolicy": {
+      "$ref": "#/$defs/networkPolicy",
+      "properties": {
+        "matchLabels": {
+          "type": "array",
+          "$comment": "PREL-DR-D1125-059 - Provide an option in order to render the Network policy Helm chart using 'networkPolicy' parameter as a global parameter and as per service-level parameter.",
+          "items": {
+            "type": "string",
+            "pattern": "[a-z0-9\\-]"
+          }
+        }
+      }
+    },
+    "nodeSelector": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z]+$": {
+          "$ref": "#/$defs/empty.object"
+        }
+      }
+    },
+    "operator": {
+      "type": "object",
+      "properties": {
+        "operandConfig": {
+          "type": "object",
+          "properties": {
+            "ephemeral_storage_base": {
+              "type": "string",
+              "default": "80Mi",
+              "$ref": "#/$defs/resources.storage.pattern"
+            },
+            "hugepages_1Gi": {
+              "type": ["null", "string"],
+              "$ref": "#/$defs/resources.storage.pattern"
+            },
+            "hugepages_2Mi": {
+              "type": ["null", "string"],
+              "$ref": "#/$defs/resources.storage.pattern"
+            }
+          }
+        }
+      }
+    },
+    "patroni": {
+      "type": "object",
+      "properties": {
+        "logLevel": {
+          "type": "string",
+          "default": "INFO",
+          "pattern": "^(NOTSET|DEBUG|INFO|WARN|WARNING|ERROR|CRITICAL)$"
+        },
+        "requests_logLevel": {
+          "type": "string"
+        }
+      }
+    },
+    "persistentVolumeClaim": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "title": "Enable persistent storage",
+          "default": true
+        },
+        "housekeeping_threshold": {
+          "type": "integer",
+          "title": "When the ratio of PVC usage in percentage reaches this value, the housekeeping on Postgres WAL files could be triggered. If the value of this parameter is set to 100, the housekeeping will be disabled.",
+          "default": 100
+        },
+        "size": {
+          "type": "string",
+          "title": "Size of data volume expressed in BytesSize of data volume",
+          "default": "8Gi",
+          "pattern": "^(\\d+(.\\d+)?[kMGTPE]i?)$"
+        },
+        "storageClassName": {
+          "type": ["null", "string"],
+          "title": "Storage class of data PVC. Empty string means using the Kubernetes cluster default storageclass, also support NFS.",
+          "default": ""
+        }
+      }
+    },
+    "podPriority": {
+      "type": "object",
+      "title": "The pod priority will be resolved to value according to the existing priority class. The higher the value, the higher the priority. The pod priority is zero when priorityClassName not set.",
+      "$comment": "DR-D1126-030 - An ADP Service SHALL support configuration of priority class to allow assigning priorities to Pods.",
+      "properties": {
+        "brAgent": {
+          "$ref": "#/$defs/podPriority.priorityClassName"
+        },
+        "cleanuphook": {
+          "$ref": "#/$defs/podPriority.priorityClassName"
+        },
+        "hooklauncher": {
+          "$ref": "#/$defs/podPriority.priorityClassName"
+        },
+        "postgres": {
+          "$ref": "#/$defs/podPriority.priorityClassName"
+        },
+        "feoperator": {
+          "$ref": "#/$defs/podPriority.priorityClassName"
+        },
+        "beoperator": {
+          "$ref": "#/$defs/podPriority.priorityClassName"
+        }
+      }
+    },
+    "postgresInitdbArgs": {
+      "type": "array",
+      "items": {
+        "type": [
+          "object",
+          "string"
+        ],
+        "patternProperties": {
+          "^[a-zA-Z0-9-]+$": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "postgresLogging": {
+      "type": "object",
+      "title": "Enable postgres logging or not",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "probes": {
+      "type": "object",
+      "title": "Liveness, Startup and Readiness probes",
+      "description": "Availability and Resiliency Rules and Guidelines",
+      "$comment": "DR-D1120-011-AD and DR-D1120-012-AD - liveness probe, DR-D1120-013-AD and DR-D1120-014-AD - readiness probe, GL-D1120-015-AD and DR-D1120-016-AD startup probe",
+      "properties": {
+        "beoperator": {
+          "type": "object",
+          "properties": {
+            "livenessProbe": {
+              "type": "object",
+              "properties": {
+                "failureThreshold": {
+                  "type": "integer",
+                  "default": 15,
+                  "minimum": 1
+                },
+                "initialDelaySeconds": {
+                  "type": "integer",
+                  "default": 0,
+                  "minimum": 0
+                },
+                "periodSeconds": {
+                  "type": "integer",
+                  "default": 15,
+                  "minimum": 1
+                },
+                "timeoutSeconds": {
+                  "type": "integer",
+                  "default": 5,
+                  "minimum": 1
+                }
+              }
+
+            },
+            "readinessProbe": {
+              "type": "object",
+              "properties": {
+                "failureThreshold": {
+                  "type": "integer",
+                  "default": 5,
+                  "minimum": 1
+                },
+                "initialDelaySeconds": {
+                  "type": "integer",
+                  "default": 0,
+                  "minimum": 0
+                },
+                "periodSeconds": {
+                  "type": "integer",
+                  "default": 15,
+                  "minimum": 1
+                },
+                "successThreshold": {
+                  "type": "integer",
+                  "default": 1,
+                  "minimum": 1
+                },
+                "timeoutSeconds": {
+                  "type": "integer",
+                  "default": 15,
+                  "minimum": 1
+                }
+              }
+
+            },
+            "startupProbe": {
+              "type": "object",
+              "properties": {
+                "failureThreshold": {
+                  "type": "integer",
+                  "default": 15,
+                  "minimum": 1
+                },
+                "initialDelaySeconds": {
+                  "type": "integer",
+                  "default": 0,
+                  "minimum": 0
+                },
+                "periodSeconds": {
+                  "type": "integer",
+                  "default": 15,
+                  "minimum": 1
+                },
+                "timeoutSeconds": {
+                  "type": "integer",
+                  "default": 20,
+                  "minimum": 1
+                }
+              }
+
+            }
+          }
+
+        },
+        "bra": {
+          "type": "object",
+          "properties": {
+            "livenessProbe": {
+              "type": "object",
+              "properties": {
+                "failureThreshold": {
+                  "type": "integer",
+                  "default": 6,
+                  "minimum": 1
+                },
+                "initialDelaySeconds": {
+                  "type": "integer",
+                  "default": 0,
+                  "minimum": 0
+                },
+                "periodSeconds": {
+                  "type": "integer",
+                  "default": 5,
+                  "minimum": 1
+                },
+                "timeoutSeconds": {
+                  "type": "integer",
+                  "default": 10,
+                  "minimum": 1
+                }
+              }
+
+            },
+            "readinessProbe": {
+              "type": "object",
+              "properties": {
+                "failureThreshold": {
+                  "type": "integer",
+                  "default": 6,
+                  "minimum": 1
+                },
+                "initialDelaySeconds": {
+                  "type": "integer",
+                  "default": 0,
+                  "minimum": 0
+                },
+                "periodSeconds": {
+                  "type": "integer",
+                  "default": 5,
+                  "minimum": 1
+                },
+                "successThreshold": {
+                  "type": "integer",
+                  "default": 1,
+                  "minimum": 1
+                },
+                "timeoutSeconds": {
+                  "type": "integer",
+                  "default": 10,
+                  "minimum": 1
+                }
+              }
+
+            },
+            "startupProbe": {
+              "type": "object",
+              "properties": {
+                "failureThreshold": {
+                  "type": "integer",
+                  "default": 50,
+                  "minimum": 1
+                },
+                "initialDelaySeconds": {
+                  "type": "integer",
+                  "default": 0,
+                  "minimum": 0
+                },
+                "periodSeconds": {
+                  "type": "integer",
+                  "default": 10,
+                  "minimum": 1
+                },
+                "timeoutSeconds": {
+                  "type": "integer",
+                  "default": 10,
+                  "minimum": 1
+                }
+              }
+
+            }
+          }
+
+        },
+        "brm": {
+          "type": "object",
+          "properties": {
+            "livenessProbe": {
+              "type": "object",
+              "properties": {
+                "failureThreshold": {
+                  "type": "integer",
+                  "default": 6,
+                  "minimum": 1
+                },
+                "initialDelaySeconds": {
+                  "type": "integer",
+                  "default": 0,
+                  "minimum": 0
+                },
+                "periodSeconds": {
+                  "type": "integer",
+                  "default": 5,
+                  "minimum": 1
+                },
+                "timeoutSeconds": {
+                  "type": "integer",
+                  "default": 10,
+                  "minimum": 1
+                }
+              }
+
+            },
+            "readinessProbe": {
+              "type": "object",
+              "properties": {
+                "failureThreshold": {
+                  "type": "integer",
+                  "default": 10,
+                  "minimum": 1
+                },
+                "initialDelaySeconds": {
+                  "type": "integer",
+                  "default": 0,
+                  "minimum": 0
+                },
+                "periodSeconds": {
+                  "type": "integer",
+                  "default": 5,
+                  "minimum": 1
+                },
+                "successThreshold": {
+                  "type": "integer",
+                  "default": 1,
+                  "minimum": 1
+                },
+                "timeoutSeconds": {
+                  "type": "integer",
+                  "default": 10,
+                  "minimum": 1
+                }
+              }
+
+            },
+            "startupProbe": {
+              "type": "object",
+              "properties": {
+                "failureThreshold": {
+                  "type": "integer",
+                  "default": 50,
+                  "minimum": 1
+                },
+                "initialDelaySeconds": {
+                  "type": "integer",
+                  "default": 0,
+                  "minimum": 0
+                },
+                "periodSeconds": {
+                  "type": "integer",
+                  "default": 10,
+                  "minimum": 1
+                },
+                "timeoutSeconds": {
+                  "type": "integer",
+                  "default": 10,
+                  "minimum": 1
+                }
+              }
+
+            }
+          }
+
+        },
+        "feoperator": {
+          "type": "object",
+          "properties": {
+            "livenessProbe": {
+              "type": "object",
+              "properties": {
+                "failureThreshold": {
+                  "type": "integer",
+                  "default": 15,
+                  "minimum": 1
+                },
+                "initialDelaySeconds": {
+                  "type": "integer",
+                  "default": 0,
+                  "minimum": 0
+                },
+                "periodSeconds": {
+                  "type": "integer",
+                  "default": 15,
+                  "minimum": 1
+                },
+                "timeoutSeconds": {
+                  "type": "integer",
+                  "default": 5,
+                  "minimum": 1
+                }
+              }
+
+            },
+            "readinessProbe": {
+              "type": "object",
+              "properties": {
+                "failureThreshold": {
+                  "type": "integer",
+                  "default": 5,
+                  "minimum": 1
+                },
+                "initialDelaySeconds": {
+                  "type": "integer",
+                  "default": 0,
+                  "minimum": 0
+                },
+                "periodSeconds": {
+                  "type": "integer",
+                  "default": 15,
+                  "minimum": 1
+                },
+                "successThreshold": {
+                  "type": "integer",
+                  "default": 1,
+                  "minimum": 1
+                },
+                "timeoutSeconds": {
+                  "type": "integer",
+                  "default": 15,
+                  "minimum": 1
+                }
+              }
+
+            },
+            "startupProbe": {
+              "type": "object",
+              "properties": {
+                "failureThreshold": {
+                  "type": "integer",
+                  "default": 15,
+                  "minimum": 1
+                },
+                "initialDelaySeconds": {
+                  "type": "integer",
+                  "default": 0,
+                  "minimum": 0
+                },
+                "periodSeconds": {
+                  "type": "integer",
+                  "default": 15,
+                  "minimum": 1
+                },
+                "timeoutSeconds": {
+                  "type": "integer",
+                  "default": 20,
+                  "minimum": 1
+                }
+              }
+
+            }
+          }
+
+        },
+        "logshipper": {
+          "type": "object",
+          "properties": {
+            "livenessProbe": {
+              "type": "object",
+              "properties": {
+                "failureThreshold": {
+                  "type": "integer",
+                  "default": 30,
+                  "minimum": 1
+                },
+                "initialDelaySeconds": {
+                  "type": "integer",
+                  "default": 1,
+                  "minimum": 0
+                },
+                "periodSeconds": {
+                  "type": "integer",
+                  "default": 10,
+                  "minimum": 1
+                },
+                "timeoutSeconds": {
+                  "type": "integer",
+                  "default": 10,
+                  "minimum": 1
+                }
+              }
+
+            }
+          }
+
+        },
+        "metrics": {
+          "type": "object",
+          "properties": {
+            "livenessProbe": {
+              "type": "object",
+              "properties": {
+                "failureThreshold": {
+                  "type": "integer",
+                  "default": 20,
+                  "minimum": 1
+                },
+                "initialDelaySeconds": {
+                  "type": "integer",
+                  "default": 0,
+                  "minimum": 0
+                },
+                "periodSeconds": {
+                  "type": "integer",
+                  "default": 10,
+                  "minimum": 1
+                },
+                "timeoutSeconds": {
+                  "type": "integer",
+                  "default": 10,
+                  "minimum": 1
+                }
+              }
+
+            },
+            "readinessProbe": {
+              "type": "object",
+              "properties": {
+                "failureThreshold": {
+                  "type": "integer",
+                  "default": 15,
+                  "minimum": 1
+                },
+                "initialDelaySeconds": {
+                  "type": "integer",
+                  "default": 0,
+                  "minimum": 0
+                },
+                "periodSeconds": {
+                  "type": "integer",
+                  "default": 10,
+                  "minimum": 1
+                },
+                "successThreshold": {
+                  "type": "integer",
+                  "default": 1,
+                  "minimum": 1
+                },
+                "timeoutSeconds": {
+                  "type": "integer",
+                  "default": 10,
+                  "minimum": 1
+                }
+              }
+
+            },
+            "startupProbe": {
+              "type": "object",
+              "properties": {
+                "failureThreshold": {
+                  "type": "integer",
+                  "default": 70,
+                  "minimum": 1
+                },
+                "initialDelaySeconds": {
+                  "type": "integer",
+                  "default": 0,
+                  "minimum": 0
+                },
+                "periodSeconds": {
+                  "type": "integer",
+                  "default": 5,
+                  "minimum": 1
+                },
+                "timeoutSeconds": {
+                  "type": "integer",
+                  "default": 10,
+                  "minimum": 1
+                }
+              }
+
+            }
+          }
+
+        },
+        "postgres": {
+          "type": "object",
+          "properties": {
+            "livenessProbe": {
+              "type": "object",
+              "properties": {
+                "failureThreshold": {
+                  "type": "integer",
+                  "default": 10,
+                  "minimum": 1
+                },
+                "initialDelaySeconds": {
+                  "type": "integer",
+                  "default": 0,
+                  "minimum": 0
+                },
+                "periodSeconds": {
+                  "type": "integer",
+                  "default": 15,
+                  "minimum": 1
+                },
+                "timeoutSeconds": {
+                  "type": "integer",
+                  "default": 15,
+                  "minimum": 1
+                }
+              }
+
+            },
+            "readinessProbe": {
+              "type": "object",
+              "properties": {
+                "failureThreshold": {
+                  "type": "integer",
+                  "default": 6,
+                  "minimum": 1
+                },
+                "initialDelaySeconds": {
+                  "type": "integer",
+                  "default": 0,
+                  "minimum": 0
+                },
+                "periodSeconds": {
+                  "type": "integer",
+                  "default": 5,
+                  "minimum": 1
+                },
+                "successThreshold": {
+                  "type": "integer",
+                  "default": 1,
+                  "minimum": 1
+                },
+                "timeoutSeconds": {
+                  "type": "integer",
+                  "default": 6,
+                  "minimum": 1
+                }
+              }
+
+            },
+            "startupProbe": {
+              "type": "object",
+              "properties": {
+                "failureThreshold": {
+                  "type": "integer",
+                  "default": 70,
+                  "minimum": 1
+                },
+                "initialDelaySeconds": {
+                  "type": "integer",
+                  "default": 0,
+                  "minimum": 0
+                },
+                "periodSeconds": {
+                  "type": "integer",
+                  "default": 5,
+                  "minimum": 1
+                },
+                "timeoutSeconds": {
+                  "type": "integer",
+                  "default": 32,
+                  "minimum": 1
+                }
+              }
+
+            }
+          }
+
+        }
+      }
+    },
+    "resources": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z0-9_-]+$": {
+          "type": "object",
+          "patternProperties": {
+            "^(limits|requests)$": {
+              "type": "object",
+              "properties": {
+                "cpu": {
+                  "type": ["string", "number"],
+                  "if": {
+                    "type": "string"
+                  },
+                  "then": {
+                    "$ref": "#/$defs/resources.cpu.pattern"
+                  }
+                }
+              },
+              "patternProperties": {
+                "^(memory|ephemeral-storage)$": {
+                  "type": "string",
+                  "$ref": "#/$defs/resources.storage.pattern"
+                }
+              }
+            }
+          }
+        }
+      },
+      "properties": {
+        "postgres": {
+          "type": "object",
+          "patternProperties": {
+            "^(limits|requests)$": {
+              "type": "object",
+              "patternProperties": {
+                "^(hugepages-(1Gi|2Mi))$": {
+                  "type": ["null", "string"],
+                  "if": {
+                    "type": "string"
+                  },
+                  "then": {
+                    "$ref": "#/$defs/resources.storage.pattern"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "contains": {
+              "properties": {
+                "bra": {}
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "bra": {
+                "type": "object",
+                "properties": {
+                  "jvm": {
+                    "type": "object",
+                    "properties": {
+                      "initialMemoryAllocationPercentage": {
+                        "type": "integer",
+                        "default": 50,
+                        "minimum": 1,
+                        "maximum": 100
+                      },
+                      "largeMemoryAllocationMaxPercentage": {
+                        "type": "integer",
+                        "default": 50,
+                        "minimum": 1,
+                        "maximum": 100
+                      },
+                      "smallMemoryAllocationMaxPercentage": {
+                        "type": "integer",
+                        "default": 70,
+                        "minimum": 1,
+                        "maximum": 100
+                      }
+                    }
+                  }
+                },
+                "patternProperties": {
+                  "^(limits|requests)$": {
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "restore": {
+      "type": "object",
+      "properties": {
+        "backupDataDir": {
+          "type": "string",
+          "default": ""
+        }
+      }
+    },
+    "seccompProfile": {
+      "type": "object",
+      "title": "Set seccompProfile for all containers if seccompProfile for specific containers were not designated.",
+      "$comment": "DR-D1123-128 - ADP services shall define seccomp profile",
+      "$ref": "#/$defs/seccompProfile.properties",
+      "properties": {
+        "postgres": {
+          "$ref": "#/$defs/seccompProfile.properties"
+        },
+        "metrics": {
+          "$ref": "#/$defs/seccompProfile.properties"
+        },
+        "kube_client": {
+          "$ref": "#/$defs/seccompProfile.properties"
+        },
+        "brm": {
+          "$ref": "#/$defs/seccompProfile.properties"
+        },
+        "bra": {
+          "$ref": "#/$defs/seccompProfile.properties"
+        },
+        "hooklauncher": {
+          "$ref": "#/$defs/seccompProfile.properties"
+        },
+        "feoperator": {
+          "$ref": "#/$defs/seccompProfile.properties"
+        },
+        "beoperator": {
+          "$ref": "#/$defs/seccompProfile.properties"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Localhost"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "localhostProfile"
+            ],
+            "patternProperties": {
+              "^[a-zA-Z-_]+$": {
+                "properties": {
+                  "localhostProfile": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "localhostProfile"
+                ]
+              }
+            }
+          }
+        }
+      ]
+
+    },
+    "securityContext": {
+      "type": "object",
+      "properties": {
+        "allowPrivilegeEscalation": {
+          "type": "boolean"
+        }
+      }
+    },
+    "securityPolicy": {
+      "type": "object",
+      "properties": {
+        "beoperator": {
+          "$ref": "#/$defs/securityPolicy.properties"
+        },
+        "dispatchjob": {
+          "$ref": "#/$defs/securityPolicy.properties"
+        },
+        "feoperator": {
+          "$ref": "#/$defs/securityPolicy.properties"
+        },
+        "hooklauncher": {
+          "$ref": "#/$defs/securityPolicy.properties",
+          "default": "eric-lcm-smart-helm-hooks"
+        },
+        "oppatchhook": {
+          "$ref": "#/$defs/securityPolicy.properties"
+        },
+        "pgdatahook": {
+          "$ref": "#/$defs/securityPolicy.properties"
+        },
+        "pghook": {
+          "$ref": "#/$defs/securityPolicy.properties"
+        },
+        "postdelhook": {
+          "$ref": "#/$defs/securityPolicy.properties"
+        },
+        "postgres": {
+          "$ref": "#/$defs/securityPolicy.properties"
+        },
+        "prerohook": {
+          "$ref": "#/$defs/securityPolicy.properties"
+        },
+        "preuphook": {
+          "$ref": "#/$defs/securityPolicy.properties"
+        }
+      }
+    },
+    "service": {
+      "type": "object",
+      "properties": {
+        "endpoints": {
+          "type": "object",
+          "properties": {
+            "postgres": {
+              "type": "object",
+              "properties": {
+                "tls": {
+                  "type": "object",
+                  "properties": {
+                    "enforced": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "postgresExporter": {
+              "type": "object",
+              "properties": {
+                "tls": {
+                  "type": "object",
+                  "properties": {
+                    "enforced": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "port": {
+          "type": "integer"
+        }
+      }
+    },
+    "shhRbacEnabled": {
+      "type": "boolean",
+      "default": true
+    },
+    "terminationGracePeriodSeconds": {
+      "type": "object",
+      "properties": {
+        "beoperator": {
+          "$ref": "#/$defs/terminationGracePeriodSeconds.properties"
+        },
+        "brAgent": {
+          "$ref": "#/$defs/terminationGracePeriodSeconds.properties"
+        },
+        "feoperator": {
+          "$ref": "#/$defs/terminationGracePeriodSeconds.properties"
+        },
+        "postgres": {
+          "$ref": "#/$defs/terminationGracePeriodSeconds.properties"
+        }
+      }
+
+    },
+    "tolerations": {
+      "type": ["object", "null", "string", "array"],
+      "anyOf": [
+        {
+          "if": {
+            "type": "object"
+          },
+          "then": {
+            "patternProperties": {
+              "^[a-zA-Z0-9\\-]+$": {
+                "$ref": "#/$defs/tolerations.properties"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "topologySpreadConstraints": {
+      "type": "object",
+      "$comment": "DR-D1120-090-AD - In order to allow a deployment engineer to influence scheduling decisions made by Kubernetes scheduler, an ADP service SHALL expose topologySpreadConstraints in its values.yaml file",
+      "patternProperties": {
+        "^[a-zA-Z0-9]": {
+          "type": ["array", "string"],
+          "if": {
+            "type": "array"
+          },
+          "then": {
+          "default": [],
+          "items": {
+            "type": "object",
+            "properties": {
+              "maxSkew": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "topologyKey": {
+                "type": "string"
+              },
+              "whenUnsatisfiable": {
+                "type": "string",
+                "enum": ["DoNotSchedule", "ScheduleAnyway"]
+              }
+            }
+          }
+          },
+          "else": {
+            "default": ""
+          }
+        }
+      }
+    },
+    "updateStrategy": {
+      "type": "object",
+      "properties": {
+        "rollingUpdate": {
+          "type": "object",
+          "properties": {
+            "partition": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0
+            }
+          }
+        },
+        "type": {
+          "type": "string",
+          "default": "RollingUpdate"
+        }
+      }
+    },
+    "enableNewScrapePattern": {
+      "type": "boolean",
+      "default": false
+    },
+    "appArmorProfile": {
+      "$ref": "#/$defs/appArmorProfile.properties",
+      "properties": {
+        "postgres": {
+          "$ref": "#/$defs/appArmorProfile.properties"
+        },
+        "metrics": {
+          "$ref": "#/$defs/appArmorProfile.properties"
+        },
+        "kube_client": {
+          "$ref": "#/$defs/appArmorProfile.properties"
+        },
+        "brm": {
+          "$ref": "#/$defs/appArmorProfile.properties"
+        },
+        "bra": {
+          "$ref": "#/$defs/appArmorProfile.properties"
+        },
+        "hooklauncher": {
+          "$ref": "#/$defs/appArmorProfile.properties"
+        },
+        "feoperator": {
+          "$ref": "#/$defs/appArmorProfile.properties"
+        },
+        "beoperator": {
+          "$ref": "#/$defs/appArmorProfile.properties"
+        }
+      }
+    },
+    "postgresConfig": {
+      "type": ["object","null"]
+    }
+
+  }
+}

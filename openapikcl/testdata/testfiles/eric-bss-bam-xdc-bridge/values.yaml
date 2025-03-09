@@ -1,0 +1,151 @@
+#global:
+#  labels: {}
+#  annotations: {}
+#  timezone: UTC
+#  pullSecret:
+#  nodeSelector: {}
+#  tolerations: []
+#  security:
+#    tls:
+#      enabled: true
+#  registry:
+#    url: armdocker.rnd.ericsson.se
+#    imagePullPolicy: IfNotPresent
+#    repoPath:
+#  networkPolicy:
+#    enabled: false
+#  securityPolicy:
+#    rolekind: ""
+#  podSecurityContext:
+#    supplementalGroups:
+#  fsGroup:
+#    manual:
+#    namespace:
+#  internalIPFamily:
+#  log:
+#    streamingMethod: "indirect"
+
+replicaCount: 1
+
+imageCredentials:
+  xdcbridge:
+    repoPath:
+    registry:
+      url:
+      imagePullPolicy:
+  pullSecret:
+
+images:
+#  xdcbridge:
+#    name: eric-bss-bam-xdc-bridge
+#    tag:
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  name:
+
+service:
+  type: ClusterIP
+  port: 5000
+
+resources:
+  xdcbridge:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+nodeSelector: {}
+tolerations: []
+
+affinity:
+  nodeAffinity: {}
+
+annotations: {}
+labels: {}
+
+config:
+  additionalCrdGroups: []
+
+  upstream:
+    caSecret: upstream-ca-secret
+    certSecret: upstream-xdc-client-cert
+  alarms:
+    enabled: true
+    kafka:
+      host: eric-bss-kafka-proxy-http:80
+  server:
+    caSecret: xdc-bridge-client-root-ca-cert
+    certSecret: xdc-bridge-server-cert-secret
+    port: 4141
+  metrics:
+    enabled: true
+    # used for pm metrics access if network policies are in use
+    host: eric-pm-server
+    serviceName: xdc_bridge
+    caSecret: eric-pm-server-ca-cert
+  storage:
+    type: "fs"
+    localPath: "/tmp"
+    rootPath: /var/run/data
+    maxAge: 60
+  logLevel: info
+  log:
+    streamingMethod: ""
+  logTransformerHost: "eric-log-transformer:5024"
+  logTransformerNoTlsHost: "eric-log-transformer:5025"
+  logTimeoutSeconds: 5
+  logQueueSize: 1000
+  logConnectionTtlMinutes: 120
+
+probes:
+  xdcbridge:
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 1
+      periodSeconds: 10
+      timeoutSeconds: 2
+    startupProbe:
+      failureThreshold: 60
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 2
+
+terminationGracePeriodSeconds: 30
+
+podPriority:
+  eric-bss-bam-xdc-bridge:
+    priorityClassName:
+
+persistence:
+  persistentVolumeClaim:
+    size: 1Gi
+    storageClassName:
+
+seccompProfile:
+  xdcbridge:
+    type: ""
+    localhostProfile: ""
+
+appArmorProfile:
+  xdcbridge:
+    type: ""
+    localhostProfile: ""
+
+networkPolicy:
+  enabled: true
+  egress:
+    accessLabels:
+      xdcbridge: {}
+
+securityPolicy:
+  rolename: ""
+
+podSecurityContext:
+  supplementalGroups:

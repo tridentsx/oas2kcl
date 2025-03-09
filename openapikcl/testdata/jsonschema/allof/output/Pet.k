@@ -1,0 +1,3 @@
+import regex
+
+schema Pet:

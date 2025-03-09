@@ -1,0 +1,547 @@
+# Default values for eric-data-distributed-coordinator-ed.
+# This is a YAML-formatted file
+# Declare variables to be passed into your templates.
+
+#global:
+##  local log has precedence over global.log
+# log:
+#   streamingMethod: null # Supported values: direct, indirect, dual
+## DR1120-061 Tolerations to influence scheduling decisions made by Kubernetes scheduler
+#   tolerations: []
+# logShipper:
+#   deployment:
+#     model:  # Supported values ["static", ""]
+## Global configuration parameter to enable/disable Network Policy
+# networkPolicy:
+#   enabled: false
+# hooklauncher:
+#   executor: service
+#   executorCharts: []
+# registry:
+#   repoPath:
+# Possible values are: "IPv4", "IPv6", ""
+# internalIPFamily:
+#The Secret resource name to use for authenticating towards docker registry when pulling the image
+#pullSecret: armdocker_secret_name
+  #registry:
+    #Global image registry
+    #url: armdocker.rnd.ericsson.se
+  #back up orchestrator service config that agent communicates with
+  #adpBR:
+    #service name
+    #broServiceName: eric-ctrl-bro
+    #service port
+    #broGrpcServicePort: 3000
+    #brLabelKey: adpbrlabelkey
+  #timezone setting
+  #timezone: UTC
+  #security:
+    #tls:
+      #enabled: true
+      #DR-D1123-133 (Security)
+      #trustedInternalRootCa:
+        #secret: "eric-sec-sip-tls-trusted-root-cert"
+    #policyBinding:
+      #create: false
+    #policyReferenceMap:
+      #default-restricted-security-policy: "default-restricted-security-policy"
+  #securityPolicy:
+    #rolekind: ""  # possible values: "ClusterRole", "Role", ""
+  #nodeSelector: {}
+  # fsGroup:
+  #   manual: 10000
+  #   namespace: true
+  #  # DR-D1123-135 - When the global ID for supplementalGroups is set, and both global and local values are provided,
+#  # the global values are combined with the local values. If no local settings are given, the global values will be used as-is.
+#  podSecurityContext:
+#    supplementalGroups: null  # {value='0..max'} (default=null)
+
+productInfo:
+  # R-State of the product. R State should match helm chart version (3.1.0 -> R2A)
+  # To automate it when packaging the helm chart rstate can be generated
+  # and below value replaced with correct R-State
+  rstate: "RSTATE"
+
+# Additional labels allow a list of key/values to be appended to the list of labels of the resource object.
+labels: {}
+
+# A list of key/values to be appended to the list of user defined annotations
+annotations: {}
+
+## Tolerations to influence scheduling decisions made by Kubernetes scheduler
+tolerations:
+  dced: []
+  brAgent:
+  - key: node.kubernetes.io/not-ready
+    operator: Exists
+    effect: NoExecute
+    tolerationSeconds: 0
+  - key: node.kubernetes.io/unreachable
+    operator: Exists
+    effect: NoExecute
+    tolerationSeconds: 0
+  hooklauncher: []
+terminationGracePeriodSeconds:
+  dced: 30
+  brAgent: 30
+
+pods:
+  dced:
+    # The number of pods in the Data Distributed Coordinator-ED ensemble
+    replicaCount: 3
+
+updateStrategy:
+  # Update Strategy
+  type: "RollingUpdate"
+  rollingUpdate:
+    maxUnavailable: 25%
+    maxSurge: 25%
+
+imageCredentials:
+  repoPath:
+  dced:
+    registry:
+      # Docker registry url. Overrides global.registry.url
+      url:
+      # The Secret resource name to use for authenticating towards docker registry when pulling the image
+      # container images pull Policy
+      imagePullPolicy:
+    # Docker repository path
+    repoPath:
+  brAgent:
+    registry:
+      # Docker registry url. Overrides global.registry.url
+      url:
+      # container images pull Policy
+      imagePullPolicy:
+    # Docker repository path
+    repoPath:
+  # The Secret resource name to use for authenticating towards docker registry when pulling the image
+  #pullSecret: armdocker_secret_name
+  logshipper:
+    registry:
+      url:
+      imagePullPolicy:
+    repoPath: proj-adp-log-released
+  metricsexporter:
+    registry:
+      # Docker registry url. Overrides global.registry.url
+      url:
+      # container images pull Policy
+      imagePullPolicy:
+    # Docker repository path
+    repoPath:
+  hooklauncher:
+    registry:
+      url:
+      imagePullPolicy:
+    repoPath:
+
+  ## log has precedence over global.log
+log:
+  ## streamingMethod has precedence over 'outputs'
+  ## Supported values: direct, indirect, dual
+  streamingMethod: null
+
+## Logshipper configurations
+## Only in effect when:
+##    global.log.streamingMethod is set to dual or direct
+##    log.streamingMethod is set to dual or direct
+## Local configurations has precedence over global.
+## Requires Log Transformer service.
+
+resources:
+  init:
+    requests:
+      cpu: "200m"
+      memory: "200Mi"
+      # Support ephemeral-storage parameter, no default value.
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions.
+      ephemeral-storage:
+    limits:
+      cpu: "500m"
+      memory: "500Mi"
+      # Support ephemeral-storage parameter, no default value.
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions.
+      ephemeral-storage:
+  dced:
+    requests:
+      # This is the min CPU setting at startup
+      cpu: "400m"
+      # This is the min Memory setting at startup
+      memory: "400Mi"
+      # Support ephemeral-storage parameter, no default value.
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions.
+      ephemeral-storage:
+    limits:
+      # This the maximum cpu setting that can be requested
+      cpu: "1"
+      # This is the max memory setting that can be requested
+      memory: "1Gi"
+      # Support ephemeral-storage parameter, no default value.
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions.
+      ephemeral-storage:
+  brAgent:
+    requests:
+      cpu: "400m"
+      memory: "400Mi"
+      # Support ephemeral-storage parameter, no default value.
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions.
+      ephemeral-storage:
+    limits:
+      cpu: "1"
+      memory: "2Gi"
+      # Support ephemeral-storage parameter, no default value.
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions.
+      ephemeral-storage:
+    jvm:
+     initialMemoryAllocationPercentage: 50
+     smallMemoryAllocationMaxPercentage: 70
+     largeMemoryAllocationMaxPercentage: 50
+  logshipper:
+    requests:
+      memory: "50Mi"
+      cpu: "50m"
+      # Support ephemeral-storage parameter, no default value.
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions.
+      ephemeral-storage:
+    limits:
+      memory: "100Mi"
+      cpu: "100m"
+      # Support ephemeral-storage parameter, no default value.
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions.
+      ephemeral-storage:
+  metricsexporter:
+    requests:
+      cpu: "100m"
+      memory: "8Mi"
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions.
+      ephemeral-storage:
+    limits:
+      cpu: "200m"
+      memory: "32Mi"
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions.
+      ephemeral-storage:
+  hooklauncher:
+    requests:
+      memory: "50Mi"
+      cpu: "50m"
+      ephemeral-storage: "100Mi"
+    limits:
+      memory: "100Mi"
+      cpu: "100m"
+      ephemeral-storage: "100Mi"
+
+probes:
+  dced:
+    readinessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 0
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 15
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 0
+      periodSeconds: 10
+      timeoutSeconds: 15
+      # True to make strict livenessprobe logic for dced container
+      StrictLivenessProbe: false
+      # Number of time entrypoint.sh will check for etcd process
+      EntrypointChecksNumber: 60
+      # True to restart etcd each time it dies
+      EntrypointRestartEtcd: "true"
+      # Timeout (seconds) for read function while reading the pipe
+      EntrypointPipeTimeout: 5
+      # Min time (seconds) before checking for etcd process
+      EntrypointEctdProcessInterval: 5
+      #StartupProbe feature is stable from k8 v.1.20.x onwards, in case deployed in a cluster below that version, readiness Probe's InitialDelaySeconds: 0
+    startupProbe:
+      # The number of seconds that kubelet waits before performing the first health check probe
+      initialDelaySeconds: 5
+      # The timeout for the health check
+      timeoutSeconds: 15
+      # When a probe fails, no of times before giving up.
+      failureThreshold: 12
+      # How often (in seconds) to perform the probe.
+      periodSeconds: 10
+
+  brAgent:
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 15
+      periodSeconds: 10
+      timeoutSeconds: 15
+  metricsexporter:
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 15
+      periodSeconds: 15
+      timeoutSeconds: 15
+  logshipper:
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 300
+      periodSeconds: 30
+      successThreshold: 1
+      timeoutSeconds: 15
+
+# dced client port 2379 and peer port 2380 cannot be changed
+# ports:
+#   dced:
+#     # The port to listen for client connections
+#     client: 2379
+#     # The peer port
+#     peer: 2380
+# Can specify labels for directing node assignment. Format - label: value
+nodeSelector:
+  dced: {}
+  brAgent: {}
+  hooklauncher: {}
+# sets inter-pod anti-affinity , values supported 'Soft/Hard'.
+affinity:
+  podAntiAffinity: "hard"
+  topologyKey: "kubernetes.io/hostname"
+
+# Service level parameter to enable/disable Network Policy.
+networkPolicy:
+  enabled: true
+
+topologySpreadConstraints:
+  dced: []
+
+# Environment variables
+env:
+  dced:
+    # Configures log level for all etcd subpackages. Only supports debug, info, warn, error, panic, or fatal.
+    ETCD_LOG_LEVEL: info
+    # Set default "zap" logging
+    ETCD_LOGGER: zap
+    # Set level of detail for exported metrics, specify 'extensive' to include histogram metric
+    ETCD_METRICS: basic
+    # Maximum number of snapshot files to retain (0 is unlimited)
+    ETCD_MAX_SNAPSHOTS: 3
+    # Maximum number of wal files to retain (0 is unlimited)
+    ETCD_MAX_WALS: 3
+    # Raise alarms when backend size exceeds the given quota, give 256 MiB by default
+    ETCD_QUOTA_BACKEND_BYTES: "268435456"
+    #Interpret 'auto-compaction-retention' one of: 'periodic', 'revision'. 'periodic' for duration based retention (e.g. '5m'), 'revision' for revision number based retention
+    ETCD_AUTO_COMPACTION_MODE: "revision"
+    # Auto compaction retention for mvcc key value store in hour/or based on retention. 0 means disable auto compaction.
+    ETCD_AUTO_COMPACTION_RETENTION: 100
+    # The frequency in milliseconds with which the leader will notify followers that it is still the leader (For best practices should be set around round-trip time between members)
+    ETCD_HEARTBEAT_INTERVAL: 100
+    # How long in milliseconds a follower node will go without hearing a heartbeat before attempting to become leader itself.
+    ETCD_ELECTION_TIMEOUT: 1000
+    # etcd --tls-min-version --tls-max-version to enable TLS 1.3 support.
+    ETCD_TLS_MIN: TLS1.2
+    ETCD_TLS_MAX: TLS1.3
+    # Enable/ Disable defragmentation - enabled by default
+    DEFRAGMENT_ENABLE: "true"
+    # defragments every set interval (in minutes) once the pod is alive and defragmentation is enabled - default 60 mins
+    DEFRAGMENT_PERIODIC_INTERVAL: 60
+    # monitor alarm list every set interval (in minutes)
+    MONITOR_ALARM_INTERVAL: 5
+    # delay between defragment and remove alarm (in minutes) once the NOSPACE alarm been handled.
+    DISARM_ALARM_PEER_INTERVAL: 6
+    ETCD_SNAPSHOT_COUNT: 5000
+    # TLSv1.3 suppport
+    GODEBUG: tls13=1
+    # Threshold value for DB size
+    DB_THRESHOLD_PERCENTAGE: 70
+
+
+# The minimum available Distributed Coordinator-EDs required during voluntary disruption.
+podDisruptionBudget: {}
+  # Select either one of the below parameters with your expected values.
+  # maxUnavailable: 1
+  # minAvailable: "51%"
+
+service:
+   endpoints:
+     dced:
+        tls:
+           # local parameter which overrides Global parameter to Enable/Disable tls mode with required/optional values resp. (Partial support for DR-1123-113)
+           enforced: "required"
+           # For verifying client certs - required/optional
+           verifyClientCertificate: "required"
+        metrics:
+          enabled: true
+        acls:
+          # The name of the secret containing etcd credentials
+          adminSecret: eric-data-distributed-coordinator-creds
+          # The key within the secret containing etcd password
+          rootPassword: etcdpasswd
+        certificates:
+          client:
+            # path where client (etcdctl) certificates and keys are stored
+            path: /run/secrets/eric-data-distributed-coordinator-ed-etcdctl-client-cert
+
+            # path where client (BRO) certificates and keys are stored
+            bro: /run/secrets/eric-data-distributed-coordinator-ed-etcd-bro-client-cert
+            # enable client cert auth
+            clientCertAuth: true
+            # commonName: root
+          peer:
+            autoTls: true
+            peerCertAuth: true
+     pm:
+        tls:
+           enforced: "required"
+           verifyClientCertificate: "required"
+persistence:
+  persistentVolumeClaim:
+    size: "1Gi"
+    storageClassName: "network-block"
+    enabled: true
+
+clusterDomain: "cluster.local"
+
+metricsexporter:
+  ## If false, metricsexporter will not be installed
+  ## It will only be enabled if metrics.enabled is true and metricsexporter.enabled is also true.
+  enabled: false
+  port: 9087
+
+brAgent:
+   enabled: false
+   brLabelValue:
+   backupTypeList:
+   replicaCount: 1
+   logLevel: "INFO"
+   backupFileName: "/sharedData/snapshot.txt"
+   dcedReadTimeout: 50
+   maxInboundMessageSize: ""
+   properties:
+     fileName: "application.properties"
+     applicationProperties: |-
+       dced.agent.restore.type=overwrite
+       dced.excluded.paths=
+       dced.included.paths=
+   logging:
+     fileName: "log4j2.xml"
+     log4jxml: |-
+        <?xml version="1.0" encoding="UTF-8"?>
+        <Configuration status="WARN" monitorInterval="30" packages="com.ericsson.adp.mgmt.dced.bragent.logging">
+            <Appenders>
+                <Console name="Appender" target="SYSTEM_OUT" follow="true">
+                    <AdpJsonLayout compact="true" eventEol="true" >
+                       <!--  Mandatory Fields -->
+                       <KeyValuePair key="version" value="1.2.0"/>
+                       <KeyValuePair key="timestamp" value="YYYY-MM-dd'T'HH:mm:ss.SSSXXX"/>
+                       <KeyValuePair key="service_id" value="eric-data-distributed-coordinator-ed-bra-agent"/>
+                       <RewriteField oldKey="level_standardLevel" newKey="severity"/>
+                       <RewriteField oldKey="message_formattedMessage" newKey="message"/>
+                       <!--  Optional Fields -->
+                       <KeyValuePair key="function" value="Backup and Restore"/>
+                       <KeyValuePair key="category" value="Distributed Coordinator ED"/>
+                       <RewriteField oldKey="source_classLoaderName" newKey="proc_id"/>
+                       <RewriteField oldKey="source_className" newKey="ul_id"/>
+                    </AdpJsonLayout>
+                </Console>
+            </Appenders>
+            <Loggers>
+                <Root level="${env:LOG_LEVEL:-INFO}">
+                    <AppenderRef ref="Appender" />
+                </Root>
+            </Loggers>
+        </Configuration>
+
+logShipper:
+  logLevel: info
+  storage:
+    medium: "Ephemeral"
+    path: "/logs"
+    size: "500Mi" # This should not be changed
+  shutdownDelay: 2 # This should not be changed
+  input:
+    files:
+      - enabled: true
+        paths:
+          - "initContainer.log"
+          - "etcd.log"
+          - "brAgent.log"
+          - "metricsexporter.log"
+        parsers:
+          - "dced-scripts"
+          - "json"
+  parsers:
+    - name: "dced-scripts"
+      pattern: '^(?<timestamp>.*) \| (?<severity>.*) \| (?<message>.*)'
+  output:
+    logTransformer:
+      host: eric-log-transformer
+
+pmServer:
+  pmServiceName: eric-pm-server
+
+hooklauncher:
+  cleanup: false
+
+bandwidth:
+  ## maximum outgoing traffic rate from DCED
+  maxEgressRate:
+
+# DR-D1123-135 - A set of local supplementalGroups values
+podSecurityContext:
+  supplementalGroups: null  # {value='0..max'} (default=null)
+
+## The AppArmor profile for pod level annotations
+## Type values are 'unconfined', 'runtime/default', 'localhost', ''
+## Default value is '' for backward compatibility
+appArmorProfile:
+  type: ""
+  localhostProfile: ""
+  dced:
+    type: ""
+    localhostProfile:
+  init:
+    type: ""
+    localhostProfile:
+  metricsexporter:
+    type: ""
+    localhostProfile:
+  logshipper:
+    type: ""
+    localhostProfile:
+  brAgent:
+    type: ""
+    localhostProfile:
+
+## The Seccomp profile for container level security context
+## Type values are 'Unconfined', 'RuntimeDefault', 'Localhost', ''
+## Default value is '' for backward compatibility
+seccompProfile:
+  type: ""
+  localhostProfile: ""
+  dced:
+    type: ""
+    localhostProfile:
+  init:
+    type: ""
+    localhostProfile:
+  metricsexporter:
+    type: ""
+    localhostProfile:
+  logshipper:
+    type: ""
+    localhostProfile:
+  brAgent:
+    type: ""
+    localhostProfile:
+# Pod priority configuration for deployments DR-1126-030
+podPriority:
+  eric-data-distributed-coordinator-ed:
+    priorityClassName: "" # No priority set to eric-data-distributed-coordinator-ed
+  eric-data-distributed-coordinator-ed-agent:
+    priorityClassName: "" # No priority set to eric-data-distributed-coordinator-ed-agent
+  hooklauncher:
+    priorityClassName: "" # No priority set to hooklauncher
+
+securityPolicy:
+  dced:
+    rolename: eric-data-distributed-coordinator-ed
+  hooklauncher:
+    rolename: eric-lcm-smart-helm-hooks
+
+enableNewScrapePattern: false

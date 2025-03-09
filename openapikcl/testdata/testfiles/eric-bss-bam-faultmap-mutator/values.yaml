@@ -1,0 +1,105 @@
+#global:
+#  labels: {}
+#  annotations: {}
+#  pullSecret:
+#  nodeSelector: {}
+#  tolerations : []
+#  registry:
+#    imagePullPolicy: IfNotPresent
+#    url: armdocker.rnd.ericsson.se
+#    repoPath:
+#  securityPolicy:
+#    rolekind: ""
+#  podSecurityContext:
+#    supplementalGroups:
+#  fsGroup:
+#    manual:
+#    namespace:
+#  log:
+#    streamingMethod: "indirect"
+
+imageCredentials:
+# pullSecret:
+  faultmapMutator:
+    registry:
+      url:
+      imagePullPolicy:
+    repoPath:
+
+images:
+  faultmapMutator:
+    name:
+    tag:
+    restartPolicy: Never
+
+sourceConfigMapLabel: "bss.ericsson.com/bamFaultmapDelegate"
+targetConfigMapName: eric-bss-bam-alarm-handler-faultmappings
+logLevel: info
+log:
+  streamingMethod: ""
+logTransformerHost: "eric-log-transformer:5024"
+logTransformerNoTlsHost: "eric-log-transformer:5025"
+logTimeoutSeconds: 5
+logQueueSize: 100
+logConnectionTtlMinutes: 15
+kafkaHost: eric-bss-kafka-proxy-http:80
+
+cronjob:
+  schedule: "*/5 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+
+resources:
+  # Below commented out resource config is also supported but
+  # deprecated in BAM 3.3. If boths ways are configured the
+  # deprecated values has precedence.
+  #
+  #requests:
+  #  cpu:
+  #  memory:
+  #limits:
+  #  cpu:
+  #  memory:
+  faultmap-mutator:
+    requests:
+      cpu: 50m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 64Mi
+
+labels: {}
+annotations: {}
+
+nodeSelector: {}
+affinity:
+  nodeAffinity: {}
+
+tolerations: []
+
+terminationGracePeriodSeconds: 30
+
+podPriority:
+  eric-bss-bam-faultmap-mutator:
+    priorityClassName:
+
+networkPolicy:
+  egress:
+    accessLabels:
+      faultmapMutator: {}
+
+seccompProfile:
+  faultmap-mutator:
+    type: ""
+    localhostProfile: ""
+
+appArmorProfile:
+  faultmap-mutator:
+    type: ""
+    localhostProfile: ""
+
+securityPolicy:
+  rolename: ""
+
+podSecurityContext:
+  supplementalGroups:

@@ -1,0 +1,139 @@
+acmesolver:
+  image:
+    pullPolicy: nisi mollit incididunt ut
+    registry: commodo enim ex
+affinity:
+  dolor_1: reprehenderit Lorem
+  in_5d: 93838899
+approveSignerNames: []
+automountServiceAccountToken: true
+cainjector:
+  affinity:
+    eaa08: in
+  automountServiceAccountToken: true
+  config:
+    laborum52: 56879832.68536851
+  containerSecurityContext:
+    ipsum_8_5: -42091527.847911306
+    pariatur_030: 2098693.7944978327
+  deploymentAnnotations:
+    in___6: true
+    non49: -45124873.987166844
+    sunt_a50: minim sit velit sint
+    nostrud_d: -74125911.74808076
+  enableServiceLinks: true
+  enabled: true
+  extraArgs: []
+  extraEnv: []
+  podAnnotations:
+    incididunt_642: false
+clusterResourceNamespace: laborum labore reprehenderit in aliqua
+config:
+  nisi_f2: -26627764
+  dolore8_: eiusmod
+  adipisicing_9a7: est ad fugiat
+containerSecurityContext:
+  proident_f: 94137450.76807407
+  occaecat_7f: 26183353
+  esse_1: -60849741.27847893
+crds:
+  enabled: false
+  keep: true
+creator: dolor
+deploymentAnnotations:
+  in_da: et consectetur nulla
+  nostrud_03: -66960190
+disableAutoApproval: true
+dns01RecursiveNameservers: sint laborum reprehenderit aliquip id
+dns01RecursiveNameserversOnly: false
+enableCertificateOwnerRef: false
+enableServiceLinks: true
+enabled: false
+extraArgs: []
+extraEnv: []
+extraObjects: []
+featureGates: fugiat
+fullnameOverride: consectetur
+global:
+  ipsumed: 21591705
+  anima8d: 51804495.56135976
+  aliquaf: true
+  anim_5a1: true
+  dolore_b64: 72527801.78714278
+  culpa_7b0: 51316285
+  adipisicing_39f: true
+hostAliases: []
+http_proxy: consectetur anim Lorem esse in
+https_proxy: id veniam laborum
+image:
+  digest: est incididunt proident exercitation
+  pullPolicy: exercitation
+  registry: ullamco in non ad
+  repository: nisi do deserunt
+  tag: velit laborum
+ingressShim:
+  defaultIssuerGroup: consequat
+  defaultIssuerKind: quis
+  defaultIssuerName: elit
+installCRDs: false
+livenessProbe:
+  dolore3f4: 41577469.03921017
+  incididunt_14: aliquip in
+maxConcurrentChallenges: -42446779.17585733
+nameOverride: adipisicing
+namespace: et Lorem
+no_proxy: non adipisicing aliqua amet
+nodeSelector:
+  do_1e: -70117380.312022
+  enim_31: aliquip
+podAnnotations:
+  aute__c: ullamco aliquip nulla et dolor
+podDisruptionBudget:
+  enabled: true
+  maxUnavailable:
+    description: This configures the maximum unavailable pods for disruptions. It can either be set to an integer (e.g. 1) or a percentage value (e.g. 25%). it cannot be used if `minAvailable` is set.
+  minAvailable:
+    description: |-
+      This configures the minimum available pods for disruptions. It can either be set to an integer (e.g. 1) or a percentage value (e.g. 25%).
+      It cannot be used if `maxUnavailable` is set.
+podDnsConfig:
+  tempor5: -26563060.2268482
+  essef: -8441484.731551126
+  incididunt_1: 92905067.3216905
+podDnsPolicy: ut ullamco
+podLabels:
+  dolore_f2c: 976865
+  non_2_c: true
+  do27e: false
+  labore55d: 26849044.956340775
+prometheus:
+  enabled: true
+replicaCount: 73010115.61219054
+resources:
+  Utba: id
+  temporbc: sint consequat eiusmod eu
+  Duisb: eu minim ipsum magna ea
+securityContext:
+  culpa60: -6069879.643760204
+  reprehenderit6: irure amet sit
+serviceAccount:
+  annotations:
+    tempor_e1: 28887474.114122063
+  automountServiceAccountToken: true
+  create: true
+  labels:
+    elit_be7: 73238591.25867242
+    id_d: -81701572.52037437
+    ex_10c: false
+    ex__4: false
+  name: enim sed deserunt anim
+serviceAnnotations:
+  Excepteur_15: false
+  velit04e: -68866869.16348523
+  ex64: -46820349.56133796
+  consectetur__0f: 31871312
+serviceIPFamilies: []
+serviceLabels:
+  nostrud_4: true
+  ut_543: true
+volumes: []

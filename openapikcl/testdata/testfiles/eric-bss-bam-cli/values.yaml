@@ -1,0 +1,149 @@
+#global:
+#  labels: {}
+#  annotations: {}
+#  pullSecret:
+#  nodeSelector: {}
+#  tolerations: []
+#  registry:
+#    url: armdocker.rnd.ericsson.se
+#    imagePullPolicy: IfNotPresent
+#    repoPath:
+#  security:
+#    tls:
+#      enabled: true
+#  timezone: UTC
+#  networkPolicy:
+#    enabled: false
+#  securityPolicy:
+#    rolekind: ""
+#  podSecurityContext:
+#    supplementalGroups:
+#  fsGroup:
+#    manual:
+#    namespace:
+#  internalIPFamily:
+#  log:
+#    streamingMethod: "indirect"
+
+replicaCount: 1
+
+imageCredentials:
+  pullSecret:
+  repoPath:
+  registry:
+    url:
+    imagePullPolicy:
+
+images:
+  bamcli:
+    name:
+    tag:
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  name:
+
+resources:
+  # Below commented out resource config is also supported but
+  # deprecated in BAM 3.3. If boths ways are configured the
+  # deprecated values has precedence.
+  #
+  #requests:
+  #  cpu:
+  #  memory:
+  #limits:
+  #  cpu:
+  #  memory:
+  bamcli:
+    requests:
+      cpu: 40m
+      memory: 32Mi
+    limits:
+      cpu: 60m
+      memory: 64Mi
+
+updateStrategy:
+  bamcli:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 50%
+      maxSurge: 50%
+
+service:
+  port: 8080
+ingress:
+  enabled: true
+  ingressClass:
+  secretName: eric-bss-bam-cli-proxy-cert
+  hostname: eric-bss-bam-cli-proxy
+  tls:
+    passthrough: false
+    ca: eric-tm-ingress-controller-cr-oam-client-ca
+
+config:
+  logLevel: info
+  notice: "If you are not an authorized user, please exit immediately."
+  log:
+    streamingMethod: ""
+  logTransformerHost: "eric-log-transformer:5024"
+  logTransformerNoTlsHost: "eric-log-transformer:5025"
+  logTimeoutSeconds: 5
+  logQueueSize: 1000
+  logConnectionTtlMinutes: 120
+  kafkaHost: eric-bss-kafka-proxy-http:80
+
+labels: {}
+annotations: {}
+nodeSelector: {}
+
+tolerations: []
+
+affinity:
+  nodeAffinity: {}
+
+probes:
+  bamcli:
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 1
+      periodSeconds: 10
+      timeoutSeconds: 2
+    startupProbe:
+      failureThreshold: 60
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 2
+
+terminationGracePeriodSeconds: 30
+
+podPriority:
+  eric-bss-bam-cli:
+    priorityClassName:
+
+networkPolicy:
+  enabled: true
+  egress:
+    accessLabels:
+      bamcli: {}
+
+topologySpreadConstraints: [] # Configuration for topology-spread constraints.
+
+seccompProfile:
+  bamcli:
+    type: ""
+    localhostProfile: ""
+
+appArmorProfile:
+  bamcli:
+    type: ""
+    localhostProfile: ""
+
+securityPolicy:
+  rolename: ""
+
+podSecurityContext:
+  supplementalGroups:

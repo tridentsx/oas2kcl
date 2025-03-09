@@ -1,0 +1,598 @@
+# Default values for eric-data-coordinator-zk
+
+# If specified, allows the overriding of the name of all Kubernetes resources in the Data Coordinator ZK service
+#fullnameOverride:
+
+#global:
+##  local log has precedence over global.log
+#   log:
+#     streamingMethod: null # Supported values: direct, indirect, dual
+#   logShipper: # mandatory to set global.logShipper.deployment.type as sidecar
+#     deployment:
+#       type: "sidecar"
+#       model:  # Supported values ["static", ""]
+## DR1120-061 Tolerations to influence scheduling decisions made by Kubernetes scheduler
+#   tolerations: []
+## Global configuration parameter to enable/disable Network Policy
+# networkPolicy:
+#   enabled: false
+# hooklauncher:
+#   executor: service
+#   executorCharts: []
+# registry:
+#   repoPath:
+# Possible values are: IPv4, IPv6, ""
+# internalIPFamily:
+# The Secret resource name to use for authenticating towards docker registry when pulling the image
+#pullSecret: armdocker_secret_name
+  #registry:
+    # Global image registry
+    # url: armdocker.rnd.ericsson.se
+    # repoPath, image repository path
+    # repoPath:
+  # Backup and Restore Orchestrator service configuration that Data Coordinator ZK BrAgent communicates with
+  #adpBR:
+    #service name
+    #broServiceName: eric-ctrl-bro
+    #service port
+    #broGrpcServicePort: 3000
+    #brLabelKey: adpbrlabelkey
+  #timezone setting
+  #timezone: UTC
+  #security:
+    #tls:
+      #enabled: true
+      #DR-D1123-133 (Security)
+      #trustedInternalRootCa:
+        #secret: "eric-sec-sip-tls-trusted-root-cert"
+    #sasl:
+      #enabled: false
+  #security:
+    #policyBinding:
+      #create: false
+    #policyReferenceMap:
+      #default-restricted-security-policy: "default-restricted-security-policy"
+  #securityPolicy:
+    #rolekind: ""  # possible values: "ClusterRole", "Role", ""
+  #nodeSelector: {}
+  # fsGroup:
+  #   manual: 10000
+  #   namespace: true
+## DR-D1123-135 - When the global ID for supplementalGroups is set, and both global and local values are provided,
+## the global values are combined with the local values. If no local settings are given, the global values will be used as-is.
+#   podSecurityContext:
+##    supplementalGroups: null # {value='0..max'} (default=null)
+
+# The number of servers in the Data Coordinator ZK ensemble
+replicaCount: 3
+
+updateStrategy:
+  # Update Strategy
+  type: "RollingUpdate"
+
+productInfo:
+  # R-State of the product. R State should match helm chart version (3.1.0 -> R2A)
+  # To automate it when packaging the helm chart rstate can be generated
+  # and below value replaced with correct R-State
+  rstate: "RSTATE"
+
+# Additional labels allow a list of key/values to be appended to the list of labels of the resource object.
+labels: {}
+
+# A list of key/values to be appended to the list of user defined annotations
+annotations: {}
+
+probes:
+  datacoordinatorzk:
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 0
+      periodSeconds: 10
+      timeoutSeconds: 15
+    startupProbe:
+      failureThreshold: 18
+      initialDelaySeconds: 0
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 10
+  metricsexporter:
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 15
+      periodSeconds: 15
+      timeoutSeconds: 15
+  brAgent:
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 0
+      periodSeconds: 10
+      timeoutSeconds: 15
+    startupProbe:
+      failureThreshold: 18
+      initialDelaySeconds: 0
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 10
+  logshipper:
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 300
+      periodSeconds: 30
+      timeoutSeconds: 15
+
+## Tolerations to influence scheduling decisions made by Kubernetes scheduler
+tolerations:
+  datacoordinatorzk: []
+  brAgent:
+  - key: node.kubernetes.io/not-ready
+    operator: Exists
+    effect: NoExecute
+    tolerationSeconds: 0
+  - key: node.kubernetes.io/unreachable
+    operator: Exists
+    effect: NoExecute
+    tolerationSeconds: 0
+  hooklauncher: []
+  shhpostupgrade: []
+terminationGracePeriodSeconds:
+  datacoordinatorzk: 30
+  brAgent: 30
+
+topologySpreadConstraints:
+  datacoordinatorzk: []
+
+## log has precedence over global.log
+log:
+  ## streamingMethod has precedence over 'outputs'
+  ## Supported values: direct, indirect, dual
+  streamingMethod: null
+
+## Logshipper configurations
+## Only in effect when:
+##    global.log.streamingMethod is set to dual or direct
+##    log.streamingMethod is set to dual or direct
+## Local configurations has precedence over global.
+## Requires Log Transformer service.
+logShipper:
+  logLevel: info
+  filters:
+    enabled: true
+    modify:
+      enabled: true
+      rules:
+        - |-
+          condition key_value_equals severity "DEBUG"
+          set severity "debug"
+        - |-
+          condition key_value_equals severity "INFO"
+          set severity "info"
+        - |-
+          condition key_value_equals severity "WARN"
+          set severity "warning"
+        - |-
+          condition key_value_equals severity "ERROR"
+          set severity "error"
+  storage:
+    path: "/logs"
+    size: "500Mi" # This should not be changed
+    medium: "Ephemeral"
+  shutdownDelay: 2 # This should not be changed
+  input:
+    files:
+      - enabled: true
+        paths:
+          - "datacoordinatorzk.log"
+        parsers:
+          - "json"
+        multilines:
+          - "dczk-warnings"
+      - enabled: true
+        paths:
+          - "brAgent.log"
+        parsers:
+          - "json"
+  multilines:
+    - name: "dczk-warnings"
+      start:
+        pattern: ".*"
+        next: "cont1"
+      cont:
+        - name: "cont1"
+          pattern: "(^java.*)|(^\tat (.*))"
+          next: "cont1"
+  output:
+    logTransformer:
+      enabled: true
+      host: "eric-log-transformer"
+
+readinessProbe:
+  logshipper:
+    initialDelaySeconds: 10 # This should not be changed
+
+imageCredentials:
+  repoPath:
+  datacoordinatorzk:
+    registry:
+      # Docker registry url. Overrides global.registry.url
+      # url, service specific Docker registry url, overrides the global value when set
+      url:
+      # The Secret resource name to use for authenticating towards docker registry when pulling the image
+      # container images pull Policy
+      imagePullPolicy:
+    # Docker repository path
+    repoPath:
+  brAgent:
+    registry:
+      # Docker registry url. Overrides global.registry.url
+      # url, service specific Docker registry url, overrides the global value when set
+      url:
+      # container images pull Policy
+      imagePullPolicy:
+    # Docker repository path
+    repoPath:
+  # The Secret resource name to use for authenticating towards docker registry when pulling the image
+  #pullSecret: armdocker_secret_name
+  logshipper:
+    registry:
+      url:
+      imagePullPolicy:
+    repoPath: proj-adp-log-released
+  metricsexporter:
+    registry:
+      # Docker registry url. Overrides global.registry.url
+      # url, service specific Docker registry url, overrides the global value when set
+      url:
+      # container images pull Policy
+      imagePullPolicy:
+    # Docker repository path
+    repoPath:
+  hooklauncher:
+    registry:
+      url:
+      imagePullPolicy:
+    repoPath:
+resources:
+  datacoordinatorzk:
+    requests:
+      # This is the min CPU setting at startup
+      cpu: "1"
+      # This is the min Memory setting at startup
+      memory: "2Gi"
+      # Support ephemeral-storage parameter, no default value.
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions
+      ephemeral-storage:
+    limits:
+      # This the maximum cpu setting that can be requested
+      cpu: "2"
+      # This is the max memory setting that can be requested
+      memory: "4Gi"
+      # Support ephemeral-storage parameter, no default value.
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions
+      ephemeral-storage:
+    jvm:
+      initialMemoryAllocationPercentage: 50
+      smallMemoryAllocationMaxPercentage: 70
+      largeMemoryAllocationMaxPercentage: 50
+  brAgent:
+   requests:
+     cpu: "1"
+     memory: "1Gi"
+     # Support ephemeral-storage parameter, no default value.
+     # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions
+     ephemeral-storage:
+   limits:
+     cpu: "1"
+     memory: "2Gi"
+     # Support ephemeral-storage parameter, no default value.
+     # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions
+     ephemeral-storage:
+   jvm:
+     initialMemoryAllocationPercentage: 50
+     smallMemoryAllocationMaxPercentage: 70
+     largeMemoryAllocationMaxPercentage: 50
+  logshipper:
+    requests:
+      memory: "20Mi"
+      cpu: "46m"
+      # Support ephemeral-storage parameter, no default value.
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions
+      ephemeral-storage:
+    limits:
+      memory: "60Mi"
+      cpu: "60m"
+      # Support ephemeral-storage parameter, no default value.
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions
+      ephemeral-storage:
+  metricsexporter:
+    requests:
+      cpu: "100m"
+      memory: "8Mi"
+      # Support ephemeral-storage parameter, no default value.
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions
+      ephemeral-storage:
+    limits:
+      cpu: "200m"
+      memory: "32Mi"
+      # Support ephemeral-storage parameter, no default value.
+      # Notice: Specifying incorrect ephemeral-storage may cause unexpected pod evictions
+      ephemeral-storage:
+  hooklauncher:
+    requests:
+      memory: "50Mi"
+      cpu: "50m"
+      ephemeral-storage:
+    limits:
+      memory: "100Mi"
+      cpu: "100m"
+      ephemeral-storage:
+
+# Heap resources
+# support for -Xmx and -Xms will be deprecated soon.
+# Use resources.datacoordinatorzk.jvm for setting -Xmx and -Xms instead.
+# If -Xmx or/and -Xms is set then resources.datacoordinatorzk.jvm would not take effect.
+heap: ""
+
+# Configure additional zookeeper jvm flags. For example, "-Dzookeeper.skipACL=yes -Dzookeeper.forceSync=no"
+dczkJvmFlags:
+
+# Configure Certificate validity between DCZK and BR-Agent
+dzckBragentCertValidity:
+  overrideTtl:
+  overrideLeadTime:
+
+# Configure Certificate validity between BRO and BR-Agent
+broBragentCertValidity:
+  overrideTtl:
+  overrideLeadTime:
+
+# Configure server name provided by Service Provider for mTLS communication,It will be used to derive CA name by appending -ca.
+serverNameParameter:
+  pmServer: eric-pm-server
+
+# sets inter-pod anti-affinity , values supported 'Soft/Hard'.
+affinity:
+  podAntiAffinity: "soft"
+  topologyKey: "kubernetes.io/hostname"
+
+# Service level parameter to enable/disable Network Policy.
+networkPolicy:
+  enabled: true
+
+security:
+  sasl:
+    credentials:
+      kubernetesSecretName: eric-data-coordinator-zk
+
+metrics:
+  enabled: true
+
+service:
+  endpoints:
+    pm:
+      tls:
+        enforced: "required"
+        verifyClientCertificate: "required"
+        port: 21008
+    datacoordinatorzk:
+      metricsPort: 21007
+      tls:
+        enforced: "optional"
+        verifyClientCertificate: "required"
+        servcertTimeToLive:
+        servcertRenewalLeadTime:
+        clientcertTimeToLive:
+        clientcertRenewalLeadTime:
+        peer:
+          enforced: "optional"
+          portUnification: true
+          #  provider for tls solution, supported values: none, edaTls, sip-tls
+        provider: "sip-tls"
+      # edaTls:
+        # name of the secret that hold the keystore/truststore and their credentials
+        # secretName: eric-data-coordinator-zk-jks-secret
+        # name of the keystore stored in the secret
+        # keystoreFile: server.keystore.jks
+        # name of the file containing the password of the keystore
+        # keystorePasswordFile: keystorepw
+        # name of the truststore stored in the secret
+        # truststoreFile: server.truststore.jks
+        # name of the file containing the password of the truststore
+        # truststorePasswordFile: truststorepw
+        # enable/disable client authentication, possible values: need,want,none
+        # clientAuth: need
+
+network:
+  datacoordinatorzk:
+    adminServer:
+      # port for the admin server
+      port: 8080
+      # Admin server address
+      address: "127.0.0.1"
+    client:
+      tlsPort: 2281
+
+# Specify labels for directing node assignment. Format - label: value
+nodeSelector:
+  datacoordinatorzk: {}
+  brAgent: {}
+
+# The port Data Coordinator ZK followers use to connect to the leader
+serverPort: 2888
+
+# The port used for leader election
+leaderElectionPort: 3888
+
+# The port to listen for client connections; that is, the port that clients attempt to connect to
+clientPort: 2181
+
+# The number of servers to maintain a quorum in the Data Coordinator ZK ensemble.
+podDisruptionBudget: {}
+  # Select either one of below parameters with your expected values.
+  # maxUnavailable: 1
+  # minAvailable: "51%"
+
+# The length of a single tick, which is the basic time unit used by Data Coordinator ZK, measured in milliseconds
+tickTimeMs: 2000
+
+# Amount of time, in ticks (see tickTimeMs), to allow followers to connect and sync to a leader. Increased this value as needed if data is large
+initLimit: 10
+
+# Amount of time, in ticks (see tickTime), to allow followers to sync with Data Coordinator ZK. If followers fall too far behind a leader, they will be dropped
+syncLimit: 5
+
+# Limits the number of concurrent connections (socket level) that a single client, identified by IP address, may make to a single member of the Data Coordinator ZK ensemble
+maxClientCnxns: 60
+
+# Number of snapshots to keep. If more than snapRetainCount snapshots are present the oldest ones will be purged
+snapRetainCount: 3
+
+# Number of transactions before creating a snapshot
+snapCount: 1000000
+
+# The time interval for which purging of the snapshots is triggered
+purgeIntervalHours: 1
+
+# The root logging level
+logLevel: "INFO"
+
+# The log message to be filtered from the logs.(Multiple messages can be configured)
+logFilterMessage:
+  - "Unable to read additional data from client sessionid 0x0"
+  - "running stat"
+
+# The Kubernetes cluster domain that gets populated to Subject Alternative Name
+clusterDomain: "cluster.local"
+
+persistence:
+  persistentVolumeClaim:
+   # Size of the persistent volume
+   size: "5Gi"
+   # The storage class to use for the persistent volume
+   storageClassName: "network-block"
+   # A Boolean variable indicating whether the Helm chart uses a persistent volume (true) or whether it uses ephermal storage (false)
+   enabled: true
+
+#DCZK Metrics-Exporter Configuration
+metricsexporter:
+  ## If false, metricsexporter will not be installed
+  ## It will only be enabled if metrics.enabled is true and metricsexporter.enabled is also true.
+  enabled: false
+  port: 9087
+
+bandwidth:
+  maxEgressRate: # maximum outgoing traffic rate from DCZK
+
+brAgent:
+   enabled: false
+   brLabelValue:
+   replicaCount: 1
+   logLevel: "INFO"
+   backupTypeList:
+   properties:
+     fileName: "application.properties"
+     applicationProperties: |-
+       dczk.excluded.paths=/zookeeper,/eric-data-message-bus-kf
+       dczk.included.paths=
+       dczk.agent.restore.type=default
+   logging:
+     fileName: "log4j2.xml"
+     log4jxml: |-
+        <?xml version="1.0" encoding="UTF-8"?>
+        <Configuration status="WARN" monitorInterval="30" packages="com.ericsson.adp.mgmt.dczk.bragent.logging">
+            <Appenders>
+                <Console name="Appender" target="SYSTEM_OUT" follow="true">
+                    <AdpJsonLayout compact="true" eventEol="true" >
+                       <!--  Mandatory Fields -->
+                       <KeyValuePair key="version" value="1.2.0"/>
+                       <KeyValuePair key="timestamp" value="YYYY-MM-dd'T'HH:mm:ss.SSSXXX"/>
+                       <KeyValuePair key="service_id" value="eric-data-coordinator-zk-bra-agent"/>
+                       <RewriteField oldKey="level_standardLevel" newKey="severity"/>
+                       <RewriteField oldKey="message_formattedMessage" newKey="message"/>
+                       <!--  Optional Fields -->
+                       <KeyValuePair key="function" value="Backup and Restore"/>
+                       <KeyValuePair key="category" value="Data Coordinator ZK"/>
+                       <RewriteField oldKey="source_classLoaderName" newKey="proc_id"/>
+                       <RewriteField oldKey="source_className" newKey="ul_id"/>
+                    </AdpJsonLayout>
+                </Console>
+            </Appenders>
+            <Loggers>
+                <Root level="${env:LOG_LEVEL:-INFO}">
+                    <AppenderRef ref="Appender" />
+                </Root>
+            </Loggers>
+        </Configuration>
+   grpc:
+     backup:
+       # Time, in seconds, to wait for the data channel to be ready before aborting the backup
+       dataChannelTimeoutSecs: 30
+       # Maximum Size, in KiB, of fragment chunk to send with each backup data message
+       fragmentChunkSize: 512
+
+# Pod priority configuration for deployments DR-1126-030
+podPriority:
+  eric-data-coordinator-zk:
+    priorityClassName: "" # No priority set to eric-data-coordinator-zk
+  eric-data-coordinator-zk-agent:
+    priorityClassName: "" # No priority set to eric-data-coordinator-zk-agent
+  hooklauncher:
+    priorityClassName: "" # No priority set to hooklauncher
+
+# DR-D1123-135 - A set of local supplementalGroups values
+podSecurityContext:
+  supplementalGroups: null # {value='0..max'} (default=null)
+
+#Default ciphers + ciphers for TLS1.3 including CHACHA which comes from Java11
+tlsCiphers: TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_AES_128_GCM_SHA256,TLS_AES_256_GCM_SHA384,TLS_CHACHA20_POLY1305_SHA256
+
+securityPolicy:
+  datacoordinatorzk:
+    rolename: eric-data-coordinator-zk
+  hooklauncher:
+    rolename: eric-lcm-smart-helm-hooks
+  postupgrade:
+    rolename: eric-data-coordinator-zk
+
+## The AppArmor profile for pod level annotations
+## Type values are 'unconfined', 'runtime/default', 'localhost', ''
+## Default value is '' for backward compatibility
+appArmorProfile:
+  type: ""
+  localhostProfile: ""
+  datacoordinatorzk:
+    type: ""
+    localhostProfile:
+  metricsexporter:
+    type: ""
+    localhostProfile:
+  logshipper:
+    type: ""
+    localhostProfile:
+  brAgent:
+    type: ""
+    localhostProfile:
+
+## The Seccomp profile for container level security context
+## Type values are 'Unconfined', 'RuntimeDefault', 'Localhost', ''
+## Default value is '' for backward compatibility
+seccompProfile:
+  type: ""
+  localhostProfile: ""
+  datacoordinatorzk:
+    type: ""
+    localhostProfile:
+  metricsexporter:
+    type: ""
+    localhostProfile:
+  logshipper:
+    type: ""
+    localhostProfile:
+  brAgent:
+    type: ""
+    localhostProfile:
+  hooklauncher:
+    type: ""
+    localhostProfile:
+
+# The new scrape configuration is enabled using a new helm parameter.
+enableNewScrapePattern: false

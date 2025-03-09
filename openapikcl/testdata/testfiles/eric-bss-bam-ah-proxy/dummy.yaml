@@ -1,0 +1,199 @@
+{
+  "quib": "do velit ullamco in ipsum",
+  "ut_": "eu Excepteur deserunt dolor",
+  "affinity": {
+    "dolor_7b": "fugiat cupidatat veniam",
+    "nodeAffinity": {
+      "cupidatat_8f8": "dolor aliquip velit sit"
+    },
+    "podAntiAffinity": "dolore sit",
+    "topologyKey": "elit consequat"
+  },
+  "annotations": {
+    "ut9b6": 35681234
+  },
+  "appArmorProfile": {
+    "elitc8b": 69209245.72151673,
+    "consectetur_25": 61731673,
+    "velit_23": true
+  },
+  "autoScaling": {
+    "nisie9": true,
+    "sunte1": 48960165
+  },
+  "config": {
+    "in_d": false,
+    "ex_376": true,
+    "alarms": {
+      "etf33": false,
+      "enabled": false
+    },
+    "log": {
+      "deserunt_38": "dolor est qui nostrud officia",
+      "labore_0f7": 60388958.28555146,
+      "reprehenderitb": "in ad ipsum sunt do",
+      "connectionTtlMinutes": "62253288802",
+      "level": 10097415.354254305,
+      "streamingMethod": "direct",
+      "queueSize": "309043792",
+      "timeoutSeconds": 38526287,
+      "transformerHost": "culpa reprehenderit et dolor ea",
+      "transformerNoTlsHost": -88547971.24332933
+    },
+    "metrics": {
+      "adipisicing_2_": "sunt",
+      "culpa_91": false,
+      "ut3a3": false,
+      "serviceName": 43231399
+    },
+    "server": {
+      "reprehenderit514": "non",
+      "Lorem22e": -4494793.834169462,
+      "sit_a3": -96202124,
+      "anim_4": "ad in et occaecat laboris",
+      "port": "-42836950296"
+    }
+  },
+  "fullnameOverride": null,
+  "global": {
+    "inc": 93294261,
+    "nulla_0e7": "proident fugiat adipisicing sed",
+    "non1ee": -64227853,
+    "culpa_33": "sed",
+    "cupidatat0": -63298192.06838802,
+    "consequat_a": "voluptate irure nostrud consectetur",
+    "deseruntaa": 8189593,
+    "fsGroup": {
+      "mollit_df": "sed sunt mollit cillum sit",
+      "sit0": "labore nulla",
+      "manual": null,
+      "namespace": false
+    },
+    "internalIPFamily": "IPv6",
+    "log": {
+      "consectetur_8": false,
+      "sed_": 74014972.61267656,
+      "enim6a": -12473250.841094434,
+      "streamingMethod": ""
+    },
+    "tolerations": [],
+    "pullSecret": -6540553.834436879,
+    "registry": {
+      "imagePullPolicy": -83167494,
+      "url": -72914
+    },
+    "timezone": -70231252.9667124
+  },
+  "imageCredentials": {
+    "Excepteur_3": -759246.8211212307,
+    "laborum7": true,
+    "ahproxy": {
+      "registry": {
+        "imagePullPolicy": null,
+        "url": "incididunt"
+      },
+      "repoPath": null
+    },
+    "pullSecret": -72957670
+  },
+  "images": {
+    "voluptate_b7": false,
+    "eiusmod6": true,
+    "consectetur_cc": false,
+    "ahproxy": {
+      "reprehenderit6": "deserunt occaecat eu eiusmod",
+      "mollitb": -16315089.279257894,
+      "Ut1": -43376749.34958575,
+      "eiusmod_0e4": -74224605
+    }
+  },
+  "labels": {
+    "commodo5_6": "aute irure deserunt"
+  },
+  "nameOverride": 42999516.3728134,
+  "networkPolicy": {
+    "laborum_108": 93675332,
+    "enim_558": true,
+    "laborumd": "proident incididunt eiusmod",
+    "quis87": false
+  },
+  "nodeSelector": {
+    "occaecat_b31": true
+  },
+  "podDisruptionBudget": {
+    "Ut_a7": 95797009,
+    "Uta84": -25382956,
+    "cupidatat3": true,
+    "cillum_85_": "aliqua est Duis deserunt nostrud",
+    "maxUnavailable": "incididunt consequat elit consectetur velit",
+    "minAvailable": -71581761
+  },
+  "podPriority": {
+    "nulla_b": 9925451
+  },
+  "podSecurityContext": {
+    "sit_027": -74083329,
+    "supplementalGroups": null
+  },
+  "probes": {
+    "Ut6d": 37988211.598697186,
+    "nostrud_7f": true,
+    "esse_01": -21137006,
+    "dolore_a69": "ex et commodo",
+    "ahproxy": {
+      "livenessProbe": {
+        "periodSeconds": "5370395"
+      },
+      "startupProbe": {
+        "failureThreshold": "89201",
+        "initialDelaySeconds": "-617",
+        "periodSeconds": "-384797715",
+        "successThreshold": "-4",
+        "timeoutSeconds": "-06"
+      }
+    }
+  },
+  "replicaCount": "-33505",
+  "resources": {
+    "ut_db": false,
+    "Ut3b4": -74715205.53653441,
+    "pariatur7": true,
+    "minim_33": true,
+    "fugiat__": "ut Duis reprehenderit",
+    "ahproxy": {
+      "minim_9c": -22625291.953846633,
+      "nisic5": -33333245.810796,
+      "veniam_c": 67466151,
+      "velit01": -52013090
+    }
+  },
+  "seccompProfile": {
+    "ipsum__e7": 7423259.824683592,
+    "labore7": -14131217
+  },
+  "securityPolicy": {
+    "et_f1c": 63856416.66088614,
+    "adipisicingcc": "labore et",
+    "enim_3": "enim reprehenderit fugiat id",
+    "sint2": "ut Lorem magna"
+  },
+  "service": {
+    "culpa680": -61637663,
+    "velit6f": "ea culpa ex consequat",
+    "nulla__bd": "ut",
+    "port": "28459623"
+  },
+  "serviceAccount": {
+    "nostrud6": -30676147,
+    "deserunt_4": -53458375.88116629,
+    "Ut_12": -18688033.359272808,
+    "pariatur_9e": -22675745.797139242,
+    "Duis_86f": 24612653.437643006
+  },
+  "terminationGracePeriodSeconds": "-182632",
+  "tolerations": [],
+  "topologySpreadConstraints": [],
+  "updateStrategy": {
+    "type": "proident quis eiusmod"
+  }
+}

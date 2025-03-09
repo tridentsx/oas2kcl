@@ -1,0 +1,180 @@
+# Default values for eric-bss-bam-cm-store.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+#global:
+#  labels: {}
+#  annotations: {}
+#  pullSecret:
+#  nodeSelector: {}
+#  tolerations: []
+#  registry:
+#    url: armdocker.rnd.ericsson.se
+#    imagePullPolicy: IfNotPresent
+#    repoPath:
+#  networkPolicy:
+#    enabled: false
+#  securityPolicy:
+#    rolekind: ""
+#  podSecurityContext:
+#    supplementalGroups:
+#  internalIPFamily:
+#  log:
+#    streamingMethod: "indirect"
+
+imageCredentials:
+  repoPath:
+  bamcmstore:
+#    pullPolicy:
+    registry:
+      imagePullPolicy:
+  bamcmstorebra:
+#    pullPolicy:
+    registry:
+      imagePullPolicy:
+  pullSecret:
+  registry:
+    url:
+
+images:
+  bamcmstore:
+    name:
+    tag:
+  bamcmstorebra:
+    name:
+    tag:
+
+nameOverride: ""
+fullnameOverride: ""
+logLevel: info
+log:
+  streamingMethod: ""
+logTransformerHost: "eric-log-transformer:5024"
+logTransformerNoTlsHost: "eric-log-transformer:5025"
+logTimeoutSeconds: 5
+logQueueSize: 1000
+logConnectionTtlMinutes: 120
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+service:
+  type: ClusterIP
+  port: 3000
+
+alarms:
+  enabled: true
+  kafka:
+    host: eric-bss-kafka-proxy-http:80
+
+metrics:
+  enabled: true
+  host: eric-pm-server
+  serviceName: cm_store
+
+updateStrategy:
+  bamcmstore:
+    type: Recreate
+    rollingUpdate:
+      maxUnavailable: 50%
+      maxSurge: 50%
+
+resources:
+  bamcmstore:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      cpu: "1"
+      memory: "512Mi"
+  bra:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      cpu: "1"
+      memory: "512Mi"
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity:
+  nodeAffinity: {}
+
+annotations: {}
+
+labels: {}
+
+persistence:
+  persistentVolumeClaim:
+    size: 1Gi
+    storageClassName:
+
+#Below is migration code should be removed after deprecation period for BSS_BAM-4269
+#persistentVolumeClaim:
+#  size: 1Gi
+#  storageClassName:
+
+brAgent:
+  enabled: true
+  productionDate: 2024-08-30T08:56:14+00:00
+  backupTypeList:
+  - cmStore
+  brLabelValue:
+
+probes:
+  bamcmstore:
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 1
+      periodSeconds: 10
+      timeoutSeconds: 2
+    startupProbe:
+      failureThreshold: 60
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 2
+
+terminationGracePeriodSeconds: 30
+
+podPriority:
+  eric-bss-bam-cm-store:
+    priorityClassName:
+
+networkPolicy:
+  enabled: true
+  egress:
+    accessLabels:
+      bamcmstore: {}
+
+topologySpreadConstraints: [] # Configuration for topology-spread constraints.
+
+seccompProfile:
+  bamcmstore:
+    type: ""
+    localhostProfile: ""
+  bamcmstorebra:
+    type: ""
+    localhostProfile: ""
+
+appArmorProfile:
+  bamcmstore:
+    type: ""
+    localhostProfile: ""
+  bamcmstorebra:
+    type: ""
+    localhostProfile: ""
+
+securityPolicy:
+  rolename: ""
+
+podSecurityContext:
+  supplementalGroups:

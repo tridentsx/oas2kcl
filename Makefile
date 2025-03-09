@@ -72,6 +72,34 @@ generate-attributions:
 	@go-licenses save . --save_path=$(OUTPUT_DIR) --force
 	@echo "✅ Attribution files saved in $(OUTPUT_DIR)/"
 
+# Generate KCL schemas for all test cases
+.PHONY: generate-test-outputs
+generate-test-outputs:
+	@echo "Generating KCL schemas for all test cases..."
+	@cd openapikcl && GENERATE_TEST_OUTPUTS=1 go test -v -run TestGenerateTestCaseOutputs
+
+# Generate KCL schema for a single test case
+# Usage: make generate-test-case TEST_CASE=jsonschema/basic
+.PHONY: generate-test-case
+generate-test-case:
+	@if [ -z "$(TEST_CASE)" ]; then \
+		echo "Error: TEST_CASE is required. Usage: make generate-test-case TEST_CASE=basic"; \
+		exit 1; \
+	fi
+	@echo "Generating KCL schema for test case: $(TEST_CASE)"
+	@cd openapikcl && TEST_DATA_DIR=testdata/$(TEST_CASE) GENERATE_TEST_OUTPUTS=1 go test -v -run TestGenerateTestCaseOutputs
+
+# Run tests for specific packages
+.PHONY: test-jsonschema
+test-jsonschema:
+	@echo "Running tests for the JSON Schema package..."
+	@cd openapikcl/jsonschema && go test -v ./...
+
+.PHONY: test-oas
+test-oas:
+	@echo "Running tests for the OpenAPI Schema package..."
+	@cd openapikcl/oas && go test -v ./...
+
 # Display help
 .PHONY: help
 help:
@@ -86,4 +114,8 @@ help:
 	@echo "  make clean                 - Remove built artifacts"
 	@echo "  make check-licenses        - Verify all dependencies comply with Apache 2.0"
 	@echo "  make generate-attributions - Generate license attribution files in licenses/"
+	@echo "  make generate-test-outputs - Generate KCL schemas for all test cases"
+	@echo "  make generate-test-case    - Generate KCL schema for a single test case"
+	@echo "  make test-jsonschema       - Run tests for the JSON Schema package"
+	@echo "  make test-oas              - Run tests for the OpenAPI Schema package"
 

@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PrimitiveTypes",
+  "type": "object",
+  "description": "A schema demonstrating all primitive JSON Schema types",
+  "properties": {
+    "stringValue": {
+      "type": "string",
+      "description": "A string value"
+    },
+    "integerValue": {
+      "type": "integer",
+      "description": "An integer value"
+    },
+    "numberValue": {
+      "type": "number",
+      "description": "A floating-point number"
+    },
+    "booleanValue": {
+      "type": "boolean",
+      "description": "A boolean value (true or false)"
+    },
+    "nullValue": {
+      "type": "null",
+      "description": "A null value"
+    },
+    "multiTypeValue": {
+      "type": ["string", "number", "null"],
+      "description": "A value that can be of multiple types"
+    }
+  },
+  "required": ["stringValue", "integerValue", "numberValue", "booleanValue"]
+} 

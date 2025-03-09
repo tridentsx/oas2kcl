@@ -1,0 +1,269 @@
+# Default values for eric-bss-kube-rbac-proxy.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 2
+
+#global:
+#  labels: {}
+#  annotations: {}
+#  timezone: UTC
+#  # Secret must be manually created in the namespace.
+#  pullSecret:
+#  nodeSelector: {}
+#  tolerations: []
+#  registry:
+#    url: armdocker.rnd.ericsson.se
+#    imagePullPolicy:
+#    repoPath:
+#  networkPolicy:
+#    enabled: false
+#  securityPolicy:
+#    rolekind: ""
+#  podSecurityContext:
+#    supplementalGroups:
+#  fsGroup:
+#    manual:
+#    namespace:
+#  internalIPFamily:
+#  log:
+#    streamingMethod: "indirect"
+
+
+imageCredentials:
+  repoPath:
+  # Mandatory: Private registry
+  #pullSecret:
+  registry:
+    url:
+    # Overrides global registry
+    ## Secret must be manually created in the namespace.
+    imagePullPolicy:
+
+images:
+  proxy:
+    name:
+    tag:
+
+nameOverride: ""
+fullnameOverride: ""
+
+updateStrategy:
+  proxy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 50%
+      maxSurge: 50%
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the name template
+  name:
+
+service:
+  type: ClusterIP
+  port: 9443
+
+config:
+  upstream:
+    # CA used to validate upstream
+    caSecret: eric-sec-sip-tls-trusted-root-cert
+    caKey: cacertbundle.pem
+    issuerRef:
+    existingSecret:
+    privateKey: tls.key
+    certKey: tls.crt
+    serverName:
+    # Url to forward request to after successful authn/authz
+    url:
+    noTlsUrl:
+    includeAuthHeaders: true
+  certAuth:
+    enabled: false
+    # CA to authenticate incoming certificates
+    clientCaSecret:
+    clientCaSecretKey: ca.crt
+  basicAuth:
+    # Experimental feature use with care default disabled
+    enabled: false
+    # List if comma separated user:pwd:group
+    userList: ""
+    # Secret containing user list
+    userSecretName: ""
+    # Path to file containing user list
+    userSecretFileName: ""
+  oidcAuth:
+    enabled: true
+    # CA used to validate oidc provider
+    caSecret: eric-sec-sip-tls-trusted-root-cert
+    caKey: cacertbundle.pem
+    # Audience
+    clientId: AuthorizationClient
+    issuerUrl:
+    usernameClaim: email
+    groupsClaim: groups
+    # Remove Authorization header when token is authenticated
+    # If set to false token will not be removed and will be passed to upstream service.
+    removeAuthenticatedToken: true
+    # Full login url of the authentication proxy service to perform authorization code grant flow
+    # to fetch the tokens from IAM If upstream service requires access from GUI
+    # Example: https://eric-bss-sec-authn-proxy.ericsson.se/sec/authn/v1/login?origin=
+    authnProxyLoginURL:
+  hmacAuth:
+    enabled: false
+    sharedSecretName: ""
+    sharedSecretField: hmac-shared-secret
+    userGroupsConfigMapName: ""
+  tls:
+    existingSecret:
+    privateKey:
+    certKey:
+    caKey:
+  verbose: false
+  logLevel: info
+  log:
+    streamingMethod: ""
+  logTransformerHost: "eric-log-transformer:5024"
+  logTransformerNoTlsHost: "eric-log-transformer:5025"
+  logTimeoutSeconds: 5
+  logQueueSize: 1000
+  logConnectionTtlMinutes: 120
+  # rbac policy role definition files and config maps
+  rbac:
+    # File containing local service rbac policy roles
+    localRolePolicyFileName:
+    # File containing global rbac policy roles
+    globalRolePolicyFileName:
+    # Label value of config maps containing service rbac policy roles
+    # Default: ""
+    # Example: "oam-service-x" - select all config maps containing label "com.ericsson.bss/bam-service-rbac=oam-service-x"
+    serviceRolePolicyCmLabel:
+    # Label value of config maps containing global rbac policy roles
+    # Default: oam-rbac - select all config maps containing label "com.ericsson.bss/bam-global-rbac=oam-rbac"
+    globalRolePolicyCmLabel: oam-rbac
+    # Type of module used for permission evaluation
+    # 0 - classic kubernetes model, only one wildcard in end of pattern
+    # 1 - reserved, do not use
+    # 2 - wildcard allowed model 2, wildcard and param id allowed in pattern
+    # Any other value will be handled as 0
+    # Default: 0 "
+    modelType: 0
+  audit:
+    # Disable auditing of requests where certificate authorization has been used
+    # Default: false - Audit log all requests
+    disableCertAuthAudit: false
+  dataCollection:
+    enabled: false
+    path: /_data-collection
+  metrics:
+    enabled: false
+    path: /_metrics
+    host: eric-pm-server
+    serviceName:
+  faultIndications:
+    enabled: false
+    host: eric-bss-bam-ah-proxy:5000
+
+ingress:
+  enabled: true
+  fqdn:
+  ingressClass:
+  specification:
+  # type of the ingress used in deployment 
+  type: contour
+  circuitBreaker:
+    maxConnections: 1024
+    maxPendingRequests: 1024
+    maxRequests: 1024
+    maxRetries: 1024
+
+podDisruptionBudget:
+  minAvailable: 1
+  maxUnavailable:
+
+resources:
+  rbacProxy:
+    requests:
+      cpu: 50m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 64Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+topologySpreadConstraints: []
+
+affinity:
+  podAntiAffinity: "soft"
+  nodeAffinity: {}
+  # topologyKey value to use when setting podAntiAffinity
+  # Default: "kubernetes.io/hostname"
+  # Example: "kubernetes.io/zone" - specify kubernetes.io/zone as antiAffinity key
+  topologyKey: "kubernetes.io/hostname"
+
+labels: {}
+
+annotations: {}
+
+probes:
+  proxy:
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 1
+      periodSeconds: 10
+      timeoutSeconds: 2
+    startupProbe:
+      failureThreshold: 60
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 2
+
+terminationGracePeriodSeconds: 30
+
+licenseControl:
+  interval: 600
+  secondsPerSeverity: 43200
+  kafkaProxyHost: eric-bss-kafka-proxy-http:80
+  functionControlHost: eric-bss-bam-function-controller-evaluation-service:8443
+  functionControlNoTlsHost: eric-bss-bam-function-controller-evaluation-service:8080
+
+podPriority:
+  eric-bss-kube-rbac-proxy:
+    priorityClassName:
+
+networkPolicy:
+  enabled: true
+  egress:
+    accessLabels:
+      rbacProxy: {}
+
+seccompProfile:
+  proxy:
+    type: ""
+    localhostProfile: ""
+
+appArmorProfile:
+  proxy:
+    type: ""
+    localhostProfile: ""
+
+autoScaling:
+  proxy:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+    averageUtilization:
+      cpu: 160
+      memory: 160
+
+securityPolicy:
+  rolename: ""
+
+podSecurityContext:
+  supplementalGroups:

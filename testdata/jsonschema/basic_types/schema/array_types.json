@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ArrayTypes",
+  "type": "object",
+  "description": "A schema demonstrating different array types in JSON Schema",
+  "properties": {
+    "stringArray": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "An array of strings"
+    },
+    "numberArray": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "description": "An array of numbers"
+    },
+    "integerArray": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      },
+      "description": "An array of integers"
+    },
+    "mixedTypeArray": {
+      "type": "array",
+      "items": {
+        "type": ["string", "number", "boolean"]
+      },
+      "description": "An array with items of multiple possible types"
+    },
+    "anyTypeArray": {
+      "type": "array",
+      "description": "An array with items of any type"
+    },
+    "tupleArray": {
+      "type": "array",
+      "items": [
+        { "type": "string" },
+        { "type": "number" },
+        { "type": "boolean" }
+      ],
+      "description": "A tuple array with specific types in specific positions"
+    },
+    "nestedArrays": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "description": "A nested array (array of arrays of strings)"
+    }
+  }
+} 
