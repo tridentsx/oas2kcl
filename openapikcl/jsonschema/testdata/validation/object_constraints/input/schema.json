@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "ObjectValidation",
+  "description": "A schema for testing object validation constraints",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z]{2}\\d{4}$",
+      "description": "ID with pattern constraint"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 50,
+      "description": "Name with length constraints"
+    },
+    "address": {
+      "type": "object",
+      "properties": {
+        "street": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "zipCode": {
+          "type": "string",
+          "pattern": "^\\d{5}(-\\d{4})?$"
+        }
+      },
+      "required": ["street", "city"],
+      "description": "Nested address object"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Array of tags"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Metadata as key-value pairs"
+    }
+  },
+  "required": ["id", "name"],
+  "additionalProperties": false
+} 

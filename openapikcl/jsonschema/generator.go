@@ -16,23 +16,33 @@ import (
 
 // SchemaGenerator converts JSON Schema to KCL schemas
 type SchemaGenerator struct {
-	RawSchema    map[string]interface{}
-	OutputDir    string
-	SchemaName   string
-	Definitions  map[string]map[string]interface{}
-	CreatedFiles map[string]bool
+	RawSchema        map[string]interface{}
+	OutputDir        string
+	SchemaName       string
+	Definitions      map[string]map[string]interface{}
+	CreatedFiles     map[string]bool
+	processedSchemas map[string]bool // Track which schemas have been processed to prevent circular references
 }
 
 // NewSchemaGenerator creates a new SchemaGenerator
 func NewSchemaGenerator(rawSchema map[string]interface{}, outputDir string) *SchemaGenerator {
-	// Extract definitions
-	defs := make(map[string]map[string]interface{})
+	// Create a schema generator
+	generator := &SchemaGenerator{
+		RawSchema:        rawSchema,
+		OutputDir:        outputDir,
+		CreatedFiles:     make(map[string]bool),
+		processedSchemas: make(map[string]bool), // Initialize the map for tracking processed schemas
+	}
+
+	// Process any definitions
 	if defsMap, ok := utils.GetMapValue(rawSchema, "definitions"); ok {
+		defs := make(map[string]map[string]interface{})
 		for name, schema := range defsMap {
 			if schemaMap, ok := schema.(map[string]interface{}); ok {
 				defs[name] = schemaMap
 			}
 		}
+		generator.Definitions = defs
 	}
 
 	// Extract schema name from title or default to Schema
@@ -43,13 +53,9 @@ func NewSchemaGenerator(rawSchema map[string]interface{}, outputDir string) *Sch
 		schemaName = types.FormatSchemaName(filepath.Base(id))
 	}
 
-	return &SchemaGenerator{
-		RawSchema:    rawSchema,
-		OutputDir:    outputDir,
-		SchemaName:   schemaName,
-		Definitions:  defs,
-		CreatedFiles: make(map[string]bool),
-	}
+	generator.SchemaName = schemaName
+
+	return generator
 }
 
 // GenerateKCLSchemas generates KCL schemas from a JSON Schema
@@ -62,15 +68,12 @@ func (g *SchemaGenerator) GenerateKCLSchemas() ([]string, error) {
 	createdFiles := []string{}
 
 	// Generate main schema
-	mainSchemaContent, err := g.GenerateKCLSchema(g.RawSchema, g.SchemaName)
+	mainSchemaName, err := g.GenerateKCLSchema(g.RawSchema, g.SchemaName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate main schema: %w", err)
 	}
 
-	mainSchemaFile := filepath.Join(g.OutputDir, g.SchemaName+".k")
-	if err := os.WriteFile(mainSchemaFile, []byte(mainSchemaContent), 0644); err != nil {
-		return nil, fmt.Errorf("failed to write main schema file: %w", err)
-	}
+	mainSchemaFile := filepath.Join(g.OutputDir, mainSchemaName+".k")
 	createdFiles = append(createdFiles, mainSchemaFile)
 	g.CreatedFiles[mainSchemaFile] = true
 
@@ -80,15 +83,12 @@ func (g *SchemaGenerator) GenerateKCLSchemas() ([]string, error) {
 			continue // Skip if already created
 		}
 
-		schemaContent, err := g.GenerateKCLSchema(defSchema, name)
+		schemaName, err := g.GenerateKCLSchema(defSchema, name)
 		if err != nil {
 			return nil, fmt.Errorf("failed to generate schema for definition %s: %w", name, err)
 		}
 
-		schemaFile := filepath.Join(g.OutputDir, types.FormatSchemaName(name)+".k")
-		if err := os.WriteFile(schemaFile, []byte(schemaContent), 0644); err != nil {
-			return nil, fmt.Errorf("failed to write schema file for definition %s: %w", name, err)
-		}
+		schemaFile := filepath.Join(g.OutputDir, schemaName+".k")
 		createdFiles = append(createdFiles, schemaFile)
 		g.CreatedFiles[schemaFile] = true
 	}
@@ -138,6 +138,16 @@ func (g *SchemaGenerator) GenerateKCLSchema(rawSchema map[string]interface{}, sc
 	// Generate schema definition
 	schemaLines := []string{}
 
+	// Get required properties
+	requiredProps := []string{}
+	if requiredArray, ok := utils.GetArrayValue(rawSchema, "required"); ok {
+		for _, reqProp := range requiredArray {
+			if reqStr, ok := reqProp.(string); ok {
+				requiredProps = append(requiredProps, reqStr)
+			}
+		}
+	}
+
 	// Add schema declaration
 	schemaLines = append(schemaLines, fmt.Sprintf("schema %s:", formattedName))
 
@@ -150,140 +160,185 @@ func (g *SchemaGenerator) GenerateKCLSchema(rawSchema map[string]interface{}, sc
 	// Collect all checks for later consolidation
 	// propertyChecks := []string{}
 
+	// Track if we need to generate validator schemas
+	needsEmailValidator := false
+	needsURIValidator := false
+	needsDateTimeValidator := false
+	needsUUIDValidator := false
+	needsIPv4Validator := false
+
 	// Add properties
-	if hasProps && len(properties) > 0 {
+	if hasProps {
+		var propLine string
 		for propName, propValue := range properties {
 			propSchema, ok := propValue.(map[string]interface{})
 			if !ok {
 				continue
 			}
 
-			// Variable to hold the property type
-			var propType string
-
-			// Check for complex object types that should be separate schemas
-			if propName == "socialProfiles" {
-				// Create a dedicated schema for socialProfiles
-				socialProfilesProps, hasProps := utils.GetMapValue(propSchema, "properties")
-				if hasProps {
-					// Create schema
-					socialSchema := []string{fmt.Sprintf("schema %sSocialProfiles:", formattedName)}
-
-					// Add properties from the socialProfiles object
-					for socialProp, socialPropValue := range socialProfilesProps {
-						socialPropSchema, ok := socialPropValue.(map[string]interface{})
-						if !ok {
-							continue
-						}
-
-						// Get type and description
-						socialPropType := types.GetKCLType(socialPropSchema)
-						description, hasDesc := utils.GetStringValue(socialPropSchema, "description")
-
-						if hasDesc {
-							socialSchema = append(socialSchema, fmt.Sprintf("    # %s", description))
-						}
-
-						// Add property with optional ? for non-required properties
-						socialSchema = append(socialSchema, fmt.Sprintf("    %s: %s", utils.SanitizePropertyName(socialProp), socialPropType))
-					}
-
-					// Add the schema to our nested schemas
-					nestedSchemas = append(nestedSchemas, strings.Join(socialSchema, "\n"))
-
-					// Use the schema type for socialProfiles
-					propType = fmt.Sprintf("%sSocialProfiles", formattedName)
-				} else {
-					propType = "dict"
+			// Determine if property is required
+			isRequired := false
+			for _, reqProp := range requiredProps {
+				if reqProp == propName {
+					isRequired = true
+					break
 				}
-			} else if propName == "addresses" {
-				// Generate specific schema for addresses
-				addressItemSchema, ok := utils.GetMapValue(propSchema, "items")
-				if ok {
-					addressProps, hasProps := utils.GetMapValue(addressItemSchema, "properties")
-					if hasProps {
-						// Create address schema
-						addrSchema := []string{fmt.Sprintf("schema %sAddress:", formattedName)}
+			}
 
-						// Get required properties
-						requiredProps := []string{}
-						if required, ok := utils.GetArrayValue(addressItemSchema, "required"); ok {
-							for _, reqProp := range required {
-								if reqStr, ok := reqProp.(string); ok {
-									requiredProps = append(requiredProps, reqStr)
-								}
-							}
-						}
-
-						// Add properties
-						for addrProp, addrPropValue := range addressProps {
-							addrPropSchema, ok := addrPropValue.(map[string]interface{})
-							if !ok {
-								continue
-							}
-
-							// Get type
-							addrPropType := types.GetKCLType(addrPropSchema)
-							// We no longer use isRequired since all properties are marked as required for simplicity
-							// isRequired := StringInSlice(addrProp, requiredProps)
-
-							description, hasDesc := utils.GetStringValue(addrPropSchema, "description")
-							if hasDesc {
-								addrSchema = append(addrSchema, fmt.Sprintf("    # %s", description))
-							}
-
-							// Add property with : for required and optional properties
-							addrSchema = append(addrSchema, fmt.Sprintf("    %s: %s", utils.SanitizePropertyName(addrProp), addrPropType))
-
-							// Add constraints as comments for the address properties
-							constraints := validation.GenerateConstraints(addrPropSchema, addrProp)
-							if constraints != "" {
-								for _, constraint := range strings.Split(constraints, "\n") {
-									if strings.TrimSpace(constraint) != "" {
-										addrSchema = append(addrSchema, constraint)
-									}
-								}
-							}
-						}
-
-						// Add the schema to our nested schemas
-						nestedSchemas = append(nestedSchemas, strings.Join(addrSchema, "\n"))
-
-						// Add a validator schema for address if needed
-						addressValidatorSchema := validation.GenerateValidatorSchema(addressItemSchema, formattedName+"Address")
-						if addressValidatorSchema != "" {
-							nestedSchemas = append(nestedSchemas, addressValidatorSchema)
-						}
-
-						// Use the schema type for addresses - list of Address objects
-						propType = fmt.Sprintf("list[%sAddress]", formattedName)
-					} else {
+			// Determine the property type
+			var propType string
+			schemaType, typeOk := types.GetSchemaType(propSchema)
+			if !typeOk {
+				propType = "str" // default to string for unknown types
+			} else if schemaType == "array" {
+				// Get item type for arrays
+				items, hasItems := utils.GetMapValue(propSchema, "items")
+				if hasItems {
+					itemType, hasType := types.GetSchemaType(items)
+					if !hasType {
 						propType = "list"
+					} else {
+						// For specialized format items in arrays, use the corresponding validator
+						if itemType == "string" {
+							if format, hasFormat := utils.GetStringValue(items, "format"); hasFormat && format != "" {
+								switch format {
+								case "date-time":
+									propType = "[DateTimeValidator]"
+									needsDateTimeValidator = true
+								case "email":
+									propType = "[EmailValidator]"
+									needsEmailValidator = true
+								case "uri":
+									propType = "[URIValidator]"
+									needsURIValidator = true
+								case "uuid":
+									propType = "[UUIDValidator]"
+									needsUUIDValidator = true
+								case "ipv4":
+									propType = "[IPv4Validator]"
+									needsIPv4Validator = true
+								default:
+									propType = "[str]"
+								}
+							} else {
+								propType = "[str]"
+							}
+						} else if itemType == "integer" {
+							propType = "[int]"
+						} else if itemType == "number" {
+							propType = "[float]"
+						} else if itemType == "boolean" {
+							propType = "[bool]"
+						} else if itemType == "object" {
+							// For object types in arrays, we need to create a special schema
+							// For simplicity, we'll just use dict here, but in a complete
+							// implementation, we'd create a proper schema for the object type
+							propType = "[dict]"
+						} else {
+							propType = "[any]"
+						}
 					}
 				} else {
 					propType = "list"
 				}
 			} else {
-				// For normal properties, use GetKCLType
+				// For non-array types, use the KCL type mapper
 				propType = types.GetKCLType(propSchema)
+
+				// For specialized format strings, use the corresponding validator
+				if schemaType == "string" {
+					if format, hasFormat := utils.GetStringValue(propSchema, "format"); hasFormat && format != "" {
+						switch format {
+						case "date-time":
+							propType = "DateTimeValidator"
+							needsDateTimeValidator = true
+						case "email":
+							propType = "EmailValidator"
+							needsEmailValidator = true
+						case "uri":
+							propType = "URIValidator"
+							needsURIValidator = true
+						case "uuid":
+							propType = "UUIDValidator"
+							needsUUIDValidator = true
+						case "ipv4":
+							propType = "IPv4Validator"
+							needsIPv4Validator = true
+						default:
+							propType = "str"
+						}
+					}
+				}
 			}
 
-			// Add description as comment if available
-			description, hasDesc := utils.GetStringValue(propSchema, "description")
-			if hasDesc {
-				schemaLines = append(schemaLines, fmt.Sprintf("    # %s", description))
+			// Add the property line
+			var optionalMarker string
+			if !isRequired {
+				optionalMarker = "?"
+			}
+			propLine = fmt.Sprintf("    %s%s: %s", utils.SanitizePropertyName(propName), optionalMarker, propType)
+			schemaLines = append(schemaLines, propLine)
+
+			// Add property constraints as comments
+			if schemaType == "string" {
+				if minLength, ok := utils.GetIntValue(propSchema, "minLength"); ok {
+					schemaLines = append(schemaLines, fmt.Sprintf("    # Min length: %d", minLength))
+				}
+				if maxLength, ok := utils.GetIntValue(propSchema, "maxLength"); ok {
+					schemaLines = append(schemaLines, fmt.Sprintf("    # Max length: %d", maxLength))
+				}
+				if pattern, ok := utils.GetStringValue(propSchema, "pattern"); ok {
+					schemaLines = append(schemaLines, fmt.Sprintf("    # Regex pattern: %s", pattern))
+				}
+				if format, ok := utils.GetStringValue(propSchema, "format"); ok {
+					schemaLines = append(schemaLines, fmt.Sprintf("    # Format: %s", format))
+
+					switch format {
+					case "date-time":
+						schemaLines = append(schemaLines, "    # Date-time string in ISO 8601 format")
+					case "date":
+						schemaLines = append(schemaLines, "    # Date string in ISO 8601 format (YYYY-MM-DD)")
+					case "time":
+						schemaLines = append(schemaLines, "    # Time string in ISO 8601 format (HH:MM:SS)")
+					case "email":
+						schemaLines = append(schemaLines, "    # Email address string")
+					case "uri":
+						schemaLines = append(schemaLines, "    # URI string following RFC 3986")
+					case "hostname":
+						schemaLines = append(schemaLines, "    # Hostname following RFC 1034")
+					case "ipv4":
+						schemaLines = append(schemaLines, "    # IPv4 address string")
+					case "ipv6":
+						schemaLines = append(schemaLines, "    # IPv6 address string")
+					case "uuid":
+						schemaLines = append(schemaLines, "    # UUID string representation")
+					}
+				}
+			} else if schemaType == "array" {
+				if minItems, ok := utils.GetIntValue(propSchema, "minItems"); ok {
+					schemaLines = append(schemaLines, fmt.Sprintf("    # Min items: %d", minItems))
+				}
+				if maxItems, ok := utils.GetIntValue(propSchema, "maxItems"); ok {
+					schemaLines = append(schemaLines, fmt.Sprintf("    # Max items: %d", maxItems))
+				}
+				if uniqueItems, ok := utils.GetBoolValue(propSchema, "uniqueItems"); ok && uniqueItems {
+					schemaLines = append(schemaLines, "    # Unique items: true")
+				}
+
+				// Add item format if applicable
+				items, hasItems := utils.GetMapValue(propSchema, "items")
+				if hasItems {
+					itemType, _ := types.GetSchemaType(items)
+					if itemType == "string" {
+						if format, ok := utils.GetStringValue(items, "format"); ok {
+							schemaLines = append(schemaLines, fmt.Sprintf("    # Item format: %s", format))
+						}
+					}
+				}
 			}
 
-			// Add property
-			sanitizedName := utils.SanitizePropertyName(propName)
-			schemaLines = append(schemaLines, fmt.Sprintf("    %s: %s", sanitizedName, propType))
-
-			// Add constraints as comments for the property
-			propConstraints := validation.GenerateConstraints(propSchema, propName)
-			if propConstraints != "" {
-				schemaLines = append(schemaLines, propConstraints)
-				schemaLines = append(schemaLines, "")
-			}
+			// Add a blank line after each property
+			schemaLines = append(schemaLines, "")
 		}
 	}
 
@@ -299,10 +354,59 @@ func (g *SchemaGenerator) GenerateKCLSchema(rawSchema map[string]interface{}, sc
 	// Add schema definition
 	content.WriteString(strings.Join(schemaLines, "\n"))
 
-	// Generate validator schema if needed
-	validatorSchema := validation.GenerateValidatorSchema(rawSchema, formattedName)
-	if validatorSchema != "" {
-		nestedSchemas = append(nestedSchemas, validatorSchema)
+	// Add validation checks if needed
+	if hasValidationConstraints(rawSchema) || len(requiredProps) > 0 {
+		content.WriteString("\n\n    check:")
+
+		// Add validation for required properties
+		for _, reqName := range requiredProps {
+			sanitizedName := utils.SanitizePropertyName(reqName)
+			content.WriteString(fmt.Sprintf("\n        %s != None", sanitizedName))
+		}
+
+		// Add validation for string properties
+		for propName, propSchemaInterface := range properties {
+			propSchema, ok := propSchemaInterface.(map[string]interface{})
+			if !ok {
+				continue
+			}
+
+			if schemaType, hasType := utils.GetStringValue(propSchema, "type"); hasType {
+				sanitizedName := utils.SanitizePropertyName(propName)
+
+				// String validation
+				if schemaType == "string" {
+					// Min/max length
+					if minLength, ok := utils.GetIntValue(propSchema, "minLength"); ok {
+						content.WriteString(fmt.Sprintf("\n        %s == None or len(%s) >= %d", sanitizedName, sanitizedName, minLength))
+					}
+					if maxLength, ok := utils.GetIntValue(propSchema, "maxLength"); ok {
+						content.WriteString(fmt.Sprintf("\n        %s == None or len(%s) <= %d", sanitizedName, sanitizedName, maxLength))
+					}
+					// Pattern
+					if pattern, ok := utils.GetStringValue(propSchema, "pattern"); ok {
+						escapedPattern := strings.ReplaceAll(pattern, "\\", "\\\\")
+						content.WriteString(fmt.Sprintf("\n        %s == None or regex.match(\"%s\", %s)", sanitizedName, escapedPattern, sanitizedName))
+						imports = append(imports, "import regex")
+					}
+				}
+
+				// Array validation
+				if schemaType == "array" {
+					// Min/max items
+					if minItems, ok := utils.GetIntValue(propSchema, "minItems"); ok {
+						content.WriteString(fmt.Sprintf("\n        %s == None or len(%s) >= %d", sanitizedName, sanitizedName, minItems))
+					}
+					if maxItems, ok := utils.GetIntValue(propSchema, "maxItems"); ok {
+						content.WriteString(fmt.Sprintf("\n        %s == None or len(%s) <= %d", sanitizedName, sanitizedName, maxItems))
+					}
+					// Unique items
+					if uniqueItems, ok := utils.GetBoolValue(propSchema, "uniqueItems"); ok && uniqueItems {
+						content.WriteString(fmt.Sprintf("\n        %s == None or len(%s) == len({str(item): None for item in %s})", sanitizedName, sanitizedName, sanitizedName))
+					}
+				}
+			}
+		}
 	}
 
 	// Add nested schemas if any
@@ -311,15 +415,153 @@ func (g *SchemaGenerator) GenerateKCLSchema(rawSchema map[string]interface{}, sc
 		content.WriteString(strings.Join(nestedSchemas, "\n\n"))
 	}
 
-	return content.String(), nil
+	// Generate validator schema if needed
+	// Convert the raw schema to a validation.Schema object
+	valSchema := convertToValidationSchema(rawSchema)
+	validatorSchemaResult, validatorImports := validation.GenerateValidatorSchema(valSchema, formattedName)
+
+	// Add any generated validator schemas
+	if validatorSchemaResult != "" {
+		nestedSchemas = append(nestedSchemas, validatorSchemaResult)
+	}
+
+	// Add imports based on schema requirements
+	if validatorImports.NeedsRegex && !StringInSlice("import regex", imports) {
+		imports = append(imports, "import regex")
+	}
+	if validatorImports.NeedsDatetime && !StringInSlice("import datetime", imports) {
+		imports = append(imports, "import datetime")
+	}
+	if validatorImports.NeedsNet && !StringInSlice("import net", imports) {
+		imports = append(imports, "import net")
+	}
+
+	// Write the main schema to a file
+	schemaFilePath := filepath.Join(g.OutputDir, formattedName+".k")
+	if err := os.WriteFile(schemaFilePath, []byte(content.String()), 0644); err != nil {
+		return "", err
+	}
+
+	// Generate and write validator schemas if needed
+	if needsEmailValidator {
+		emailValidatorContent := `import regex
+
+schema EmailValidator:
+    value: str
+
+    check:
+        regex.match(value, r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$") if value, "Value must be a valid email address"
+`
+		emailValidatorPath := filepath.Join(g.OutputDir, "EmailValidator.k")
+		if err := os.WriteFile(emailValidatorPath, []byte(emailValidatorContent), 0644); err != nil {
+			return "", err
+		}
+	}
+
+	if needsURIValidator {
+		uriValidatorContent := `import regex
+
+schema URIValidator:
+    value: str
+
+    check:
+        # URI format validation - checks for valid URI format with scheme
+        regex.match(value, r"^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]") if value, "Value must be a valid URI"
+`
+		uriValidatorPath := filepath.Join(g.OutputDir, "URIValidator.k")
+		if err := os.WriteFile(uriValidatorPath, []byte(uriValidatorContent), 0644); err != nil {
+			return "", err
+		}
+	}
+
+	if needsDateTimeValidator {
+		dateTimeValidatorContent := `import regex
+import datetime
+
+schema DateTimeValidator:
+    value: str
+
+    check:
+        # First check format with regex that enforces correct ranges
+        regex.match(value, r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):[0-5]\d:[0-5]\d(\.\d+)?(Z|[+-]([01]\d|2[0-3]):[0-5]\d)$") if value, "Value must be a valid RFC 3339 date-time"
+        # Validate the date part to catch invalid dates like Feb 30
+        value != None and value and datetime.validate(value[:10], "%Y-%m-%d"), "Value contains an invalid date component"
+`
+		dateTimeValidatorPath := filepath.Join(g.OutputDir, "DateTimeValidator.k")
+		if err := os.WriteFile(dateTimeValidatorPath, []byte(dateTimeValidatorContent), 0644); err != nil {
+			return "", err
+		}
+	}
+
+	if needsUUIDValidator {
+		uuidValidatorContent := `import regex
+
+schema UUIDValidator:
+    value: str
+
+    check:
+        # Validate UUID format
+        regex.match(value, r"^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$") if value, "Value must be a valid UUID"
+`
+		uuidValidatorPath := filepath.Join(g.OutputDir, "UUIDValidator.k")
+		if err := os.WriteFile(uuidValidatorPath, []byte(uuidValidatorContent), 0644); err != nil {
+			return "", err
+		}
+	}
+
+	if needsIPv4Validator {
+		ipv4ValidatorContent := `import regex
+
+schema IPv4Validator:
+    value: str
+
+    check:
+        # Validate IPv4 format
+        regex.match(value, r"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$") if value, "Value must be a valid IPv4 address"
+`
+		ipv4ValidatorPath := filepath.Join(g.OutputDir, "IPv4Validator.k")
+		if err := os.WriteFile(ipv4ValidatorPath, []byte(ipv4ValidatorContent), 0644); err != nil {
+			return "", err
+		}
+	}
+
+	return formattedName, nil
 }
 
 // handleObjectProperty processes an object property and returns its type and nested schema if applicable
 func (g *SchemaGenerator) handleObjectProperty(propSchema map[string]interface{}, propName string, parentSchemaName string) (string, string) {
+	// Track processed schemas to avoid circular references
+	if g.processedSchemas == nil {
+		g.processedSchemas = make(map[string]bool)
+	}
+
 	// Check if this is an object type
 	schemaType, ok := types.GetSchemaType(propSchema)
 	if !ok {
 		return types.GetKCLType(propSchema), "" // Not a typed schema, return normal type
+	}
+
+	// If this is an object type, generate a proper schema for it
+	if schemaType == "object" {
+		// Generate a name for the schema
+		var schemaName string
+		if title, ok := utils.GetStringValue(propSchema, "title"); ok && title != "" {
+			schemaName = types.FormatSchemaName(title)
+		} else {
+			// Create a name based on parent schema and property name
+			capitalizedPropName := strings.ToUpper(propName[0:1]) + propName[1:]
+			schemaName = types.FormatSchemaName(parentSchemaName + capitalizedPropName)
+		}
+
+		// Check for circular references
+		if g.processedSchemas[schemaName] {
+			return schemaName, ""
+		}
+		g.processedSchemas[schemaName] = true
+
+		// Handle regular object type
+		_, nestedSchema := g.generateObjectSchema(propSchema, propName, parentSchemaName)
+		return schemaName, nestedSchema
 	}
 
 	// Every property with validation should have its own schema
@@ -361,30 +603,14 @@ func (g *SchemaGenerator) handleObjectProperty(propSchema map[string]interface{}
 		// Check if the items are objects that need to be generated as separate schemas
 		itemsType, ok := types.GetSchemaType(itemsSchema)
 		if !ok || itemsType != "object" {
-			// Check if items have constraints
+			// For non-object items with constraints, recursively process
 			if hasConstraints(itemsSchema) {
-				// Generate a name for the array item schema
 				capitalizedPropName := strings.ToUpper(propName[0:1]) + propName[1:]
-				itemSchemaName := types.FormatSchemaName(parentSchemaName + capitalizedPropName + "Item")
+				itemPropName := capitalizedPropName + "Item"
+				itemSchemaName, itemSchema := g.handleObjectProperty(itemsSchema, itemPropName, parentSchemaName)
 
-				// Generate the schema for this item
-				itemSchema := ""
-				switch itemsType {
-				case "string":
-					if format, ok := utils.GetStringValue(itemsSchema, "format"); ok && format != "" {
-						itemSchema = g.generateStringFormatSchema(itemsSchema, itemSchemaName, format)
-					} else {
-						itemSchema = g.generateStringSchema(itemsSchema, itemSchemaName)
-					}
-				case "integer", "number":
-					itemSchema = g.generateNumberSchema(itemsSchema, itemSchemaName, itemsType)
-				case "boolean":
-					itemSchema = g.generateBooleanSchema(itemsSchema, itemSchemaName)
-				}
-
-				if itemSchema != "" {
-					return "[" + itemSchemaName + "]", itemSchema
-				}
+				// Return array of the nested type
+				return "[" + itemSchemaName + "]", itemSchema
 			}
 
 			return types.GetKCLType(propSchema), "" // Not object items with constraints, return normal type
@@ -400,18 +626,17 @@ func (g *SchemaGenerator) handleObjectProperty(propSchema map[string]interface{}
 			itemSchemaName = types.FormatSchemaName(parentSchemaName + capitalizedPropName + "Item")
 		}
 
+		// Check for circular references
+		if g.processedSchemas[itemSchemaName] {
+			return "[" + itemSchemaName + "]", ""
+		}
+		g.processedSchemas[itemSchemaName] = true
+
 		// Generate the nested schema for array items
 		_, itemSchema := g.generateObjectSchema(itemsSchema, itemSchemaName)
 
 		// Return the array type with the nested schema
 		return "[" + itemSchemaName + "]", itemSchema
-	}
-
-	// Handle regular object type
-	if schemaType == "object" {
-		// Generate schema for object type
-		propSchemaName, propSchema := g.generateObjectSchema(propSchema, propName, parentSchemaName)
-		return propSchemaName, propSchema
 	}
 
 	// For any other type, just return the KCL type
@@ -514,60 +739,41 @@ func (g *SchemaGenerator) generateStringSchema(propSchema map[string]interface{}
 // generateStringFormatSchema creates a KCL schema for a string property with a specific format
 func (g *SchemaGenerator) generateStringFormatSchema(propSchema map[string]interface{}, schemaName string, format string) string {
 	var schema strings.Builder
-
-	// Start schema definition
 	schema.WriteString(fmt.Sprintf("schema %s:\n", schemaName))
 
-	// Add description based on format
 	formatDescription := getFormatDescription(format)
-	schema.WriteString(fmt.Sprintf("    \"\"\"%s\n    \n", formatDescription))
-	schema.WriteString(fmt.Sprintf("    Validates string values to ensure they conform to %s format.\n    \"\"\"\n", format))
+	schema.WriteString(fmt.Sprintf("    \"\"\"String with %s format\n    \n", formatDescription))
+	schema.WriteString(fmt.Sprintf("    Validates strings to ensure they conform to %s format.\n    \"\"\"\n", formatDescription))
 	schema.WriteString("    value: str\n\n")
 
-	// Add check block for format validation
+	// Add validation
 	schema.WriteString("    check:\n")
 
 	// Add format-specific validation
 	switch format {
-	case "email":
-		schema.WriteString("        value == None or regex.match(\"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\\\.[a-zA-Z]{2,}$\", value), \"Value must be a valid email address\"\n")
-	case "uri":
-		schema.WriteString("        value == None or regex.match(\"^(https?|ftp)://[^\\\\s/$.?#].[^\\\\s]*$\", value), \"Value must be a valid URI\"\n")
-	case "date":
-		schema.WriteString("        value == None or regex.match(\"^\\\\d{4}-\\\\d{2}-\\\\d{2}$\", value), \"Value must be a valid date in YYYY-MM-DD format\"\n")
 	case "date-time":
-		schema.WriteString("        value == None or regex.match(\"^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}(\\\\.\\\\d+)?(Z|[+-]\\\\d{2}:\\\\d{2})$\", value), \"Value must be a valid ISO 8601 date-time\"\n")
-	case "time":
-		schema.WriteString("        value == None or regex.match(\"^\\\\d{2}:\\\\d{2}:\\\\d{2}$\", value), \"Value must be a valid time in HH:MM:SS format\"\n")
-	case "ipv4":
-		schema.WriteString("        value == None or regex.match(\"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$\", value), \"Value must be a valid IPv4 address\"\n")
-	case "ipv6":
-		schema.WriteString("        value == None or regex.match(\"^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$\", value), \"Value must be a valid IPv6 address\"\n")
+		schema.WriteString("        # RFC 3339 date-time validation\n")
+		schema.WriteString("        # First check format with regex that enforces correct ranges\n")
+		schema.WriteString("        regex.match(value, r\"^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])T([01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(\\.\\d+)?(Z|[+-]([01]\\d|2[0-3]):[0-5]\\d)$\") if value, \"Value must be a valid RFC 3339 date-time\"\n")
+		schema.WriteString("        # Validate the date part to catch invalid dates like Feb 30\n")
+		schema.WriteString("        value != None and value and datetime.validate(value[:10], \"%Y-%m-%d\"), \"Value contains an invalid date component\"\n")
+	case "email":
+		schema.WriteString("        # Email format validation\n")
+		schema.WriteString("        regex.match(value, r\"" + utils.CommonPatterns["email"] + "\") if value, \"Value must be a valid email address\"\n")
+	case "uri":
+		schema.WriteString("        # URI format validation\n")
+		schema.WriteString("        regex.match(value, r\"^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]\") if value, \"Value must be a valid URI\"\n")
 	case "uuid":
-		schema.WriteString("        value == None or regex.match(\"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$\", value), \"Value must be a valid UUID\"\n")
+		schema.WriteString("        # UUID format validation\n")
+		schema.WriteString("        regex.match(value, r\"^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$\") if value, \"Value must be a valid UUID\"\n")
+	case "ipv4":
+		schema.WriteString("        # IPv4 format validation\n")
+		schema.WriteString("        regex.match(value, r\"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$\") if value, \"Value must be a valid IPv4 address\"\n")
 	default:
-		// For unknown formats, add a comment but no validation
-		schema.WriteString("        # No specific validation for format: " + format + "\n")
+		schema.WriteString("        # Generic format validation\n")
+		schema.WriteString(fmt.Sprintf("        # This is a placeholder for %s format validation\n", format))
+		schema.WriteString("        value != None, \"Value must not be None\"\n")
 	}
-
-	// Add minLength/maxLength constraints if present
-	if minLength, ok := utils.GetIntValue(propSchema, "minLength"); ok {
-		schema.WriteString(fmt.Sprintf("        value == None or len(value) >= %d, \"Value must be at least %d characters\"\n", minLength, minLength))
-	}
-
-	if maxLength, ok := utils.GetIntValue(propSchema, "maxLength"); ok {
-		schema.WriteString(fmt.Sprintf("        value == None or len(value) <= %d, \"Value must be at most %d characters\"\n", maxLength, maxLength))
-	}
-
-	// Add enum constraint if present
-	if enumValues, ok := utils.GetArrayValue(propSchema, "enum"); ok && len(enumValues) > 0 {
-		enumStr := formatEnumValues(enumValues)
-		schema.WriteString(fmt.Sprintf("        value == None or value in [%s], \"Value must be one of the allowed values\"\n", enumStr))
-	}
-
-	// Add import for regex
-	schema.WriteString("\n# This schema requires the regex module\n")
-	schema.WriteString("import regex\n")
 
 	return schema.String()
 }
@@ -821,25 +1027,39 @@ func (g *SchemaGenerator) generateObjectSchema(objectSchema map[string]interface
 		schemaName = types.FormatSchemaName(propName)
 	}
 
-	// Check if we've already created this schema
-	if g.CreatedFiles[schemaName+".k"] {
+	// Check if we've already created or processed this schema (prevents circular references)
+	if g.CreatedFiles[schemaName+".k"] || g.processedSchemas[schemaName] {
 		return schemaName, ""
 	}
 
-	// Mark this schema as created
+	// Mark this schema as created and processed
 	g.CreatedFiles[schemaName+".k"] = true
+	g.processedSchemas[schemaName] = true
 
 	// Get properties
 	properties, hasProps := utils.GetMapValue(objectSchema, "properties")
 	if !hasProps {
-		// No properties, create a simple schema
-		return schemaName, fmt.Sprintf("schema %s:\n    # Empty schema\n    _ignore?: bool = True\n", schemaName)
+		// No properties, create a properly structured empty schema
+		var emptySchema strings.Builder
+
+		// Add schema declaration
+		emptySchema.WriteString(fmt.Sprintf("schema %s:\n", schemaName))
+
+		// Add documentation comment
+		emptySchema.WriteString("    \"\"\"Empty schema with no defined properties.\n    \n")
+		emptySchema.WriteString("    This schema represents an object with no specific properties defined.\n    \"\"\"\n")
+
+		// Add a placeholder field to ensure the schema is valid KCL
+		emptySchema.WriteString("    # This schema has no properties defined\n")
+		emptySchema.WriteString("    _ignore?: bool = True\n")
+
+		return schemaName, emptySchema.String()
 	}
 
 	// Get required properties
 	requiredProps := []string{}
-	if required, ok := utils.GetArrayValue(objectSchema, "required"); ok {
-		for _, reqProp := range required {
+	if requiredArray, ok := utils.GetArrayValue(objectSchema, "required"); ok {
+		for _, reqProp := range requiredArray {
 			if reqStr, ok := reqProp.(string); ok {
 				requiredProps = append(requiredProps, reqStr)
 			}
@@ -874,7 +1094,14 @@ func (g *SchemaGenerator) generateObjectSchema(objectSchema map[string]interface
 		}
 
 		// Check if property is required
-		isRequired := StringInSlice(propName, requiredProps)
+		isRequired := false
+		for _, req := range requiredProps {
+			if req == propName {
+				isRequired = true
+				break
+			}
+		}
+
 		optionalMarker := "?"
 		if isRequired {
 			optionalMarker = ""
@@ -886,7 +1113,30 @@ func (g *SchemaGenerator) generateObjectSchema(objectSchema map[string]interface
 		}
 
 		// Add property with its type
-		schema.WriteString(fmt.Sprintf("    %s%s: %s\n", utils.SanitizePropertyName(propName), optionalMarker, propType))
+		sanitizedName := utils.SanitizePropertyName(propName)
+
+		// If this is an object type, use the nested schema name
+		if schemaType, hasType := utils.GetStringValue(propSchema, "type"); hasType && schemaType == "object" {
+			// For nested objects, use the proper schema reference
+			capitalizedPropName := strings.ToUpper(propName[0:1]) + propName[1:]
+
+			// If title is defined, use it as the schema name
+			var nestedSchemaName string
+			if title, hasTitle := utils.GetStringValue(propSchema, "title"); hasTitle && title != "" {
+				nestedSchemaName = types.FormatSchemaName(title)
+			} else {
+				nestedSchemaName = types.FormatSchemaName(schemaName + capitalizedPropName)
+			}
+
+			propType = nestedSchemaName
+		} else if schemaType, hasType := utils.GetStringValue(propSchema, "type"); hasType && schemaType == "string" {
+			// For string properties with format, use str directly instead of a reference
+			if _, hasFormat := utils.GetStringValue(propSchema, "format"); hasFormat {
+				propType = "str"
+			}
+		}
+
+		schema.WriteString(fmt.Sprintf("    %s%s: %s\n", sanitizedName, optionalMarker, propType))
 
 		// Add constraints as comments
 		constraints := validation.GenerateConstraints(propSchema, propName)
@@ -902,10 +1152,13 @@ func (g *SchemaGenerator) generateObjectSchema(objectSchema map[string]interface
 		schema.WriteString("\n")
 	}
 
-	// Add validator schema
-	validatorSchema := validation.GenerateValidatorSchema(objectSchema, schemaName)
-	if validatorSchema != "" {
-		nestedSchemas.WriteString(validatorSchema)
+	// Convert the object schema to a validation.Schema object
+	valSchema := convertToValidationSchema(objectSchema)
+	validatorSchemaResult, _ := validation.GenerateValidatorSchema(valSchema, schemaName)
+
+	// Add any generated validator schemas
+	if validatorSchemaResult != "" {
+		nestedSchemas.WriteString(validatorSchemaResult)
 	}
 
 	// Combine main schema and nested schemas
@@ -936,4 +1189,224 @@ func StringInSlice(s string, slice []string) bool {
 		}
 	}
 	return false
+}
+
+// Add this helper function
+func hasValidationConstraints(schema map[string]interface{}) bool {
+	// Check if there are required properties
+	if required, ok := utils.GetArrayValue(schema, "required"); ok && len(required) > 0 {
+		return true
+	}
+
+	properties, hasProps := utils.GetMapValue(schema, "properties")
+	if !hasProps {
+		return false
+	}
+
+	for _, propSchemaInterface := range properties {
+		propSchema, ok := propSchemaInterface.(map[string]interface{})
+		if !ok {
+			continue
+		}
+
+		// Check for string constraints
+		if schemaType, hasType := utils.GetStringValue(propSchema, "type"); hasType {
+			if schemaType == "string" {
+				if _, hasMinLength := utils.GetIntValue(propSchema, "minLength"); hasMinLength {
+					return true
+				}
+				if _, hasMaxLength := utils.GetIntValue(propSchema, "maxLength"); hasMaxLength {
+					return true
+				}
+				if _, hasPattern := utils.GetStringValue(propSchema, "pattern"); hasPattern {
+					return true
+				}
+			}
+
+			// Check for array constraints
+			if schemaType == "array" {
+				if _, hasMinItems := utils.GetIntValue(propSchema, "minItems"); hasMinItems {
+					return true
+				}
+				if _, hasMaxItems := utils.GetIntValue(propSchema, "maxItems"); hasMaxItems {
+					return true
+				}
+				if uniqueItems, hasUnique := utils.GetBoolValue(propSchema, "uniqueItems"); hasUnique && uniqueItems {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
+}
+
+func getKCLType(value interface{}) string {
+	switch v := value.(type) {
+	case string:
+		// Check for format types
+		if strings.Contains(v, "T") && strings.Contains(v, "Z") {
+			return "str" // datetime format
+		}
+		if strings.Contains(v, ".") && len(strings.Split(v, ".")) == 4 {
+			return "str" // ip format
+		}
+		if strings.HasPrefix(v, "http://") || strings.HasPrefix(v, "https://") {
+			return "str" // uri format
+		}
+		return "str"
+	case float64:
+		if v == float64(int64(v)) {
+			return "int"
+		}
+		return "float"
+	case bool:
+		return "bool"
+	case []interface{}:
+		return "any"
+	case map[string]interface{}:
+		return "any"
+	default:
+		return "any"
+	}
+}
+
+func (g *SchemaGenerator) generateConstraints(schema map[string]interface{}, indent string) string {
+	var constraints strings.Builder
+
+	// Handle format constraints
+	if format, ok := schema["format"].(string); ok {
+		switch format {
+		case "date-time":
+			constraints.WriteString(fmt.Sprintf("%scheck:\n%s    datetime.parse(value) != None\n", indent, indent))
+		case "ipv4":
+			constraints.WriteString(fmt.Sprintf("%scheck:\n%s    value.split('.') | len == 4\n%s    all v in value.split('.') { int(v) >= 0 and int(v) <= 255 }\n", indent, indent, indent))
+		case "uri":
+			constraints.WriteString(fmt.Sprintf("%scheck:\n%s    value.startswith('http://') or value.startswith('https://')\n", indent, indent))
+		}
+	}
+
+	// Handle pattern constraints
+	if pattern, ok := schema["pattern"].(string); ok {
+		// Escape special characters in the pattern
+		escapedPattern := strings.ReplaceAll(pattern, "\\", "\\\\")
+		constraints.WriteString(fmt.Sprintf("%scheck:\n%s    value.match(r'%s') != None\n", indent, indent, escapedPattern))
+	}
+
+	// ... existing code ...
+
+	return constraints.String()
+}
+
+// convertToValidationSchema converts a raw JSON schema to a validation.Schema object
+func convertToValidationSchema(rawSchema map[string]interface{}) *validation.Schema {
+	result := &validation.Schema{}
+
+	// Set schema type
+	if schemaType, ok := utils.GetStringValue(rawSchema, "type"); ok {
+		result.Type = schemaType
+	}
+
+	// Set format if this is a string schema
+	if result.Type == "string" {
+		if format, ok := utils.GetStringValue(rawSchema, "format"); ok {
+			result.Format = format
+		}
+	}
+
+	// Set pattern if this is a string schema
+	if result.Type == "string" {
+		if pattern, ok := utils.GetStringValue(rawSchema, "pattern"); ok {
+			result.Pattern = pattern
+		}
+	}
+
+	// Set min/max length if this is a string schema
+	if result.Type == "string" {
+		if minLength, ok := utils.GetIntValue(rawSchema, "minLength"); ok {
+			minLengthInt := int(minLength)
+			result.MinLength = &minLengthInt
+		}
+		if maxLength, ok := utils.GetIntValue(rawSchema, "maxLength"); ok {
+			maxLengthInt := int(maxLength)
+			result.MaxLength = &maxLengthInt
+		}
+	}
+
+	// Set min/max value if this is a number or integer schema
+	if result.Type == "number" || result.Type == "integer" {
+		if minimum, ok := utils.GetFloatValue(rawSchema, "minimum"); ok {
+			result.Minimum = &minimum
+		}
+		if maximum, ok := utils.GetFloatValue(rawSchema, "maximum"); ok {
+			result.Maximum = &maximum
+		}
+	}
+
+	// Set array constraints if this is an array schema
+	if result.Type == "array" {
+		if minItems, ok := utils.GetIntValue(rawSchema, "minItems"); ok {
+			minItemsInt := int(minItems)
+			result.MinItems = &minItemsInt
+		}
+		if maxItems, ok := utils.GetIntValue(rawSchema, "maxItems"); ok {
+			maxItemsInt := int(maxItems)
+			result.MaxItems = &maxItemsInt
+		}
+		if uniqueItems, ok := utils.GetBoolValue(rawSchema, "uniqueItems"); ok {
+			result.UniqueItems = uniqueItems
+		}
+
+		// Handle array items
+		if items, ok := utils.GetMapValue(rawSchema, "items"); ok {
+			result.Items = convertToValidationSchema(items)
+		}
+	}
+
+	// Set enum values if present
+	if enum, ok := utils.GetArrayValue(rawSchema, "enum"); ok {
+		result.Enum = enum
+	}
+
+	// Set required properties
+	if required, ok := utils.GetArrayValue(rawSchema, "required"); ok {
+		result.Required = make([]string, 0, len(required))
+		for _, r := range required {
+			if str, ok := r.(string); ok {
+				result.Required = append(result.Required, str)
+			}
+		}
+	}
+
+	// Handle object properties
+	if result.Type == "object" {
+		if properties, ok := utils.GetMapValue(rawSchema, "properties"); ok {
+			result.Properties = make(map[string]*validation.Schema)
+			for propName, propSchema := range properties {
+				if propSchemaMap, ok := propSchema.(map[string]interface{}); ok {
+					result.Properties[propName] = convertToValidationSchema(propSchemaMap)
+				}
+			}
+		}
+	}
+
+	return result
+}
+
+// GenerateKCLSchemasWithTree generates KCL schemas from a JSON Schema using the tree-based approach
+func GenerateKCLSchemasWithTree(rawSchema map[string]interface{}, outputDir string, schemaName string) error {
+	// Build the schema tree
+	tree, err := BuildSchemaTree(rawSchema, schemaName, nil)
+	if err != nil {
+		return fmt.Errorf("failed to build schema tree: %w", err)
+	}
+
+	// Generate KCL schemas from the tree
+	generator := NewTreeBasedGenerator(outputDir)
+	_, err = generator.GenerateKCLSchemasFromTree(tree)
+	if err != nil {
+		return fmt.Errorf("failed to generate KCL schemas: %w", err)
+	}
+
+	return nil
 }

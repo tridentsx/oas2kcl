@@ -1,0 +1,2 @@
+schema SchemaEmails:
+    value: [EmailValidator]

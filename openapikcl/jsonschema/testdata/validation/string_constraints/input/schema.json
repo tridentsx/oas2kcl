@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "StringValidation",
+  "description": "A schema for testing string validation constraints",
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 50,
+      "description": "Name with length constraints"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "Email address with format validation"
+    },
+    "pattern_field": {
+      "type": "string",
+      "pattern": "^[A-Z][a-z]+$",
+      "description": "Field with regex pattern validation"
+    },
+    "enum_field": {
+      "type": "string",
+      "enum": ["option1", "option2", "option3"],
+      "description": "Field with enum validation"
+    }
+  },
+  "required": ["name", "email"]
+} 

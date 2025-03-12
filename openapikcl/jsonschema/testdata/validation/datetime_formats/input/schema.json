@@ -1,0 +1,10 @@
+{
+  "title": "TestSchema",
+  "type": "object",
+  "properties": {
+    "value": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+} 

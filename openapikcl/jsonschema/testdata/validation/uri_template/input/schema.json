@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "URITemplateValidation",
+  "description": "Validation of URI templates according to RFC 6570",
+  "properties": {
+    "simpleTemplate": {
+      "type": "string",
+      "format": "uri-template",
+      "description": "A simple URI template with basic expression"
+    },
+    "complexTemplate": {
+      "type": "string",
+      "format": "uri-template", 
+      "description": "A more complex URI template with multiple expressions and modifiers"
+    },
+    "multiLevelTemplate": {
+      "type": "string",
+      "format": "uri-template",
+      "description": "A URI template with multiple levels of expressions"
+    },
+    "parameterizedTemplate": {
+      "type": "string",
+      "format": "uri-template",
+      "description": "A URI template with parameterized expressions"
+    },
+    "queryTemplate": {
+      "type": "string",
+      "format": "uri-template",
+      "description": "A URI template focused on query parameters"
+    }
+  },
+  "required": ["simpleTemplate"]
+} 

@@ -2,7 +2,8 @@
 package jsonschema
 
 import (
-	"github.com/santhosh-tekuri/jsonschema/v5"
+	"strings"
+
 	"github.com/tridentsx/oas2kcl/openapikcl/jsonschema/types"
 	"github.com/tridentsx/oas2kcl/openapikcl/jsonschema/utils"
 	"github.com/tridentsx/oas2kcl/openapikcl/jsonschema/validation"
@@ -58,10 +59,41 @@ var GetPropRawSchema = types.GetPropRawSchema
 // GenerateConstraints generates KCL constraints for a property
 var GenerateConstraints = validation.GenerateConstraints
 
-// For compatibility with existing tests
-func getKCLType(schema *jsonschema.Schema, rawSchema map[string]interface{}) string {
-	// This function is called from tests with both parameters, but our implementation only needs rawSchema
-	return types.GetKCLType(rawSchema)
+// Rename getKCLType to resolveKCLType to avoid redeclaration
+func resolveKCLType(schema map[string]interface{}) string {
+	if schema == nil {
+		return "any"
+	}
+
+	// Check if this is a reference to another schema
+	if ref, ok := schema["$ref"].(string); ok {
+		refParts := strings.Split(ref, "/")
+		return refParts[len(refParts)-1]
+	}
+
+	// Get the schema type
+	schemaType, ok := schema["type"].(string)
+	if !ok {
+		return "any"
+	}
+
+	// Map JSON Schema types to KCL types
+	switch schemaType {
+	case "string":
+		return "str"
+	case "integer":
+		return "int"
+	case "number":
+		return "float"
+	case "boolean":
+		return "bool"
+	case "array":
+		return "[]"
+	case "object":
+		return "dict"
+	default:
+		return "any"
+	}
 }
 
 // For compatibility with existing tests

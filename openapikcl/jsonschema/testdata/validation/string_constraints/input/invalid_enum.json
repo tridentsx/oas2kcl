@@ -1,0 +1,6 @@
+{
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "pattern_field": "Proper",
+  "enum_field": "option4"
+} 

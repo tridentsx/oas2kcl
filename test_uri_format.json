@@ -1,0 +1,1 @@
+{"type":"object","properties":{"website":{"type":"string","format":"uri"}},"required":["website"]}

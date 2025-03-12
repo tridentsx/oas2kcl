@@ -2,9 +2,9 @@
 
 schema Order:
 
-    id?: int
     petId?: int
     status?: str
+    id?: int
 
     check:
         status in ["placed", "approved", "delivered"]

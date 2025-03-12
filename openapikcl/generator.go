@@ -194,7 +194,7 @@ func GenerateTestMainK(outputDir string, schemas []string) error {
 }
 
 // GenerateKCL generates KCL schemas from an OpenAPI or JSON Schema file
-func GenerateKCL(schemaFile string, outputDir string, packageName string, generateValidator bool) error {
+func GenerateKCL(schemaFile string, outputDir string, packageName string, debugMode bool) error {
 	// Read the schema file
 	schemaData, err := os.ReadFile(schemaFile)
 	if err != nil {
@@ -210,11 +210,11 @@ func GenerateKCL(schemaFile string, outputDir string, packageName string, genera
 	// Process based on the detected format
 	switch format {
 	case SpecFormatJSONSchema:
-		log.Printf("Detected JSON Schema format, processing with JSON Schema generator")
-		return jsonschema.GenerateSchemas(schemaData, outputDir, packageName)
+		log.Printf("Detected JSON Schema format, processing with tree-based JSON Schema generator")
+		return jsonschema.GenerateSchemaTreeAndKCL(schemaData, outputDir, debugMode)
 
 	case SpecFormatOpenAPIV2, SpecFormatOpenAPIV3, SpecFormatOpenAPIV31:
-		log.Printf("Detected OpenAPI format (%s), processing with OpenAPI generator", format)
+		log.Printf("Processing OpenAPI format (%s) with tree-based approach", format)
 
 		// Try to parse as OpenAPI
 		loader := openapi3.NewLoader()
@@ -229,7 +229,9 @@ func GenerateKCL(schemaFile string, outputDir string, packageName string, genera
 			return fmt.Errorf("error detecting OpenAPI version: %w", err)
 		}
 
-		// Generate schemas using the oas package
+		// Extract JSON schemas from OpenAPI and convert to tree-based approach
+		// For now, delegate to the standard OpenAPI processor
+		// TODO: Implement tree-based approach for OpenAPI schemas
 		return oas.GenerateSchemas(doc, outputDir, packageName, version)
 
 	default:
@@ -320,10 +322,6 @@ func GenerateTestCaseOutput(testCaseDir string) error {
 	// Get a simple package name from the directory name
 	packageName := filepath.Base(testCaseDir)
 
-	// Generate KCL schemas
-	if err := GenerateKCL(schemaFile, outputDir, packageName, true); err != nil {
-		return fmt.Errorf("failed to generate KCL schemas: %w", err)
-	}
-
-	return nil
+	// Generate KCL schemas (no debug mode for test cases)
+	return GenerateKCL(schemaFile, outputDir, packageName, false)
 }

@@ -62,6 +62,96 @@ func TestGetKCLType(t *testing.T) {
 			schema:   map[string]interface{}{},
 			expected: "any",
 		},
+		{
+			name:     "date-time format",
+			schema:   map[string]interface{}{"type": "string", "format": "date-time"},
+			expected: "str",
+		},
+		{
+			name:     "ipv4 format",
+			schema:   map[string]interface{}{"type": "string", "format": "ipv4"},
+			expected: "str",
+		},
+		{
+			name:     "uri format",
+			schema:   map[string]interface{}{"type": "string", "format": "uri"},
+			expected: "str",
+		},
+		{
+			name:     "email format",
+			schema:   map[string]interface{}{"type": "string", "format": "email"},
+			expected: "str",
+		},
+		{
+			name:     "uuid format",
+			schema:   map[string]interface{}{"type": "string", "format": "uuid"},
+			expected: "str",
+		},
+		{
+			name:     "hostname format",
+			schema:   map[string]interface{}{"type": "string", "format": "hostname"},
+			expected: "str",
+		},
+		{
+			name:     "ipv6 format",
+			schema:   map[string]interface{}{"type": "string", "format": "ipv6"},
+			expected: "str",
+		},
+		{
+			name:     "json-pointer format",
+			schema:   map[string]interface{}{"type": "string", "format": "json-pointer"},
+			expected: "str",
+		},
+		{
+			name:     "relative-json-pointer format",
+			schema:   map[string]interface{}{"type": "string", "format": "relative-json-pointer"},
+			expected: "str",
+		},
+		{
+			name:     "iri format",
+			schema:   map[string]interface{}{"type": "string", "format": "iri"},
+			expected: "str",
+		},
+		{
+			name:     "iri-reference format",
+			schema:   map[string]interface{}{"type": "string", "format": "iri-reference"},
+			expected: "str",
+		},
+		{
+			name:     "uri-reference format",
+			schema:   map[string]interface{}{"type": "string", "format": "uri-reference"},
+			expected: "str",
+		},
+		{
+			name:     "duration format",
+			schema:   map[string]interface{}{"type": "string", "format": "duration"},
+			expected: "str",
+		},
+		{
+			name:     "date format",
+			schema:   map[string]interface{}{"type": "string", "format": "date"},
+			expected: "str",
+		},
+		{
+			name:     "time format",
+			schema:   map[string]interface{}{"type": "string", "format": "time"},
+			expected: "str",
+		},
+		{
+			name:     "regex format",
+			schema:   map[string]interface{}{"type": "string", "format": "regex"},
+			expected: "str",
+		},
+		{
+			name:     "idn-email format",
+			schema:   map[string]interface{}{"type": "string", "format": "idn-email"},
+			expected: "str",
+		},
+		{
+			name:     "idn-hostname format",
+			schema:   map[string]interface{}{"type": "string", "format": "idn-hostname"},
+			expected: "str",
+		},
 	}
 
 	for _, tc := range testCases {

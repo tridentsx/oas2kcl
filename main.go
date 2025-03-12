@@ -14,7 +14,7 @@ func main() {
 	inputFile := flag.String("input", "", "Path to the input schema file (OpenAPI or JSON Schema)")
 	outputDir := flag.String("output", "output", "Directory to output the generated KCL schemas")
 	packageName := flag.String("package", "schema", "Name of the KCL package")
-	generateValidator := flag.Bool("validator", false, "Generate validator schemas")
+	debugMode := flag.Bool("debug", false, "Enable debug mode to print the schema tree structure")
 	flag.Parse()
 
 	// Validate input file
@@ -31,8 +31,8 @@ func main() {
 		}
 	}
 
-	// Generate KCL schemas
-	if err := openapikcl.GenerateKCL(*inputFile, *outputDir, *packageName, *generateValidator); err != nil {
+	// Generate KCL schemas using the tree-based approach
+	if err := openapikcl.GenerateKCL(*inputFile, *outputDir, *packageName, *debugMode); err != nil {
 		log.Fatalf("Error: %v", err)
 	}
 

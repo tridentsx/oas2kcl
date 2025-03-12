@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "ArrayValidation",
+  "description": "A schema for testing array validation constraints",
+  "properties": {
+    "simple_array": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "maxItems": 5,
+      "description": "Simple array of strings with length constraints"
+    },
+    "unique_array": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "description": "Array with unique items constraint"
+    },
+    "typed_array": {
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 100
+      },
+      "description": "Array of numbers with item constraints"
+    },
+    "nested_array": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "value": { "type": "number" }
+        },
+        "required": ["id"]
+      },
+      "description": "Array of objects"
+    },
+    "tuple_array": {
+      "type": "array",
+      "items": [
+        { "type": "string" },
+        { "type": "number" },
+        { "type": "boolean" }
+      ],
+      "minItems": 3,
+      "maxItems": 3,
+      "description": "Tuple array with fixed types"
+    }
+  },
+  "required": ["simple_array"]
+} 

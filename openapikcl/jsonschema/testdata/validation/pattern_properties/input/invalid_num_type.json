@@ -1,0 +1,12 @@
+{
+  "name": "Test Configuration",
+  "version": "1.2.3",
+  "prefix_value1": "string value",
+  "num_count": "not a number",
+  "isEnabled": true,
+  "date_created": "2023-05-15T14:30:00Z",
+  "config_feature1": {
+    "enabled": true,
+    "value": "feature1-value"
+  }
+} 

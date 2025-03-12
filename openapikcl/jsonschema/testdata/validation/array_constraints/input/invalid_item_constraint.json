@@ -1,0 +1,11 @@
+{
+  "simple_array": ["item1", "item2", "item3"],
+  "unique_array": ["apple", "banana", "cherry"],
+  "typed_array": [10, 20, 30, 150],
+  "nested_array": [
+    {"id": "a", "value": 1},
+    {"id": "b", "value": 2},
+    {"id": "c", "value": 3}
+  ],
+  "tuple_array": ["string value", 42, true]
+} 

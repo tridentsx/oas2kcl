@@ -1,0 +1,7 @@
+{
+  "simpleTemplate": "https://example.com/{username}",
+  "complexTemplate": "https://api.example.com/v1/{resource}/{id}/details{?fields,expand}",
+  "multiLevelTemplate": "https://api.example.com/v{version}/users/{userId}/posts/{postId}{?page,limit}",
+  "parameterizedTemplate": "https://api.example.com{/country*,region,city}",
+  "queryTemplate": "https://example.com/search{?q,category,lang,page,sort}"
+} 

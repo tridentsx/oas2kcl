@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "DynamicConfig",
+  "description": "Configuration with dynamic properties following specific patterns",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the configuration"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version"
+    }
+  },
+  "required": ["name", "version"],
+  "patternProperties": {
+    "^prefix_[a-zA-Z0-9]+$": {
+      "type": "string",
+      "description": "Any property starting with 'prefix_' must be a string"
+    },
+    "^num_[a-zA-Z0-9_]+$": {
+      "type": "number",
+      "description": "Any property starting with 'num_' must be a number"
+    },
+    "^is[A-Z][a-zA-Z0-9]*$": {
+      "type": "boolean",
+      "description": "Any property in camelCase starting with 'is' must be a boolean"
+    },
+    "^date_[a-zA-Z0-9_]+$": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Any property starting with 'date_' must be a valid date-time"
+    },
+    "^config_[a-zA-Z0-9_]+$": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "value": {
+          "type": ["string", "number", "boolean"]
+        }
+      },
+      "required": ["enabled"],
+      "description": "Nested configuration properties"
+    }
+  },
+  "additionalProperties": false
+} 

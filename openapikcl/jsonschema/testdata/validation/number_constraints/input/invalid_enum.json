@@ -1,0 +1,7 @@
+{
+  "integer_field": 50,
+  "number_field": 0.5,
+  "exclusive_range": 5,
+  "multiple_of": 25,
+  "enum_number": 4.0
+} 

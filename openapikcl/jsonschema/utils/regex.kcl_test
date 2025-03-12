@@ -1,0 +1,255 @@
+schema TestDate:
+    value: str
+    check:
+        value == None or value.matches(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$"), "value must be a valid RFC 3339 date-time"
+
+schema TestIPv4:
+    value: str
+    check:
+        value == None or value.matches(r"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"), "value must be a valid IPv4 address"
+
+schema TestEmail:
+    value: str
+    check:
+        value == None or value.matches(r"^[a-zA-Z0-9.!#$%&'*+/=?^_'{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"), "value must be a valid email address"
+
+schema TestURI:
+    value: str
+    check:
+        value == None or value.matches(r"^[a-zA-Z][a-zA-Z0-9+.-]*:[^\s]*$"), "value must be a valid URI"
+
+schema TestUUID:
+    value: str
+    check:
+        value == None or value.matches(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"), "value must be a valid UUID"
+
+# Test valid date-time values
+test_date_valid_1 = TestDate {
+    value = "2024-03-20T10:00:00Z"
+}
+
+test_date_valid_2 = TestDate {
+    value = "2024-03-20T10:00:00+01:00"
+}
+
+test_date_valid_3 = TestDate {
+    value = "2024-03-20T10:00:00.123Z"
+}
+
+test_date_valid_4 = TestDate {
+    value = "2024-03-20T10:00:00.123+01:00"
+}
+
+# Test valid IPv4 values
+test_ipv4_valid_1 = TestIPv4 {
+    value = "192.168.1.1"
+}
+
+test_ipv4_valid_2 = TestIPv4 {
+    value = "10.0.0.0"
+}
+
+test_ipv4_valid_3 = TestIPv4 {
+    value = "172.16.254.1"
+}
+
+test_ipv4_valid_4 = TestIPv4 {
+    value = "0.0.0.0"
+}
+
+test_ipv4_valid_5 = TestIPv4 {
+    value = "255.255.255.255"
+}
+
+# Test valid email values
+test_email_valid_1 = TestEmail {
+    value = "test@example.com"
+}
+
+test_email_valid_2 = TestEmail {
+    value = "user.name@domain.co.uk"
+}
+
+test_email_valid_3 = TestEmail {
+    value = "user+tag@example.com"
+}
+
+test_email_valid_4 = TestEmail {
+    value = "user@sub.domain.com"
+}
+
+# Test valid URI values
+test_uri_valid_1 = TestURI {
+    value = "http://example.com"
+}
+
+test_uri_valid_2 = TestURI {
+    value = "https://example.com"
+}
+
+test_uri_valid_3 = TestURI {
+    value = "ftp://example.com"
+}
+
+test_uri_valid_4 = TestURI {
+    value = "mailto:user@example.com"
+}
+
+# Test valid UUID values
+test_uuid_valid_1 = TestUUID {
+    value = "123e4567-e89b-12d3-a456-426614174000"
+}
+
+test_uuid_valid_2 = TestUUID {
+    value = "550e8400-e29b-41d4-a716-446655440000"
+}
+
+test_uuid_valid_3 = TestUUID {
+    value = "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
+}
+
+# Test None values (should pass)
+test_date_none = TestDate {
+    value = None
+}
+
+test_ipv4_none = TestIPv4 {
+    value = None
+}
+
+test_email_none = TestEmail {
+    value = None
+}
+
+test_uri_none = TestURI {
+    value = None
+}
+
+test_uuid_none = TestUUID {
+    value = None
+}
+
+# Test invalid date-time values (should fail)
+test_date_invalid_1 = TestDate {
+    value = "2024-13-20T10:00:00Z"  # Invalid month
+} assert {
+    message = "value must be a valid RFC 3339 date-time"
+}
+
+test_date_invalid_2 = TestDate {
+    value = "2024-03-20T25:00:00Z"  # Invalid hour
+} assert {
+    message = "value must be a valid RFC 3339 date-time"
+}
+
+test_date_invalid_3 = TestDate {
+    value = "2024-03-20T10:00:00"  # Missing timezone
+} assert {
+    message = "value must be a valid RFC 3339 date-time"
+}
+
+test_date_invalid_4 = TestDate {
+    value = "2024-03-20"  # Missing time
+} assert {
+    message = "value must be a valid RFC 3339 date-time"
+}
+
+# Test invalid IPv4 values (should fail)
+test_ipv4_invalid_1 = TestIPv4 {
+    value = "256.256.256.256"  # Invalid octets
+} assert {
+    message = "value must be a valid IPv4 address"
+}
+
+test_ipv4_invalid_2 = TestIPv4 {
+    value = "1.2.3"  # Missing octet
+} assert {
+    message = "value must be a valid IPv4 address"
+}
+
+test_ipv4_invalid_3 = TestIPv4 {
+    value = "192.168.001.1"  # Leading zeros
+} assert {
+    message = "value must be a valid IPv4 address"
+}
+
+test_ipv4_invalid_4 = TestIPv4 {
+    value = "192.168.1.1.1"  # Extra octet
+} assert {
+    message = "value must be a valid IPv4 address"
+}
+
+# Test invalid email values (should fail)
+test_email_invalid_1 = TestEmail {
+    value = "invalid"  # Not an email
+} assert {
+    message = "value must be a valid email address"
+}
+
+test_email_invalid_2 = TestEmail {
+    value = "@example.com"  # Missing local part
+} assert {
+    message = "value must be a valid email address"
+}
+
+test_email_invalid_3 = TestEmail {
+    value = "user@"  # Missing domain
+} assert {
+    message = "value must be a valid email address"
+}
+
+test_email_invalid_4 = TestEmail {
+    value = "user@.com"  # Invalid domain
+} assert {
+    message = "value must be a valid email address"
+}
+
+# Test invalid URI values (should fail)
+test_uri_invalid_1 = TestURI {
+    value = "example.com"  # Missing scheme
+} assert {
+    message = "value must be a valid URI"
+}
+
+test_uri_invalid_2 = TestURI {
+    value = "http:/example.com"  # Invalid format
+} assert {
+    message = "value must be a valid URI"
+}
+
+test_uri_invalid_3 = TestURI {
+    value = "http//example.com"  # Missing colon
+} assert {
+    message = "value must be a valid URI"
+}
+
+test_uri_invalid_4 = TestURI {
+    value = "http:example.com"  # Missing slashes
+} assert {
+    message = "value must be a valid URI"
+}
+
+# Test invalid UUID values (should fail)
+test_uuid_invalid_1 = TestUUID {
+    value = "not-a-uuid"  # Invalid format
+} assert {
+    message = "value must be a valid UUID"
+}
+
+test_uuid_invalid_2 = TestUUID {
+    value = "123e4567-e89b-12d3-a456-42661417400"  # Too short
+} assert {
+    message = "value must be a valid UUID"
+}
+
+test_uuid_invalid_3 = TestUUID {
+    value = "123e4567-e89b-12d3-a456-4266141740000"  # Too long
+} assert {
+    message = "value must be a valid UUID"
+}
+
+test_uuid_invalid_4 = TestUUID {
+    value = "123e4567-e89b-12d3-a456-42661417400g"  # Invalid character
+} assert {
+    message = "value must be a valid UUID"
+} 

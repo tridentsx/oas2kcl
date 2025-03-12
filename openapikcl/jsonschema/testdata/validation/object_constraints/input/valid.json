@@ -1,0 +1,14 @@
+{
+  "id": "AB1234",
+  "name": "Test Object",
+  "address": {
+    "street": "123 Main St",
+    "city": "Anytown",
+    "zipCode": "12345"
+  },
+  "tags": ["tag1", "tag2", "tag3"],
+  "metadata": {
+    "created": "2023-01-01",
+    "author": "Test User"
+  }
+} 

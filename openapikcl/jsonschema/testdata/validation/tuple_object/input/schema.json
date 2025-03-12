@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "coordinate": {
+      "type": "array",
+      "title": "Coordinate",
+      "items": [
+        {
+          "type": "string",
+          "description": "name of location"
+        },
+        {
+          "type": "integer",
+          "description": "x coordinate"
+        },
+        {
+          "type": "integer",
+          "description": "y coordinate"
+        }
+      ],
+      "additionalItems": false,
+      "minItems": 3,
+      "maxItems": 3
+    }
+  },
+  "required": ["coordinate"]
+} 
