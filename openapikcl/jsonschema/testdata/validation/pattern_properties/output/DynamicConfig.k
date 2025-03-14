@@ -5,10 +5,10 @@ schema DynamicConfig:
     name: str
 
     version: str
+    # Regex pattern: ^\d+\.\d+\.\d+$
+
 
     check:
-        # Regex pattern: ^\d+\.\d+\.\d+$
         name != None
         version != None
         version == None or regex.match("^\\d+\\.\\d+\\.\\d+$", version)
-

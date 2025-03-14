@@ -150,18 +150,18 @@ func runValidationTest(t *testing.T, testCase ValidationTestCase) {
 	// Store generated files for cleanup
 	testCase.GeneratedFiles = append(testCase.GeneratedFiles, schemaFilePath, mainFilePath)
 
-	// Validate the schema can be parsed
-	cmd := exec.Command("kcl", "fmt", schemaFilePath)
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		t.Logf("KCL schema validation error: %s", output)
-		t.Errorf("Generated schema is not valid KCL: %v", err)
+	// Validate the valid input (should pass)
+	valid, output, err := validateWithKCL(testCase.ValidInput, testCase.OutputDir, testCase.SchemaName)
+	require.NoError(t, err, "Valid input failed validation: %s\nSchema: %s\nInput: %s", output, schemaFilePath, testCase.ValidInput)
+	require.True(t, valid, "Valid input was incorrectly marked invalid")
+
+	// Validate invalid inputs (should fail)
+	for name, invalidInputPath := range testCase.InvalidInputs {
+		valid, output, err := validateWithKCL(invalidInputPath, testCase.OutputDir, testCase.SchemaName)
+		require.Error(t, err, "Invalid input '%s' unexpectedly passed validation", name)
+		require.False(t, valid, "Invalid input '%s' was incorrectly marked valid", name)
+		t.Logf("Invalid input '%s' correctly failed validation: %s", name, output)
 	}
-
-	// Skip actual validation for now due to incomplete implementation
-	t.Logf("Skipping detailed constraint validation due to incomplete implementation of certain JSON Schema features")
-
-	// Note: We would normally validate constraints here by checking valid inputs pass and invalid inputs fail validation
 }
 
 // readFile reads a file and returns its contents
@@ -172,19 +172,28 @@ func readFile(t *testing.T, path string) []byte {
 }
 
 // validateWithKCL uses kcl vet to validate input against the schema
-func validateWithKCL(inputPath, schemaPath, schemaName string) (bool, error) {
-	// Instead of validating against constraints, just check if KCL can parse the schema
-	cmd := exec.Command("kcl", "fmt", schemaPath)
+func validateWithKCL(inputPath, schemaPath, schemaName string) (bool, string, error) {
+	mainKContent := fmt.Sprintf(`
+import file
+import json
+import %s
 
-	// Capture output for debugging
+data: %s = json.decode(file.read("%s"))
+`, schemaName, schemaName, inputPath)
+
+	tempMainPath := filepath.Join(schemaPath, "temp_main.k")
+	err := os.WriteFile(tempMainPath, []byte(mainKContent), 0644)
+	if err != nil {
+		return false, "", fmt.Errorf("failed to write temporary main.k file: %w", err)
+	}
+	defer os.Remove(tempMainPath)
+
+	cmd := exec.Command("kcl", "run", tempMainPath, schemaPath)
 	output, err := cmd.CombinedOutput()
 
-	// Check result
 	if err != nil {
-		fmt.Printf("Schema validation output: %s\n", output)
-		return false, fmt.Errorf("failed to format KCL schema: %w", err)
+		return false, string(output), fmt.Errorf("validation failed: %w", err)
 	}
 
-	// No error means schema is valid KCL syntax
-	return true, nil
+	return true, string(output), nil
 }

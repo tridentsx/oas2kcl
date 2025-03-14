@@ -5,10 +5,12 @@ schema NumberValidation:
     number_field: float
 
     exclusive_range?: float
+
     multiple_of?: int
+
     enum_number?: float
+
 
     check:
         integer_field != None
         number_field != None
-
