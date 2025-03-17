@@ -12,6 +12,7 @@ func TestTranslateECMAToGoRegex(t *testing.T) {
 		name     string
 		input    string
 		expected string
+		skip     bool
 	}{
 		{
 			name:     "Simple pattern",

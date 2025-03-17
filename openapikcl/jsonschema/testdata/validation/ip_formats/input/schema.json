@@ -1,5 +1,5 @@
 {
-  "title": "TestSchema",
+  "title": "IPv4Validator",
   "type": "object",
   "properties": {
     "value": {

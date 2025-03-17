@@ -120,6 +120,7 @@ func setupTestCase(t *testing.T, baseDir, testCaseName string) ValidationTestCas
 
 // runValidationTest runs a validation test case
 func runValidationTest(t *testing.T, testCase ValidationTestCase) {
+	fmt.Println("SchemaName = " + testCase.SchemaName)
 	// Generate KCL schema
 	schemaBytes := readFile(t, testCase.SchemaPath)
 
@@ -132,23 +133,13 @@ func runValidationTest(t *testing.T, testCase ValidationTestCase) {
 	_, err = generator.GenerateKCLSchemas()
 	require.NoError(t, err, "Failed to generate KCL schema")
 
-	// Generate main.k file
-	mainContent := fmt.Sprintf("package test\n\nimport %s\n", testCase.SchemaName)
-	mainFilePath := filepath.Join(testCase.OutputDir, "main.k")
-	err = os.WriteFile(mainFilePath, []byte(mainContent), 0644)
-	require.NoError(t, err, "Failed to write main.k file")
-
 	// Verify schema is generated
 	schemaFilePath := filepath.Join(testCase.OutputDir, testCase.SchemaName+".k")
 	_, err = os.Stat(schemaFilePath)
 	require.NoError(t, err, "Schema file not generated: %s", schemaFilePath)
 
-	// Verify main.k is generated
-	_, err = os.Stat(mainFilePath)
-	require.NoError(t, err, "Main file not generated")
-
 	// Store generated files for cleanup
-	testCase.GeneratedFiles = append(testCase.GeneratedFiles, schemaFilePath, mainFilePath)
+	testCase.GeneratedFiles = append(testCase.GeneratedFiles, schemaFilePath)
 
 	// Validate the valid input (should pass)
 	valid, output, err := validateWithKCL(testCase.ValidInput, testCase.OutputDir, testCase.SchemaName)
@@ -172,25 +163,13 @@ func readFile(t *testing.T, path string) []byte {
 }
 
 // validateWithKCL uses kcl vet to validate input against the schema
-func validateWithKCL(inputPath, schemaPath, schemaName string) (bool, string, error) {
-	mainKContent := fmt.Sprintf(`
-import file
-import json
-import %s
+func validateWithKCL(inputFilePath, schemaPath, schemaName string) (bool, string, error) {
 
-data: %s = json.decode(file.read("%s"))
-`, schemaName, schemaName, inputPath)
-
-	tempMainPath := filepath.Join(schemaPath, "temp_main.k")
-	err := os.WriteFile(tempMainPath, []byte(mainKContent), 0644)
-	if err != nil {
-		return false, "", fmt.Errorf("failed to write temporary main.k file: %w", err)
-	}
-	defer os.Remove(tempMainPath)
-
-	cmd := exec.Command("kcl", "run", tempMainPath, schemaPath)
+	schemaPath = strings.Replace(schemaPath, "output", "", -1)
+	os.Setenv("JSON_INPUTFILE", inputFilePath)
+	cmd := exec.Command("kcl", "run", filepath.Join(schemaPath, "main.k"))
 	output, err := cmd.CombinedOutput()
-
+	os.Unsetenv("JSON_INPUTFILE")
 	if err != nil {
 		return false, string(output), fmt.Errorf("validation failed: %w", err)
 	}

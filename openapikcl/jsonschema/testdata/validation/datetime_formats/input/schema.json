@@ -1,5 +1,5 @@
 {
-  "title": "TestSchema",
+  "title": "DateTimeValidator",
   "type": "object",
   "properties": {
     "value": {
