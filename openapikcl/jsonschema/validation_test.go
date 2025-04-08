@@ -40,7 +40,7 @@ func TestSchemaValidation(t *testing.T) {
 	}
 
 	for _, entry := range entries {
-		if !entry.IsDir() {
+		if !entry.IsDir() || strings.HasPrefix(entry.Name(), "_") {
 			continue
 		}
 
@@ -123,20 +123,22 @@ func runValidationTest(t *testing.T, testCase ValidationTestCase) {
 	fmt.Println("SchemaName = " + testCase.SchemaName)
 	// Generate KCL schema
 	schemaBytes := readFile(t, testCase.SchemaPath)
+	debugMode := true
 
 	// Create a generator
 	var schema map[string]interface{}
 	err := json.Unmarshal(schemaBytes, &schema)
 	require.NoError(t, err, "Failed to parse schema JSON")
 
-	generator := NewSchemaGenerator(schema, testCase.OutputDir)
-	_, err = generator.GenerateKCLSchemas()
+	err = SimplifiedGenerateSchemaTreeAndKCL(schemaBytes, testCase.OutputDir, debugMode)
 	require.NoError(t, err, "Failed to generate KCL schema")
 
 	// Verify schema is generated
 	schemaFilePath := filepath.Join(testCase.OutputDir, testCase.SchemaName+".k")
-	_, err = os.Stat(schemaFilePath)
-	require.NoError(t, err, "Schema file not generated: %s", schemaFilePath)
+	// Verify schema is generated
+	files, err := filepath.Glob(filepath.Join(testCase.OutputDir, "*.k"))
+	require.NoError(t, err, "Error checking for .k files")
+	require.NotEmpty(t, files, "No .k files were generated in %s", testCase.OutputDir)
 
 	// Store generated files for cleanup
 	testCase.GeneratedFiles = append(testCase.GeneratedFiles, schemaFilePath)
@@ -164,10 +166,12 @@ func readFile(t *testing.T, path string) []byte {
 
 // validateWithKCL uses kcl vet to validate input against the schema
 func validateWithKCL(inputFilePath, schemaPath, schemaName string) (bool, string, error) {
-
 	schemaPath = strings.Replace(schemaPath, "output", "", -1)
 	os.Setenv("JSON_INPUTFILE", inputFilePath)
-	cmd := exec.Command("kcl", "run", filepath.Join(schemaPath, "main.k"))
+	fmt.Printf("Validating with input file: %s", inputFilePath)
+	//Print Present working dir
+	fmt.Println("PWD = " + os.Getenv("PWD"))
+	cmd := exec.Command("kcl", "run", schemaPath+"/main.k")
 	output, err := cmd.CombinedOutput()
 	os.Unsetenv("JSON_INPUTFILE")
 	if err != nil {

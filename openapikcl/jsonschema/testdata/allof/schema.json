@@ -15,7 +15,9 @@
           "description": "The age of the pet"
         }
       },
-      "required": ["name"]
+      "required": [
+        "name"
+      ]
     },
     {
       "type": "object",
@@ -25,8 +27,10 @@
           "description": "The breed of the pet"
         }
       },
-      "required": ["breed"]
+      "required": [
+        "breed"
+      ]
     }
   ],
   "description": "A pet schema that combines multiple schemas"
-} 
+}

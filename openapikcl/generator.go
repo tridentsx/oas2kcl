@@ -211,7 +211,7 @@ func GenerateKCL(schemaFile string, outputDir string, packageName string, debugM
 	switch format {
 	case SpecFormatJSONSchema:
 		log.Printf("Detected JSON Schema format, processing with tree-based JSON Schema generator")
-		return jsonschema.GenerateSchemaTreeAndKCL(schemaData, outputDir, debugMode)
+		return jsonschema.SimplifiedGenerateSchemaTreeAndKCL(schemaData, outputDir, debugMode)
 
 	case SpecFormatOpenAPIV2, SpecFormatOpenAPIV3, SpecFormatOpenAPIV31:
 		log.Printf("Processing OpenAPI format (%s) with tree-based approach", format)

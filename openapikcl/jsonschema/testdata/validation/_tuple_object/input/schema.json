@@ -24,5 +24,7 @@
       "maxItems": 3
     }
   },
-  "required": ["coordinate"]
-} 
+  "required": [
+    "coordinate"
+  ]
+}

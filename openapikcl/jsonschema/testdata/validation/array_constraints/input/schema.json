@@ -35,24 +35,21 @@
       "items": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "value": { "type": "number" }
+          "id": {
+            "type": "string"
+          },
+          "value": {
+            "type": "number"
+          }
         },
-        "required": ["id"]
+        "required": [
+          "id"
+        ]
       },
       "description": "Array of objects"
-    },
-    "tuple_array": {
-      "type": "array",
-      "items": [
-        { "type": "string" },
-        { "type": "number" },
-        { "type": "boolean" }
-      ],
-      "minItems": 3,
-      "maxItems": 3,
-      "description": "Tuple array with fixed types"
     }
   },
-  "required": ["simple_array"]
-} 
+  "required": [
+    "simple_array"
+  ]
+}

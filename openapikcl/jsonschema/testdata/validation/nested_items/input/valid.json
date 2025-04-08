@@ -1,0 +1,48 @@
+{
+    "manifestVersion": "1.0",
+    "projects": [
+        {
+            "name": "frontend-app",
+            "type": "web",
+            "path": "./frontend"
+        },
+        {
+            "name": "backend-service",
+            "type": "api",
+            "path": "./backend"
+        }
+    ],
+    "environmentGroups": [
+        {
+            "name": "production",
+            "environments": [
+                {
+                    "name": "prod-us-east",
+                    "url": {
+                        "type": "direct",
+                        "value": "https://api-prod-east.example.com"
+                    }
+                },
+                {
+                    "name": "prod-us-west",
+                    "url": {
+                        "type": "env",
+                        "value": "PROD_WEST_URL"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "development",
+            "environments": [
+                {
+                    "name": "dev",
+                    "url": {
+                        "type": "direct",
+                        "value": "https://api-dev.example.com"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -435,7 +435,7 @@ func (g *TreeBasedGenerator) generateConstraintValidations(node *SchemaTreeNode,
 	}
 
 	// Add additionalProperties validation if needed
-	if additionalProps, ok := node.RawSchema["additionalProperties"].(bool); ok && !additionalProps {
+	if additionalProps, ok := node.RawSchema["c"].(bool); ok && !additionalProps {
 		// Build a list of allowed property names
 		allowedProps := make([]string, 0, len(node.Properties))
 		for propName := range node.Properties {
@@ -880,23 +880,23 @@ func sanitizePropertyName(name string) string {
 }
 
 // formatSchemaName formats a schema name for KCL
-func formatSchemaName(name string) string {
-	if name == "" {
-		return "Schema"
-	}
+// func formatSchemaName(name string) string {
+// 	if name == "" {
+// 		return "Schema"
+// 	}
 
-	// Convert to camel case
-	parts := strings.Split(name, "_")
-	for i := range parts {
-		if len(parts[i]) > 0 {
-			r := []rune(parts[i])
-			r[0] = []rune(strings.ToUpper(string(r[0])))[0]
-			parts[i] = string(r)
-		}
-	}
+// 	// Convert to camel case
+// 	parts := strings.Split(name, "_")
+// 	for i := range parts {
+// 		if len(parts[i]) > 0 {
+// 			r := []rune(parts[i])
+// 			r[0] = []rune(strings.ToUpper(string(r[0])))[0]
+// 			parts[i] = string(r)
+// 		}
+// 	}
 
-	return strings.Join(parts, "")
-}
+// 	return strings.Join(parts, "")
+// }
 
 // convertNodeToValidationSchema converts a SchemaTreeNode to a validation.Schema
 func convertNodeToValidationSchema(node *SchemaTreeNode) *validation.Schema {

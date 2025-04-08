@@ -29,9 +29,16 @@
     },
     "enum_number": {
       "type": "number",
-      "enum": [1.0, 2.0, 3.0],
+      "enum": [
+        1.0,
+        2.0,
+        3.0
+      ],
       "description": "Number from enumerated values"
     }
   },
-  "required": ["integer_field", "number_field"]
-} 
+  "required": [
+    "integer_field",
+    "number_field"
+  ]
+}
