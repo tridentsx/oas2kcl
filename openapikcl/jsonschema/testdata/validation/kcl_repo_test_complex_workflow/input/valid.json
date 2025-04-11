@@ -1,0 +1,37 @@
+{
+    "name": "CI Pipeline",
+    "on": "push",
+    "permissions": "read-all",
+    "jobs": {
+        "build": {
+            "name": "Build and Test",
+            "runs-on": "ubuntu-latest",
+            "steps": [
+                {
+                    "name": "Checkout code",
+                    "uses": "actions/checkout@v2"
+                },
+                {
+                    "name": "Run tests",
+                    "run": "npm test",
+                    "working-directory": "./src"
+                }
+            ]
+        },
+        "deploy": {
+            "name": "Deploy",
+            "needs": "build",
+            "runs-on": "ubuntu-latest",
+            "environment": {
+                "name": "production",
+                "url": "https://example.com"
+            },
+            "steps": [
+                {
+                    "name": "Deploy to production",
+                    "run": "npm run deploy"
+                }
+            ]
+        }
+    }
+}

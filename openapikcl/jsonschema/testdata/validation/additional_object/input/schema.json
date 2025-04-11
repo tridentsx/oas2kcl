@@ -1,0 +1,28 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string"
+        },
+        "version": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": {
+        "type": "object",
+        "properties": {
+            "enabled": {
+                "type": "boolean"
+            },
+            "priority": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5
+            }
+        },
+        "required": [
+            "enabled"
+        ]
+    }
+}

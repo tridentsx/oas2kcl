@@ -3,6 +3,7 @@ package jsonschema
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 )
@@ -60,9 +61,24 @@ func SimplifiedGenerateSchemaTreeAndKCL(schemaBytes []byte, outputDir string, de
 	}
 
 	// Determine the schema name from title or default to "Schema"
+	// Determine the schema name from $id, title, or default to "Schema"
 	schemaName := "Schema"
 	if title, ok := rawSchema["title"].(string); ok && title != "" {
-		schemaName = title
+		schemaName = strings.ReplaceAll(strings.TrimSpace(title), " ", "_")
+	} else if id, ok := rawSchema["$id"].(string); ok && id != "" {
+		// Extract the last part of the path
+		parts := strings.Split(id, "/")
+		if len(parts) > 0 {
+			lastPart := parts[len(parts)-1]
+			// Remove everything after first period (including the period)
+			if dotIndex := strings.Index(lastPart, "."); dotIndex != -1 {
+				lastPart = lastPart[:dotIndex]
+			}
+			// Capitalize first letter
+			if len(lastPart) > 0 {
+				schemaName = strings.ToUpper(lastPart[:1]) + lastPart[1:]
+			}
+		}
 	}
 
 	// Build the schema tree
@@ -172,51 +188,7 @@ func (g *SimplifiedTreeBasedGenerator) simplifiedGenerateSchemaFromNode(node *Sc
 	// }
 
 	if g.isCompositeType(*node) {
-		for _, subschema := range node.SubSchemas {
-			subschema.SchemaName = g.addMixinSuffix(subschema.SchemaName)
-			g.simplifiedGenerateSchemaFromNode(subschema, kclSchema)
-		}
-		if _, ok := kclSchema.KCLSchema[node.SchemaName]; !ok {
-			//Create a new schema content if it doesn't exist
-			kclSchema.KCLSchema[node.SchemaName] = NewSchemaContent()
-		}
-		if node.Type == "allOf" {
-			//Add the property to the schema content
-			kclSchema.KCLSchema[node.SchemaName].Fields.WriteString(fmt.Sprintf("schema %s:\n", node.SchemaName))
-			kclSchema.KCLSchema[node.SchemaName].Fields.WriteString("    mixin [")
-			for i, subschema := range node.SubSchemas {
-				value := subschema.SchemaName
-				// Add comma and space if not the last item
-				if i < len(node.SubSchemas)-1 {
-					value += ", "
-				}
-				kclSchema.KCLSchema[node.SchemaName].Fields.WriteString(value)
-
-			}
-			kclSchema.KCLSchema[node.SchemaName].Fields.WriteString("]\n")
-		} else if node.Type == "anyOf" {
-			//Add the property to the schema content
-			kclSchema.KCLSchema[node.SchemaName].Fields.WriteString(fmt.Sprintf("schema %s:\n", node.SchemaName))
-			kclSchema.KCLSchema[node.SchemaName].Fields.WriteString("    any_of:\n")
-			for _, subschema := range node.SubSchemas {
-				kclSchema.KCLSchema[node.SchemaName].Fields.WriteString(fmt.Sprintf("        - %s\n", subschema.SchemaName))
-			}
-		} else if node.Type == "oneOf" {
-			//Add the property to the schema content
-			kclSchema.KCLSchema[node.SchemaName].Fields.WriteString(fmt.Sprintf("schema %s:\n", node.SchemaName))
-			kclSchema.KCLSchema[node.SchemaName].Fields.WriteString("    one_of:\n")
-			for _, subschema := range node.SubSchemas {
-				kclSchema.KCLSchema[node.SchemaName].Fields.WriteString(fmt.Sprintf("        - %s\n", subschema.SchemaName))
-			}
-		} else if node.Type == "not" {
-			//Add the property to the schema content
-			kclSchema.KCLSchema[node.SchemaName].Fields.WriteString(fmt.Sprintf("schema %s:\n", node.SchemaName))
-			kclSchema.KCLSchema[node.SchemaName].Fields.WriteString("    not:\n")
-			for _, subschema := range node.SubSchemas {
-				kclSchema.KCLSchema[node.SchemaName].Fields.WriteString(fmt.Sprintf("        - %s\n", subschema.SchemaName))
-			}
-		}
-
+		g.handleCompositeType(node, kclSchema, required)
 	}
 
 	//Add a check if schema name key exists in map of kclschema. If not, initialize it
@@ -276,7 +248,32 @@ func (g *SimplifiedTreeBasedGenerator) simplifiedGenerateSchemaFromNode(node *Sc
 
 			}
 			g.simplifiedGenerateSchemaFromNode(propNode.Items, kclSchema)
+		} else if g.isCompositeType(*propNode) {
+			g.handleCompositeTypeProperies(propNode, propName, node, kclSchema, required)
 		}
+	}
+
+	if node.AdditionalProperties != nil {
+
+		if g.isExtendedPrimitiveType(*node.AdditionalProperties) {
+			switch node.AdditionalProperties.Type {
+			case "string":
+				kclSchema.KCLSchema[node.SchemaName].Fields.WriteString("    [...str]: str\n")
+			case "number":
+				kclSchema.KCLSchema[node.SchemaName].Fields.WriteString("    [...str]: float\n")
+			case "integer":
+				kclSchema.KCLSchema[node.SchemaName].Fields.WriteString("    [...str]: int\n")
+			case "boolean":
+				kclSchema.KCLSchema[node.SchemaName].Fields.WriteString("    [...str]: bool\n")
+			}
+		} else if node.AdditionalProperties.Type == "array" {
+			kclSchema.KCLSchema[node.SchemaName].Fields.WriteString("    [...str]: [" + node.AdditionalProperties.Items.SchemaName + "]\n")
+			g.simplifiedGenerateSchemaFromNode(node.AdditionalProperties.Items, kclSchema)
+		} else if node.AdditionalProperties.Type == "object" {
+			kclSchema.KCLSchema[node.SchemaName].Fields.WriteString("    [...str]: " + node.AdditionalProperties.SchemaName + "\n")
+			g.simplifiedGenerateSchemaFromNode(node.AdditionalProperties, kclSchema)
+		}
+
 	}
 	return nil
 
@@ -298,7 +295,7 @@ func (g *SimplifiedTreeBasedGenerator) isExtendedPrimitiveType(node SchemaTreeNo
 		return g.isPrimitiveType(*node.Items)
 	}
 	if node.Type == "object" {
-		return len(node.Properties) == 0
+		return len(node.Properties) == 0 && node.AdditionalProperties == nil
 	}
 	return false
 }
@@ -324,6 +321,10 @@ func (g *SimplifiedTreeBasedGenerator) identifyNodeType(node *SchemaTreeNode) {
 	case Object:
 		for _, propNode := range node.Properties {
 			g.identifyNodeType(propNode)
+		}
+		// Process additional properties if present
+		if node.AdditionalProperties != nil {
+			g.identifyNodeType(node.AdditionalProperties)
 		}
 	case Array:
 		g.identifyNodeType(node.Items)
@@ -685,6 +686,139 @@ func (g *SimplifiedTreeBasedGenerator) handleNumericConstraints(node *SchemaTree
 					fmt.Sprintf("        %s in [%v] if %s is not Undefined, \"%s must be one of: %s\"\n",
 						nodeName, strings.Join(enumValues, ", "), nodeName, nodeName, strings.Join(enumValues, ", ")))
 			}
+		}
+	}
+}
+func (g *SimplifiedTreeBasedGenerator) handleCompositeTypeProperies(node *SchemaTreeNode, nodeName string, parentNode *SchemaTreeNode, kclSchema *Kclschema, required map[string]bool) {
+	optionalMarker := "?"
+	if required[node.SchemaName] {
+		optionalMarker = ""
+	}
+	switch node.Type {
+
+	case "allOf":
+		if _, ok := kclSchema.KCLSchema[parentNode.SchemaName]; !ok {
+			kclSchema.KCLSchema[parentNode.SchemaName] = NewSchemaContent()
+			kclSchema.KCLSchema[parentNode.SchemaName].Fields.WriteString(fmt.Sprintf("schema %s:\n", nodeName))
+		}
+		for _, subschema := range node.SubSchemas {
+			subschema.SchemaName = g.addMixinSuffix(subschema.SchemaName)
+			g.simplifiedGenerateSchemaFromNode(subschema, kclSchema)
+		}
+		kclSchema.KCLSchema[parentNode.SchemaName].Fields.WriteString(fmt.Sprintf("schema %s:\n", nodeName))
+		kclSchema.KCLSchema[parentNode.SchemaName].Fields.WriteString("    mixin [")
+		for i, subschema := range node.SubSchemas {
+			value := subschema.SchemaName
+			if i < len(node.SubSchemas)-1 {
+				value += ", "
+			}
+			kclSchema.KCLSchema[parentNode.SchemaName].Fields.WriteString(value)
+		}
+		kclSchema.KCLSchema[parentNode.SchemaName].Fields.WriteString("]\n")
+
+	case "anyOf":
+		kclSchema.KCLSchema[parentNode.SchemaName].Fields.WriteString(fmt.Sprintf("%s:\n", nodeName))
+		kclSchema.KCLSchema[parentNode.SchemaName].Fields.WriteString("    any_of:\n")
+		for _, subschema := range node.SubSchemas {
+			kclSchema.KCLSchema[parentNode.SchemaName].Fields.WriteString(fmt.Sprintf("        - %s\n", subschema.SchemaName))
+		}
+
+	case "oneOf":
+		if _, ok := kclSchema.KCLSchema[parentNode.SchemaName]; !ok {
+			kclSchema.KCLSchema[parentNode.SchemaName] = NewSchemaContent()
+			//There is no way to create schema with union operator. So just output schemas without top level schema
+			// kclSchema.KCLSchema[parentNode.SchemaName].Fields.WriteString(fmt.Sprintf("schema %s:", nodeName))
+		} else {
+			//OneOf is in object property so schema is already initialized.
+			kclSchema.KCLSchema[parentNode.SchemaName].Fields.WriteString(fmt.Sprintf("    %s%s:", nodeName, optionalMarker))
+		}
+		for i, subschema := range node.SubSchemas {
+			unionOperator := ""
+			if i < len(node.SubSchemas)-1 {
+				unionOperator = "|"
+			}
+			if g.isExtendedPrimitiveType(*subschema) {
+				switch subschema.Type {
+				case "string":
+					kclSchema.KCLSchema[parentNode.SchemaName].Fields.WriteString(fmt.Sprintf(" str %s", unionOperator))
+				case "integer":
+					kclSchema.KCLSchema[parentNode.SchemaName].Fields.WriteString(fmt.Sprintf(" int %s", unionOperator))
+				case "number":
+					kclSchema.KCLSchema[parentNode.SchemaName].Fields.WriteString(fmt.Sprintf(" float %s", unionOperator))
+				case "boolean":
+					kclSchema.KCLSchema[parentNode.SchemaName].Fields.WriteString(fmt.Sprintf(" bool %s", unionOperator))
+				case "array":
+					kclSchema.KCLSchema[parentNode.SchemaName].Fields.WriteString(fmt.Sprintf(" [%s] %s", convertKCLType(subschema.Items.Type), unionOperator))
+				}
+			} else if subschema.Type == "array" {
+				kclSchema.KCLSchema[parentNode.SchemaName].Fields.WriteString(fmt.Sprintf(" [%s] %s", subschema.Items.SchemaName, unionOperator))
+				g.simplifiedGenerateSchemaFromNode(subschema.Items, kclSchema)
+			} else {
+				kclSchema.KCLSchema[parentNode.SchemaName].Fields.WriteString(fmt.Sprintf(" %s %s", subschema.SchemaName, unionOperator))
+				g.simplifiedGenerateSchemaFromNode(subschema, kclSchema)
+			}
+		}
+		kclSchema.KCLSchema[parentNode.SchemaName].Fields.WriteString("\n")
+
+	case "not":
+		kclSchema.KCLSchema[parentNode.SchemaName].Fields.WriteString(fmt.Sprintf("schema %s:\n", node.SchemaName))
+		kclSchema.KCLSchema[parentNode.SchemaName].Fields.WriteString("    not:\n")
+		for _, subschema := range node.SubSchemas {
+			kclSchema.KCLSchema[parentNode.SchemaName].Fields.WriteString(fmt.Sprintf("        - %s\n", subschema.SchemaName))
+		}
+	}
+}
+
+func (g *SimplifiedTreeBasedGenerator) handleCompositeType(node *SchemaTreeNode, kclSchema *Kclschema, required map[string]bool) {
+	switch node.Type {
+
+	case "allOf":
+		if _, ok := kclSchema.KCLSchema[node.SchemaName]; !ok {
+			kclSchema.KCLSchema[node.SchemaName] = NewSchemaContent()
+			kclSchema.KCLSchema[node.SchemaName].Fields.WriteString(fmt.Sprintf("schema %s:\n", node.SchemaName))
+		}
+		for _, subschema := range node.SubSchemas {
+			subschema.SchemaName = g.addMixinSuffix(subschema.SchemaName)
+			g.simplifiedGenerateSchemaFromNode(subschema, kclSchema)
+		}
+		kclSchema.KCLSchema[node.SchemaName].Fields.WriteString("    mixin [")
+		for i, subschema := range node.SubSchemas {
+			value := subschema.SchemaName
+			if i < len(node.SubSchemas)-1 {
+				value += ", "
+			}
+			kclSchema.KCLSchema[node.SchemaName].Fields.WriteString(value)
+		}
+		kclSchema.KCLSchema[node.SchemaName].Fields.WriteString("]\n")
+
+	case "anyOf":
+		kclSchema.KCLSchema[node.SchemaName].Fields.WriteString(fmt.Sprintf("%s:\n", node.SchemaName))
+		kclSchema.KCLSchema[node.SchemaName].Fields.WriteString("    any_of:\n")
+		for _, subschema := range node.SubSchemas {
+			kclSchema.KCLSchema[node.SchemaName].Fields.WriteString(fmt.Sprintf("        - %s\n", subschema.SchemaName))
+		}
+
+	case "oneOf":
+		if _, ok := kclSchema.KCLSchema[node.SchemaName]; !ok {
+			kclSchema.KCLSchema[node.SchemaName] = NewSchemaContent()
+		}
+		for _, subschema := range node.SubSchemas {
+			if g.isExtendedPrimitiveType(*subschema) {
+				log.Default().Printf("subschema: %s is not supported in oneOf. Skipping creation!", subschema.SchemaName)
+			} else if subschema.Type == "array" {
+				log.Default().Printf("subschema: %s Array is not supported in oneOf. Will only create subschemas for items!", subschema.SchemaName)
+				g.simplifiedGenerateSchemaFromNode(subschema.Items, kclSchema)
+			} else {
+				g.simplifiedGenerateSchemaFromNode(subschema, kclSchema)
+			}
+		}
+		kclSchema.KCLSchema[node.SchemaName].Fields.WriteString("\n")
+
+	case "not":
+		kclSchema.KCLSchema[node.SchemaName].Fields.WriteString(fmt.Sprintf("schema %s:\n", node.SchemaName))
+		kclSchema.KCLSchema[node.SchemaName].Fields.WriteString("    not:\n")
+		for _, subschema := range node.SubSchemas {
+			kclSchema.KCLSchema[node.SchemaName].Fields.WriteString(fmt.Sprintf("        - %s\n", subschema.SchemaName))
 		}
 	}
 }

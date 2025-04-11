@@ -1,0 +1,12 @@
+{
+    "title": "The Great Gatsby",
+    "name": "ClassicBook",
+    "castingOption": "camelCase",
+    "authors": [
+        "F. Scott Fitzgerald"
+    ],
+    "price": 9.99,
+    "available": false,
+    "category": "Fiction",
+    "rule": "no-lending"
+}

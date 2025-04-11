@@ -1,0 +1,19 @@
+{
+    "name": "MyConfig",
+    "servers": [
+        {
+            "id": "server1",
+            "value": 80
+        },
+        {
+            "id": "server2",
+            "value": 443
+        }
+    ],
+    "databases": [
+        {
+            "id": "db1",
+            "value": 5432
+        }
+    ]
+}

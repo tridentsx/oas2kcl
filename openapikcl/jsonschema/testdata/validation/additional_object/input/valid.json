@@ -1,0 +1,16 @@
+{
+    "name": "MyApp",
+    "version": "1.0",
+    "logging": {
+        "enabled": true,
+        "priority": 1
+    },
+    "caching": {
+        "enabled": false,
+        "priority": 3
+    },
+    "monitoring": {
+        "enabled": true,
+        "priority": 5
+    }
+}

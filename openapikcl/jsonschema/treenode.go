@@ -54,6 +54,12 @@ type SchemaTreeNode struct {
 	// For object nodes: child properties
 	Properties map[string]*SchemaTreeNode
 
+	// For object nodes: additional properties schema
+	AdditionalProperties *SchemaTreeNode
+
+	// Flag to indicate if additional properties are allowed
+	AdditionalPropertiesAllowed bool
+
 	// For object nodes: pattern properties
 	PatternProperties map[string]*SchemaTreeNode
 
@@ -79,12 +85,13 @@ type SchemaTreeNode struct {
 // NewSchemaTreeNode creates a new SchemaTreeNode
 func NewSchemaTreeNode(nodeType NodeType, schemaName string, rawSchema map[string]interface{}) *SchemaTreeNode {
 	return &SchemaTreeNode{
-		Type:              nodeType,
-		SchemaName:        schemaName,
-		RawSchema:         rawSchema,
-		Properties:        make(map[string]*SchemaTreeNode),
-		PatternProperties: make(map[string]*SchemaTreeNode),
-		Constraints:       make(map[string]interface{}),
+		Type:                        nodeType,
+		SchemaName:                  schemaName,
+		RawSchema:                   rawSchema,
+		Properties:                  make(map[string]*SchemaTreeNode),
+		PatternProperties:           make(map[string]*SchemaTreeNode),
+		Constraints:                 make(map[string]interface{}),
+		AdditionalPropertiesAllowed: true, // Default to true as per JSON Schema spec
 	}
 }
 
@@ -138,7 +145,7 @@ func BuildSchemaTree(rawSchema map[string]interface{}, schemaName string, proces
 		refNode := NewSchemaTreeNode(Reference, schemaName, rawSchema)
 		err := refNode.SetRefTarget(ref)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error setting reference target: %v", err)
 		}
 		return refNode, nil
 	}
@@ -303,16 +310,43 @@ func BuildSchemaTree(rawSchema map[string]interface{}, schemaName string, proces
 
 	// Process properties for object types
 	if nodeType == Object {
+		if additionalProps, ok := rawSchema["additionalProperties"]; ok {
+			switch v := additionalProps.(type) {
+			case bool:
+				node.AdditionalPropertiesAllowed = v
+			case map[string]interface{}:
+				additionalPropsNode, err := BuildSchemaTree(v, schemaName+"AdditionalProps", processedRefs)
+				if err != nil {
+					return nil, fmt.Errorf("error building additional properties schema: %v", err)
+				}
+				node.AdditionalProperties = additionalPropsNode
+			}
+		}
 		if props, ok := rawSchema["properties"].(map[string]interface{}); ok {
 			for propName, propSchema := range props {
 				if propSchemaMap, ok := propSchema.(map[string]interface{}); ok {
 					propNode, err := BuildSchemaTree(propSchemaMap, fmt.Sprintf("%s_%s", schemaName, propName), processedRefs)
 					if err != nil {
-						return nil, err
+						return nil, fmt.Errorf("error building property %s: %v", propName, err)
+					}
+					// Handle additional properties for the nested object
+					if propNode.Type == Object {
+						if additionalProps, ok := propSchemaMap["additionalProperties"]; ok {
+							switch v := additionalProps.(type) {
+							case bool:
+								propNode.AdditionalPropertiesAllowed = v
+							case map[string]interface{}:
+								additionalPropsNode, err := BuildSchemaTree(v, propNode.SchemaName+"_additionalProps", processedRefs)
+								if err != nil {
+									return nil, fmt.Errorf("error building additional properties schema: %v", err)
+								}
+								propNode.AdditionalProperties = additionalPropsNode
+							}
+						}
 					}
 					err = node.AddProperty(propName, propNode)
 					if err != nil {
-						return nil, err
+						return nil, fmt.Errorf("error adding property %s: %v", propName, err)
 					}
 				}
 			}

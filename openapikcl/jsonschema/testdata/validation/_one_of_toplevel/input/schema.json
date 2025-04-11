@@ -1,0 +1,48 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Pet",
+    "oneOf": [
+        {
+            "type": "object",
+            "properties": {
+                "breed": {
+                    "type": "string",
+                    "enum": [
+                        "dog"
+                    ]
+                },
+                "name": {
+                    "type": "string"
+                },
+                "bark": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "breed",
+                "name"
+            ]
+        },
+        {
+            "type": "object",
+            "properties": {
+                "breed": {
+                    "type": "string",
+                    "enum": [
+                        "cat"
+                    ]
+                },
+                "name": {
+                    "type": "string"
+                },
+                "meow": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "breed",
+                "name"
+            ]
+        }
+    ]
+}

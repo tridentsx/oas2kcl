@@ -1,0 +1,11 @@
+{
+    "name": "ClassicBook",
+    "castingOption": "PascalCase",
+    "authors": [
+        "F. Scott Fitzgerald"
+    ],
+    "price": "9.99",
+    "available": "false",
+    "category": "Romance",
+    "rule": 123
+}

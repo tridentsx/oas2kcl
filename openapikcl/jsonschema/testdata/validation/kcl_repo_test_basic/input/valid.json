@@ -1,0 +1,11 @@
+{
+    "title": "A Brief History of Time",
+    "authors": [
+        "Stephen Hawking",
+        "Leonard Mlodinow"
+    ],
+    "price": 14.99,
+    "available": false,
+    "category": "Science",
+    "rule": "non-fiction"
+}

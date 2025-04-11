@@ -1040,11 +1040,21 @@ func PrintSchemaTree(node *SchemaTreeNode, level int) {
 	}
 
 	// Print properties for object nodes
-	if node.Type == Object && len(node.Properties) > 0 {
-		fmt.Printf("%s  Properties:\n", indent)
-		for propName, propNode := range node.Properties {
-			fmt.Printf("%s    %s:\n", indent, propName)
-			PrintSchemaTree(propNode, level+2)
+	if node.Type == Object {
+		if len(node.Properties) > 0 {
+			fmt.Printf("%s  Properties:\n", indent)
+			for propName, propNode := range node.Properties {
+				fmt.Printf("%s    %s:\n", indent, propName)
+				PrintSchemaTree(propNode, level+2)
+			}
+		}
+
+		// Print additional properties information
+		if !node.AdditionalPropertiesAllowed {
+			fmt.Printf("%s  AdditionalProperties: false\n", indent)
+		} else if node.AdditionalProperties != nil {
+			fmt.Printf("%s  AdditionalProperties:\n", indent)
+			PrintSchemaTree(node.AdditionalProperties, level+2)
 		}
 	}
 

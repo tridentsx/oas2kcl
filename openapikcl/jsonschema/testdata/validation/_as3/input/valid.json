@@ -1,0 +1,49 @@
+{
+    "class": "ADC",
+    "schemaVersion": "3.50.0",
+    "id": "my-adc-config",
+    "updateMode": "selective",
+    "controls": {
+        "class": "Controls",
+        "trace": true,
+        "logLevel": "debug"
+    },
+    "Common": {
+        "class": "Tenant",
+        "Shared": {
+            "class": "Application",
+            "template": "shared",
+            "enable": true
+        }
+    },
+    "MyTenant": {
+        "class": "Tenant",
+        "MyApp": {
+            "class": "Application",
+            "template": "generic",
+            "enable": true,
+            "serviceMain": {
+                "class": "Service_HTTP",
+                "virtualAddresses": [
+                    "192.0.2.10"
+                ],
+                "pool": "web_pool"
+            },
+            "web_pool": {
+                "class": "Pool",
+                "monitors": [
+                    "http"
+                ],
+                "members": [
+                    {
+                        "servicePort": 80,
+                        "serverAddresses": [
+                            "192.0.2.20",
+                            "192.0.2.21"
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+}
