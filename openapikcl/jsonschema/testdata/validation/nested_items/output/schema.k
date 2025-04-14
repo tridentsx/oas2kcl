@@ -1,12 +1,6 @@
-schema DynatraceMonitoring:
-    environmentGroups: [DynatraceMonitoring_environmentGroups_items]
-    manifestVersion: str
-    projects: [DynatraceMonitoring_projects_items]
-
-
 schema DynatraceMonitoring_environmentGroups_items:
-    environments?: [DynatraceMonitoring_environmentGroups_items_environments_items]
     name?: str
+    environments?: [DynatraceMonitoring_environmentGroups_items_environments_items]
 
 
 schema DynatraceMonitoring_environmentGroups_items_environments_items:
@@ -19,9 +13,15 @@ schema DynatraceMonitoring_environmentGroups_items_environments_items_url:
     value?: str
 
 
+schema DynatraceMonitoring:
+    projects: [DynatraceMonitoring_projects_items]
+    environmentGroups: [DynatraceMonitoring_environmentGroups_items]
+    manifestVersion: str
+
+
 schema DynatraceMonitoring_projects_items:
+    path?: str
     name: str
     type?: str
-    path?: str
 
 

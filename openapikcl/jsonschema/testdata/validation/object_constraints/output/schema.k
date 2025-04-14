@@ -1,18 +1,5 @@
 import regex
 
-schema ObjectValidation:
-    name: str
-    address?: ObjectValidation_address
-    tags?: [str]
-    metadata?: ObjectValidation_metadata
-    id: str
-
-    check:
-        len(name) >= 3 if name is not Undefined, "String must be at least 3 characters"
-        len(name) <= 50 if name is not Undefined, "String must be at most 50 characters"
-        regex.match(id, r"^[A-Z]{2}\d{4}$") if id is not Undefined, "String must match pattern ^[A-Z]{2}\d{4}$"
-
-
 schema ObjectValidation_address:
     street: str
     city: str
@@ -24,5 +11,18 @@ schema ObjectValidation_address:
 
 schema ObjectValidation_metadata:
     [...str]: str
+
+
+schema ObjectValidation:
+    id: str
+    name: str
+    address?: ObjectValidation_address
+    tags?: [str]
+    metadata?: ObjectValidation_metadata
+
+    check:
+        regex.match(id, r"^[A-Z]{2}\d{4}$") if id is not Undefined, "String must match pattern ^[A-Z]{2}\d{4}$"
+        len(name) >= 3 if name is not Undefined, "String must be at least 3 characters"
+        len(name) <= 50 if name is not Undefined, "String must be at most 50 characters"
 
 

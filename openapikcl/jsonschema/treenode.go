@@ -3,6 +3,7 @@ package jsonschema
 
 import (
 	"fmt"
+	"strings"
 )
 
 // NodeType represents the type of a SchemaTreeNode
@@ -117,8 +118,9 @@ func (n *SchemaTreeNode) SetItems(items *SchemaTreeNode) error {
 
 // AddSubSchema adds a subschema to a composition node
 func (n *SchemaTreeNode) AddSubSchema(subSchema *SchemaTreeNode) error {
-	if n.Type != AllOf && n.Type != AnyOf && n.Type != OneOf && n.Type != Not {
-		return fmt.Errorf("cannot add subschema to non-composition node")
+	if n.Type != AllOf && n.Type != AnyOf && n.Type != OneOf && n.Type != Not &&
+		n.Type != If && n.Type != Then && n.Type != Else {
+		return fmt.Errorf("cannot add subschema to non-composition node (node type: %s, schema name: %s)", n.Type, n.SchemaName)
 	}
 	n.SubSchemas = append(n.SubSchemas, subSchema)
 	subSchema.Parent = n
@@ -134,20 +136,90 @@ func (n *SchemaTreeNode) SetRefTarget(target string) error {
 	return nil
 }
 
+// resolveReference resolves a JSON Schema reference and returns the resolved schema
+func resolveReference(ref string, rootSchema map[string]interface{}, processedRefs map[string]bool) (map[string]interface{}, error) {
+	// Check if this is a local reference (starts with #)
+	if !strings.HasPrefix(ref, "#/") {
+		return nil, fmt.Errorf("only local references are supported (starting with #/): %s", ref)
+	}
+
+	// Remove the leading #/
+	path := strings.TrimPrefix(ref, "#/")
+
+	// Split the path into components
+	components := strings.Split(path, "/")
+
+	// Navigate through the schema to find the referenced object
+	current := rootSchema
+	for _, component := range components {
+		// JSON Pointer encoding: replace ~1 with / and ~0 with ~
+		component = strings.ReplaceAll(component, "~1", "/")
+		component = strings.ReplaceAll(component, "~0", "~")
+
+		// Try to navigate to the next level
+		next, ok := current[component]
+		if !ok {
+			return nil, fmt.Errorf("reference path component not found: %s in path %s", component, ref)
+		}
+
+		// Convert to map for the next iteration
+		current, ok = next.(map[string]interface{})
+		if !ok {
+			return nil, fmt.Errorf("reference path component is not an object: %s in path %s", component, ref)
+		}
+	}
+
+	return current, nil
+}
+
+// rootSchemaStore is used to store the root schema for reference resolution
+var rootSchemaStore map[string]interface{}
+
 // BuildSchemaTree builds a schema tree from a raw JSON Schema
 func BuildSchemaTree(rawSchema map[string]interface{}, schemaName string, processedRefs map[string]bool) (*SchemaTreeNode, error) {
+	// Initialize the root schema on first call
+	// If processedRefs is nil, this is the root call
 	if processedRefs == nil {
 		processedRefs = make(map[string]bool)
+		// Store the root schema for reference resolution
+		rootSchemaStore = rawSchema
 	}
 
 	// Check for $ref first
 	if ref, ok := rawSchema["$ref"].(string); ok {
-		refNode := NewSchemaTreeNode(Reference, schemaName, rawSchema)
-		err := refNode.SetRefTarget(ref)
-		if err != nil {
-			return nil, fmt.Errorf("error setting reference target: %v", err)
+		// Check for circular references
+		if processedRefs[ref] {
+			// We've already seen this reference, create a reference node without resolving
+			fmt.Printf("Warning: Detected circular reference: %s\n", ref)
+			refNode := NewSchemaTreeNode(Reference, schemaName, rawSchema)
+			refNode.RefTarget = ref
+			return refNode, nil
 		}
-		return refNode, nil
+
+		// Mark this reference as processed to detect cycles
+		processedRefs[ref] = true
+		defer delete(processedRefs, ref) // Clean up after we're done with this branch
+
+		// Try to resolve the reference
+		resolvedSchema, err := resolveReference(ref, rootSchemaStore, processedRefs)
+		if err != nil {
+			// If we can't resolve, return a reference node
+			fmt.Printf("Warning: Could not resolve reference %s: %v\n", ref, err)
+			refNode := NewSchemaTreeNode(Reference, schemaName, rawSchema)
+			refNode.RefTarget = ref
+			return refNode, nil
+		}
+
+		// Create a node for the resolved schema, but keep track of the original reference
+		resolvedNode, err := BuildSchemaTree(resolvedSchema, schemaName, processedRefs)
+		if err != nil {
+			return nil, err
+		}
+
+		// Store the reference information in the resolved node
+		resolvedNode.RefTarget = ref
+
+		return resolvedNode, nil
 	}
 
 	// Check for composite schemas

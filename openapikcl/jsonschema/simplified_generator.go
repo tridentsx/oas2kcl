@@ -815,10 +815,44 @@ func (g *SimplifiedTreeBasedGenerator) handleCompositeType(node *SchemaTreeNode,
 		kclSchema.KCLSchema[node.SchemaName].Fields.WriteString("\n")
 
 	case "not":
+		// Ensure the schema exists before accessing its fields
+		if _, ok := kclSchema.KCLSchema[node.SchemaName]; !ok {
+			kclSchema.KCLSchema[node.SchemaName] = NewSchemaContent()
+		}
+		
+		// Write the schema declaration
 		kclSchema.KCLSchema[node.SchemaName].Fields.WriteString(fmt.Sprintf("schema %s:\n", node.SchemaName))
-		kclSchema.KCLSchema[node.SchemaName].Fields.WriteString("    not:\n")
-		for _, subschema := range node.SubSchemas {
-			kclSchema.KCLSchema[node.SchemaName].Fields.WriteString(fmt.Sprintf("        - %s\n", subschema.SchemaName))
+		
+		// Process the subschemas for the 'not' type
+		if len(node.SubSchemas) > 0 {
+			// In KCL, we can implement 'not' using a check block with a validation
+			// that ensures the value doesn't match the negated schema
+			kclSchema.KCLSchema[node.SchemaName].Check.WriteString("\n    check:\n")
+			
+			// For each subschema in the 'not', generate a validation that it doesn't match
+			for _, subschema := range node.SubSchemas {
+				// Generate the subschema first
+				g.simplifiedGenerateSchemaFromNode(subschema, kclSchema)
+				
+				// Add a validation that ensures this value doesn't conform to the subschema
+				kclSchema.KCLSchema[node.SchemaName].Check.WriteString(
+					fmt.Sprintf("        not is_%s(self), \"Value must not match schema %s\"\n", 
+						strings.ToLower(subschema.SchemaName), subschema.SchemaName))
+			}
+			
+			// Add helper functions to check against the negated schemas
+			for _, subschema := range node.SubSchemas {
+				kclSchema.KCLSchema[node.SchemaName].Check.WriteString(
+					fmt.Sprintf("\n    is_%s = lambda self -> bool {\n", strings.ToLower(subschema.SchemaName)))
+				kclSchema.KCLSchema[node.SchemaName].Check.WriteString(
+					fmt.Sprintf("        schema = %s {}\n", subschema.SchemaName))
+				kclSchema.KCLSchema[node.SchemaName].Check.WriteString("        try:\n")
+				kclSchema.KCLSchema[node.SchemaName].Check.WriteString("            schema.check(self)\n")
+				kclSchema.KCLSchema[node.SchemaName].Check.WriteString("            return True  # Validation passed, so it matches\n")
+				kclSchema.KCLSchema[node.SchemaName].Check.WriteString("        except:\n")
+				kclSchema.KCLSchema[node.SchemaName].Check.WriteString("            return False  # Validation failed, so it doesn't match\n")
+				kclSchema.KCLSchema[node.SchemaName].Check.WriteString("    }\n")
+			}
 		}
 	}
 }

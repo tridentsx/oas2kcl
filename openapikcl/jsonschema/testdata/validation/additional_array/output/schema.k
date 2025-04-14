@@ -4,7 +4,7 @@ schema Config:
 
 
 schema ConfigAdditionalProps_items:
-    value: int
     id: str
+    value: int
 
 
